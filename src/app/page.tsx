@@ -274,6 +274,16 @@ export default function DashboardPage() {
             </Link>
           </section>
         )}
+
+        {/* Dev Tools - temporary easy access to reset */}
+        <section className="mt-8 pt-4 border-t border-gray-100">
+          <Link
+            href="/reset"
+            className="text-xs text-text-subtle hover:text-brand-primary"
+          >
+            🔧 Reset App (dev)
+          </Link>
+        </section>
       </div>
 
       <BottomNav />
