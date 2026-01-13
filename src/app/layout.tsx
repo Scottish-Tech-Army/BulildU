@@ -38,8 +38,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${montserrat.variable} antialiased`}>
-        {children}
+      <body className={`${montserrat.variable} antialiased bg-gray-100`}>
+        {/* Max-width container for responsive layout */}
+        <div className="max-w-6xl mx-auto bg-brand-surface min-h-dvh shadow-lg">
+          {children}
+        </div>
       </body>
     </html>
   );

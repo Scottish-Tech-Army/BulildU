@@ -10,13 +10,15 @@ import {
   hasCheckedInThisWeek,
   getMomentumDays,
 } from "@/lib/storage";
-import { PrimaryButton } from "@/components/ui/PrimaryButton";
+
 import BottomNav from "@/components/ui/BottomNav";
 import {
   Flame,
-  Target,
   MessageCircle,
   Plus,
+  Sun,
+  Sunset,
+  Moon,
 } from "lucide-react";
 import GoalCard from "@/components/ui/GoalCard";
 import DailyQuote from "@/components/ui/DailyQuote";
@@ -92,10 +94,11 @@ export default function DashboardPage() {
     0
   );
 
-  // Time-based greeting
+  // Time-based greeting with icon
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const GreetingIcon = hour < 12 ? Sun : hour < 18 ? Sunset : Moon;
 
   // Find the next milestone to complete
   const nextMilestone = activeGoals
@@ -116,7 +119,10 @@ export default function DashboardPage() {
       <div className="px-6 pt-8 pb-4">
         {/* Header */}
         <header className="mb-6">
-          <h1 className="text-2xl text-[var(--color-charcoal)] mb-1">{greeting}</h1>
+          <h1 className="text-2xl text-[var(--color-charcoal)] mb-1 flex items-center gap-2">
+            <GreetingIcon className="w-6 h-6 text-brand-primary" />
+            {greeting}
+          </h1>
           <p className="text-text-muted">Small steps, real progress</p>
         </header>
 
@@ -139,45 +145,50 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {/* Quick Stats Row */}
-        {(activeGoals.length > 0 || momentum > 0) && (
-          <section className="mb-6">
-            <div className="grid grid-cols-3 gap-3">
-              {/* Momentum */}
-              <div className="bg-warm-ivory rounded-2xl p-4 text-center">
-                <p className="text-2xl font-bold text-brand-primary flex items-center justify-center gap-1">
-                  {momentum > 0 ? (
-                    <><Flame className="w-5 h-5 text-brand-primary" />{momentum}</>
-                  ) : "—"}
-                </p>
-                <p className="text-xs text-text-muted mt-1">
-                  {momentum === 1 ? "week" : "weeks"}
-                </p>
-              </div>
+        {/* Stats + Quote Row - responsive layout */}
+        <section className="mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {/* Quick Stats - stacks vertically in left column on large screens */}
+            <div className="lg:col-span-1">
+              <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
+                {/* Momentum */}
+                <div className="bg-warm-ivory rounded-2xl p-4 text-center">
+                  <p className="text-2xl font-bold text-brand-primary flex items-center justify-center gap-1">
+                    {momentum > 0 ? (
+                      <><Flame className="w-5 h-5 text-brand-primary" />{momentum}</>
+                    ) : "—"}
+                  </p>
+                  <p className="text-xs text-text-muted mt-1">
+                    {momentum === 1 ? "week" : "weeks"}
+                  </p>
+                </div>
 
-              {/* Active Goals */}
-              <div className="bg-warm-ivory rounded-2xl p-4 text-center">
-                <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                  {activeGoals.length}
-                </p>
-                <p className="text-xs text-text-muted mt-1">
-                  {activeGoals.length === 1 ? "goal" : "goals"}
-                </p>
-              </div>
+                {/* Active Goals */}
+                <div className="bg-warm-ivory rounded-2xl p-4 text-center">
+                  <p className="text-2xl font-bold text-[var(--color-charcoal)]">
+                    {activeGoals.length}
+                  </p>
+                  <p className="text-xs text-text-muted mt-1">
+                    {activeGoals.length === 1 ? "goal" : "goals"}
+                  </p>
+                </div>
 
-              {/* Milestones Progress */}
-              <div className="bg-warm-ivory rounded-2xl p-4 text-center">
-                <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                  {completedMilestones}/{totalMilestones}
-                </p>
-                <p className="text-xs text-text-muted mt-1">done</p>
+                {/* Milestones Progress */}
+                <div className="bg-warm-ivory rounded-2xl p-4 text-center">
+                  <p className="text-2xl font-bold text-[var(--color-charcoal)]">
+                    {completedMilestones}/{totalMilestones}
+                  </p>
+                  <p className="text-xs text-text-muted mt-1">done</p>
+                </div>
               </div>
             </div>
-          </section>
-        )}
 
-        {/* Daily Inspirational Quote */}
-        <DailyQuote />
+            {/* Daily Quote - takes 2 columns on large screens */}
+            <div className="lg:col-span-2 h-full">
+              <DailyQuote className="h-full" />
+            </div>
+          </div>
+        </section>
 
         {/* Next Best Action */}
         {nextMilestone && (
@@ -234,20 +245,18 @@ export default function DashboardPage() {
             </div>
           </section>
         ) : (
-          /* Empty State */
-          <section className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mb-4">
-              <Target className="w-8 h-8 text-brand-primary" />
-            </div>
-            <h2 className="text-xl text-[var(--color-charcoal)] mb-2">
-              Ready to set your first goal?
-            </h2>
-            <p className="text-text-muted mb-6 max-w-xs">
-              Start with something that matters to you. We&apos;ll help you
-              break it down into small, achievable steps.
-            </p>
-            <Link href="/goals/new" className="w-full max-w-xs">
-              <PrimaryButton>Set a goal</PrimaryButton>
+          /* Empty State - simpler dotted line style with explainer */
+          <section className="mb-6">
+            <Link href="/goals/new">
+              <div className="border-2 border-dashed border-warm-ivory rounded-2xl p-6 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-colors">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Plus className="w-5 h-5 text-brand-primary" />
+                  <span className="text-brand-primary">Set your first goal</span>
+                </div>
+                <p className="text-sm text-text-muted">
+                  Start with something that matters to you
+                </p>
+              </div>
             </Link>
           </section>
         )}

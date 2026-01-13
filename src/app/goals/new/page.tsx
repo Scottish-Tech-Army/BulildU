@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FullScreenLayout, PrimaryButton, CelebrationScreen } from "@/components";
 import { BackButton } from "@/components/ui/BackButton";
-import { ProgressBar } from "@/components/ui/ProgressBar";
+import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { TextAreaField } from "@/components/ui/TextAreaField";
 import { MilestoneInput } from "@/components/ui/MilestoneInput";
 import { MilestoneItem } from "@/components/ui/MilestoneItem";
@@ -136,8 +136,9 @@ export default function NewGoalPage() {
   if (step === "done") {
     return (
       <CelebrationScreen
+        progress={100}
         title="Goal created!"
-        subtitle={`You've set a SMART goal with ${draft.milestones.length} milestone${draft.milestones.length !== 1 ? "s" : ""}. Time to take action!`}
+        subtitle={`You've set a goal with ${draft.milestones.length} milestone${draft.milestones.length !== 1 ? "s" : ""}. Time to take action!`}
         buttonText="Go to dashboard"
         onButtonClick={() => router.push("/")}
       />
@@ -147,17 +148,18 @@ export default function NewGoalPage() {
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-sm mx-auto px-6 py-6">
-          {/* Back button */}
-          <div className="mb-4">
-            <BackButton onClick={handleBack} />
-          </div>
+        {/* Back button - outside centered container to stay at far left */}
+        <div className="px-6 pt-6 pb-2">
+          <BackButton onClick={handleBack} />
+        </div>
+        
+        <div className="max-w-sm mx-auto px-6 pb-6">
 
-          {/* Progress bar */}
-          <ProgressBar progress={((currentStepIndex + 1) / totalSteps) * 100} />
-          <p className="text-sm text-[var(--color-text-muted)] text-center mt-2 mb-6">
-            Step {currentStepIndex + 1} of {totalSteps}
-          </p>
+          {/* Progress display */}
+          <ProgressDisplay 
+            progress={Math.round((currentStepIndex / totalSteps) * 100)}
+            label={`Step ${currentStepIndex + 1} of ${totalSteps}`}
+          />
 
           <div className="flex-1">
             {/* Step 1: Relevant (Why) */}
@@ -366,7 +368,7 @@ export default function NewGoalPage() {
               <div className="space-y-6">
                 <div>
                   <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    Review your SMART Goal
+                    Review your Goal
                   </h1>
                   <p className="text-[var(--color-text-muted)]">
                     Make sure clearly defined and achievable.

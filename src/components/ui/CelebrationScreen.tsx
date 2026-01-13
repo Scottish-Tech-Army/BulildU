@@ -39,6 +39,8 @@ export function CelebrationScreen({
   const [displayValue, setDisplayValue] = useState(0);
   const animationRef = useRef<number | null>(null);
   const hasCompletedRef = useRef(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Animate count-up and fire confetti when complete
   useEffect(() => {
@@ -56,21 +58,29 @@ export function CelebrationScreen({
 
       if (progressRatio < 1) {
         animationRef.current = requestAnimationFrame(animate);
-      } else if (!hasCompletedRef.current) {
-        // Animation complete - fire confetti!
+      } else if (!hasCompletedRef.current && canvasRef.current) {
+        // Animation complete - fire confetti from canvas scoped to content!
         hasCompletedRef.current = true;
-        confetti({
+        
+        const myConfetti = confetti.create(canvasRef.current, {
+          resize: true,
+          useWorker: true,
+        });
+        
+        // Fire from left
+        myConfetti({
           particleCount: 30,
           angle: 60,
           spread: 70,
-          origin: { x: 0, y: 0.6 },
+          origin: { x: 0, y: 0.5 },
           colors: ["#bc03b9", "#ffffff", "#efebee"],
         });
-        confetti({
+        // Fire from right
+        myConfetti({
           particleCount: 30,
           angle: 120,
           spread: 70,
-          origin: { x: 1, y: 0.6 },
+          origin: { x: 1, y: 0.5 },
           colors: ["#bc03b9", "#ffffff", "#efebee"],
         });
       }
@@ -88,31 +98,40 @@ export function CelebrationScreen({
   return (
     <div className="min-h-dvh bg-brand-primary flex flex-col">
       {/* Main content - centered */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+      <div 
+        ref={contentRef}
+        className="flex-1 flex flex-col items-center justify-center px-6 text-center relative"
+      >
+        {/* Scoped confetti canvas */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+        />
+        
         {/* Animated progress percentage */}
         {progress !== undefined && (
-          <div className="text-8xl font-light text-white mb-8">
+          <div className="text-8xl font-light text-white mb-8 relative z-10">
             {displayValue}%
           </div>
         )}
 
         {/* Icon badge (optional) */}
         {Icon && (
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-8">
+          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-8 relative z-10">
             <Icon className="w-10 h-10 text-white" />
           </div>
         )}
 
         {/* Title */}
-        <h1 className="text-3xl text-white mb-6">{title}</h1>
+        <h1 className="text-3xl text-white mb-6 relative z-10">{title}</h1>
 
         {/* Subtitle */}
         {subtitle && (
-          <p className="text-white/90 mb-8 max-w-xs">{subtitle}</p>
+          <p className="text-white/90 mb-8 max-w-xs relative z-10">{subtitle}</p>
         )}
 
         {/* Custom content slot */}
-        {children && <div className="mt-4">{children}</div>}
+        {children && <div className="mt-4 relative z-10">{children}</div>}
       </div>
 
       {/* Sticky bottom CTA */}

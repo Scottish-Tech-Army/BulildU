@@ -29,7 +29,11 @@ function getTodayDateString(): string {
  * Caches the quote in localStorage for the day to minimize API calls.
  * Includes required attribution per ZenQuotes API terms.
  */
-export default function DailyQuote() {
+interface DailyQuoteProps {
+  className?: string;
+}
+
+export default function DailyQuote({ className = "" }: DailyQuoteProps) {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -83,8 +87,8 @@ export default function DailyQuote() {
 
   if (isLoading) {
     return (
-      <section className="mb-6">
-        <div className="bg-warm-ivory rounded-2xl p-5">
+      <section className={`${className}`}>
+        <div className="bg-warm-ivory rounded-2xl py-8 px-12 h-full">
           <div className="animate-pulse flex gap-4">
             <div className="w-8 h-8 bg-white rounded"></div>
             <div className="flex-1">
@@ -102,11 +106,11 @@ export default function DailyQuote() {
   }
 
   return (
-    <section className="mb-6">
+    <section className={`flex flex-col ${className}`}>
       <h2 className="text-sm text-text-muted uppercase tracking-wide mb-3">
         Daily Inspiration
       </h2>
-      <div className="bg-warm-ivory rounded-2xl p-5">
+      <div className="bg-warm-ivory rounded-2xl py-8 px-12 flex-1 flex flex-col justify-center">
         <div className="flex gap-4">
           <QuoteIcon className="w-8 h-8 text-brand-primary flex-shrink-0" fill="currentColor" />
           <div>
