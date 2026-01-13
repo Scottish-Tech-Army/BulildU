@@ -1,6 +1,6 @@
 "use client";
 
-import { Goal, getGoalProgress } from "@/lib/storage";
+import { Goal } from "@/lib/storage";
 
 interface GoalProgressCardProps {
   goal: Goal;
@@ -15,30 +15,22 @@ export function GoalProgressCard({
   goal,
   onMilestoneToggle,
 }: GoalProgressCardProps) {
-  const progress = getGoalProgress(goal);
   const completedCount = goal.milestones.filter((m) => m.completed).length;
   const totalMilestones = goal.milestones.length;
 
   return (
     <div className="bg-white rounded-2xl p-4 border border-gray-100">
       {/* Goal Header - matches GoalCard layout */}
-      <div className="flex items-start justify-between gap-4 mb-4">
-        {/* Left: Milestones count, Title, and Category */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-500 mb-1">
-            {completedCount}/{totalMilestones} milestones
-          </p>
-          <h3 className="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
-            {goal.title}
-          </h3>
-          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warm-ivory text-text-muted">
-            {goal.category}
-          </span>
-        </div>
-
-        {/* Right: Large percentage */}
-        <span className="text-2xl font-bold text-brand-primary">
-          {progress}%
+      <div className="mb-4">
+        {/* Milestones count, Title, and Category */}
+        <p className="text-sm text-gray-500 mb-1">
+          {completedCount}/{totalMilestones} milestones
+        </p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
+          {goal.title}
+        </h3>
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warm-ivory text-text-muted">
+          {goal.category}
         </span>
       </div>
 

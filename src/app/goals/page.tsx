@@ -1,25 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Goal, getGoals } from "@/lib/storage";
 import GoalCard from "@/components/ui/GoalCard";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import BottomNav from "@/components/ui/BottomNav";
-import { BackButton } from "@/components/ui/BackButton";
+
 import { Target, Plus } from "lucide-react";
 
 /**
  * Goals list page - Shows all goals with option to create new
  */
 export default function GoalsPage() {
-  const [goals, setGoals] = useState<Goal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setGoals(getGoals());
-    setIsLoading(false);
-  }, []);
+  const [goals] = useState<Goal[]>(() => getGoals());
+  const [isLoading] = useState(() => false);
 
   if (isLoading) {
     return (
@@ -38,10 +33,7 @@ export default function GoalsPage() {
       <div className="px-6 pt-8 pb-4">
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <BackButton href="/" />
-            <h1 className="text-2xl text-gray-900">Goals</h1>
-          </div>
+          <h1 className="text-2xl text-gray-900">Goals</h1>
           <Link
             href="/goals/new"
             className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-brand-primary text-brand-primary hover:bg-brand-primary/5 transition-colors"

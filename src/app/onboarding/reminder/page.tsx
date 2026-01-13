@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FullScreenLayout, PrimaryButton, CelebrationScreen } from "@/components";
-import { BackButton } from "@/components/ui/BackButton";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { TimeOption } from "@/components/ui/TimeOption";
 import { completeOnboarding, saveOnboardingState } from "@/lib/storage";
@@ -60,9 +59,18 @@ export default function ReminderPage() {
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-sm mx-auto px-6 py-6">
-          {/* Back button */}
-          <div className="mb-4">
-            <BackButton href="/onboarding/baseline" />
+          {/* Header with Cancel */}
+          <div className="flex items-center mb-4">
+            <button
+              onClick={() => router.push("/onboarding/welcome")}
+              className="text-brand-primary text-sm"
+            >
+              Cancel
+            </button>
+            <span className="flex-1 text-center text-2xl text-[var(--color-charcoal)]">
+              Reminder Setup
+            </span>
+            <div className="w-12" />
           </div>
 
           {/* Large animated progress percentage - 5/6 complete */}
@@ -109,9 +117,18 @@ export default function ReminderPage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <PrimaryButton onClick={handleComplete} disabled={!canContinue}>
-          Complete setup
-        </PrimaryButton>
+        <div className="flex items-center gap-4">
+          <div className="w-1/2 flex justify-start">
+            <PrimaryButton onClick={() => router.push("/onboarding/baseline")} variant="secondary" className="w-full">
+              BACK
+            </PrimaryButton>
+          </div>
+          <div className="w-1/2 flex justify-end">
+            <PrimaryButton onClick={handleComplete} disabled={!canContinue} className="w-full">
+              Complete setup
+            </PrimaryButton>
+          </div>
+        </div>
       </FullScreenLayout.Footer>
     </FullScreenLayout>
   );

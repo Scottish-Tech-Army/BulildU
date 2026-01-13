@@ -61,7 +61,7 @@ interface FooterProps {
 function Footer({ children }: FooterProps) {
   return (
     <div className="sticky bottom-0 p-6 pb-safe bg-white border-t border-gray-100">
-      <div className="max-w-sm mx-auto">{children}</div>
+      {children}
     </div>
   );
 }

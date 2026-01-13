@@ -8,6 +8,7 @@ import { RatingScale } from "@/components/ui/RatingScale";
 import { GoalProgressCard } from "@/components/ui/GoalProgressCard";
 import { TextAreaField } from "@/components/ui/TextAreaField";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
+import { StepHeader } from "@/components/ui/StepHeader";
 import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 import { BackButton } from "@/components/ui/BackButton";
 import {
@@ -172,14 +173,10 @@ export default function CheckInPage() {
           {/* Step: Energy Check */}
           {step === "energy" && (
             <div className="space-y-8">
-              <div>
-                <h1 className="text-2xl text-gray-900 mb-2">
-                  How&apos;s your energy this week?
-                </h1>
-                <p className="text-gray-500">
-                  Take a moment to check in with yourself.
-                </p>
-              </div>
+              <StepHeader
+                title="How's your energy this week?"
+                subtitle="Take a moment to check in with yourself."
+              />
 
               <RatingScale
                 value={draft.energyLevel}
@@ -213,14 +210,10 @@ export default function CheckInPage() {
           {/* Step: Goal Progress */}
           {step === "goals" && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl text-gray-900 mb-2">
-                  Review your progress
-                </h1>
-                <p className="text-gray-500">
-                  Mark any milestones you&apos;ve completed this week.
-                </p>
-              </div>
+              <StepHeader
+                title="Review your progress"
+                subtitle="Mark any milestones you've completed this week."
+              />
 
               <div className="space-y-4">
                 {goals.map((goal) => (
@@ -239,14 +232,10 @@ export default function CheckInPage() {
           {/* Step: Reflection */}
           {step === "reflection" && (
             <div className="space-y-6">
-              <div>
-                <h1 className="text-2xl text-gray-900 mb-2">
-                  What went well this week?
-                </h1>
-                <p className="text-gray-500">
-                  Celebrating small wins builds momentum.
-                </p>
-              </div>
+              <StepHeader
+                title="What went well this week?"
+                subtitle="Celebrating small wins builds momentum."
+              />
 
               <TextAreaField
                 label=""

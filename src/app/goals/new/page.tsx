@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FullScreenLayout, PrimaryButton, CelebrationScreen } from "@/components";
-import { BackButton } from "@/components/ui/BackButton";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { TextAreaField } from "@/components/ui/TextAreaField";
 import { MilestoneInput } from "@/components/ui/MilestoneInput";
 import { MilestoneItem } from "@/components/ui/MilestoneItem";
 import { RatingScale } from "@/components/ui/RatingScale";
+import { StepHeader } from "@/components/ui/StepHeader";
 import { GoalCategory, createGoal, generateId } from "@/lib/storage";
 import { Lightbulb, Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, DollarSign, Home, Sprout, HeartPulse } from "lucide-react";
 
@@ -151,9 +151,16 @@ export default function NewGoalPage() {
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
-        {/* Back button - outside centered container to stay at far left */}
-        <div className="px-6 pt-6 pb-2">
-          <BackButton onClick={handleBack} />
+        {/* Header with Cancel and centered title */}
+        <div className="px-6 pt-6 pb-2 flex items-center">
+          <button
+            onClick={() => router.back()}
+            className="text-brand-primary text-sm"
+          >
+            Cancel
+          </button>
+          <span className="flex-1 text-center text-3xl text-[var(--color-charcoal)]">Create Goal</span>
+          <div className="w-14" />
         </div>
         
         <div className="max-w-sm lg:max-w-2xl mx-auto px-6 pb-6">
@@ -168,14 +175,10 @@ export default function NewGoalPage() {
             {/* Step 1: Relevant (Why) */}
             {step === "why" && (
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    Why does this goal matter to you?
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    (Relevant) Understanding your &quot;why&quot; helps you stay motivated when things get tough.
-                  </p>
-                </div>
+              <StepHeader
+                title="Why does this goal matter to you?"
+                subtitle="(Relevant) Understanding your 'why' helps you stay motivated when things get tough."
+              />
                 <TextAreaField
                   label=""
                   placeholder="I want to achieve this because..."
@@ -191,14 +194,10 @@ export default function NewGoalPage() {
             {/* Step 2: Category */}
             {step === "category" && (
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    What area of life is this goal for?
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    Choose a category to help organise your goals.
-                  </p>
-                </div>
+              <StepHeader
+                title="What area of life is this goal for?"
+                subtitle="Choose a category to help organise your goals."
+              />
                 <div className="grid grid-cols-2 gap-3">
                   {([
                     { value: "Health" as GoalCategory, label: "Health", icon: HeartPulse },
@@ -233,14 +232,10 @@ export default function NewGoalPage() {
             {/* Step 3: Specific (Title) */}
             {step === "title" && (
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    What is your specific goal?
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    (Specific) Keep it clear and simple. You can add more details later.
-                  </p>
-                </div>
+              <StepHeader
+                title="What is your specific goal?"
+                subtitle="(Specific) Keep it clear and simple. You can add more details later."
+              />
                 <div className="space-y-2">
                   <input
                     type="text"
@@ -257,14 +252,10 @@ export default function NewGoalPage() {
             {/* Step 3: Measurable */}
             {step === "measurable" && (
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    How will you know you&apos;ve achieved it?
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    (Measurable) Define what success looks like.
-                  </p>
-                </div>
+              <StepHeader
+                title="How will you know you've achieved it?"
+                subtitle="(Measurable) Define what success looks like."
+              />
                 <TextAreaField
                   label=""
                   placeholder="I will know I've succeeded when..."
@@ -280,14 +271,10 @@ export default function NewGoalPage() {
             {/* Step 4: Achievable */}
             {step === "achievable" && (
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    Is this achievable for you right now?
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    (Achievable) Rate your confidence level. If it&apos;s low, consider scaling back.
-                  </p>
-                </div>
+              <StepHeader
+                title="Is this achievable for you right now?"
+                subtitle="(Achievable) Rate your confidence level. If it's low, consider scaling back."
+              />
                 
                 <div className="py-4">
                   <RatingScale
@@ -304,14 +291,10 @@ export default function NewGoalPage() {
             {/* Step 5: Time-bound */}
             {step === "targetDate" && (
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    When would you like to achieve this by?
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    (Time-bound) A deadline helps you stay focused.
-                  </p>
-                </div>
+              <StepHeader
+                title="When would you like to achieve this by?"
+                subtitle="(Time-bound) A deadline helps you stay focused."
+              />
 
                 {/* Suggested timeframes */}
                 <div className="space-y-3">
@@ -367,14 +350,10 @@ export default function NewGoalPage() {
             {/* Step 6: Milestones */}
             {step === "milestones" && (
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    Let&apos;s break it down
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    Create your first milestone to get started. Aim for something you can do in 1-2 weeks.
-                  </p>
-                </div>
+              <StepHeader
+                title="Let's break it down"
+                subtitle="Create your first milestone to get started. Aim for something you can do in 1-2 weeks."
+              />
 
                 <MilestoneInput onAdd={addMilestone} />
 
@@ -550,9 +529,20 @@ export default function NewGoalPage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <PrimaryButton onClick={handleNext} disabled={!canProceed()}>
-          {step === "confirm" ? "Confirm & Create Goal" : "Next"}
-        </PrimaryButton>
+        <div className="flex items-center gap-4">
+          <div className="w-1/2 flex justify-start">
+            {currentStepIndex > 0 && (
+              <PrimaryButton onClick={handleBack} variant="secondary" className="w-full">
+                BACK
+              </PrimaryButton>
+            )}
+          </div>
+          <div className="w-1/2 flex justify-end">
+            <PrimaryButton onClick={handleNext} disabled={!canProceed()} className="w-full">
+              {step === "confirm" ? "Create Goal" : "Next"}
+            </PrimaryButton>
+          </div>
+        </div>
       </FullScreenLayout.Footer>
     </FullScreenLayout>
   );

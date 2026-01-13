@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/ui/BottomNav";
-import { BackButton } from "@/components/ui/BackButton";
+
 import {
   getBaselineResponse,
   getCheckIns,
@@ -124,8 +124,7 @@ export default function ProgressPage() {
     <div className="min-h-dvh bg-brand-surface pb-20">
       <div className="px-6 pt-8 pb-4">
         {/* Header */}
-        <header className="flex items-center gap-3 mb-6">
-          <BackButton href="/" />
+        <header className="mb-6">
           <h1 className="text-2xl text-[var(--color-charcoal)]">Progress</h1>
         </header>
 
@@ -211,159 +210,98 @@ export default function ProgressPage() {
               </section>
             )}
 
+            {/* Goals Progress + Where You Stand Now - responsive two-column layout */}
             <section className="mb-6">
-              <h2 className="text-xs font-medium text-text-muted mb-3">
-                Goals Progress
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-warm-ivory rounded-2xl p-4 text-center aspect-square flex flex-col items-center justify-center">
-                  <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                    {completedGoals.length}
-                  </p>
-                  <p className="text-xs text-text-muted mt-1">Goals completed</p>
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                {/* Left column: Goals Progress stats stacked - slimmer */}
+                <div className="lg:col-span-1">
+                  <h2 className="text-xs font-medium text-text-muted mb-1">
+                    Goals Progress
+                  </h2>
+                  <p className="text-xs text-text-subtle mb-3">your journey so far</p>
+                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+                    <div className="bg-warm-ivory rounded-2xl p-4 text-center aspect-square flex flex-col items-center justify-center">
+                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
+                        {completedGoals.length}
+                      </p>
+                      <p className="text-xs text-text-muted mt-1">Goals completed</p>
+                    </div>
+                    <div className="bg-warm-ivory rounded-2xl p-4 text-center aspect-square flex flex-col items-center justify-center">
+                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
+                        {completedMilestones}/{totalMilestones}
+                      </p>
+                      <p className="text-xs text-text-muted mt-1">Milestones done</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-warm-ivory rounded-2xl p-4 text-center aspect-square flex flex-col items-center justify-center">
-                  <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                    {completedMilestones}/{totalMilestones}
-                  </p>
-                  <p className="text-xs text-text-muted mt-1">Milestones done</p>
-                </div>
+
+                {/* Right column: Where You Stand Now - 3x2 grid - wider */}
+                {hasBaseline && (
+                  <div className="lg:col-span-3">
+                    <h2 className="text-xs font-medium text-text-muted mb-1">
+                      Where You Stand Now
+                    </h2>
+                    <p className="text-xs text-text-subtle mb-3">vs where you started</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      {impactMeasures
+                        .filter((m) => m.baseline !== undefined)
+                        .map((measure) => {
+                          const IconComponent = measure.icon;
+                          const baselineValue = measure.baseline!;
+                          const currentValue = measure.current;
+                          
+                          // Show current value if available, otherwise baseline
+                          const displayValue = currentValue !== undefined && currentValue !== null
+                            ? Math.round(currentValue)
+                            : baselineValue;
+                          
+                          // Calculate delta from baseline if current data exists
+                          let deltaDisplay = null;
+                          if (currentValue !== undefined && currentValue !== null) {
+                            const delta = currentValue - baselineValue;
+                            if (Math.round(delta) !== 0) {
+                              const sign = delta > 0 ? "+" : "";
+                              const arrow = delta > 0 ? "↑" : "↓";
+                              deltaDisplay = `${arrow} ${sign}${Math.round(delta)}`;
+                            }
+                          }
+                          
+                          return (
+                          <div
+                            key={measure.label}
+                            className="bg-warm-ivory rounded-2xl p-3 text-center aspect-square flex flex-col items-center justify-center"
+                          >
+                            {/* Icon and stat in a row */}
+                            <div className="flex items-center justify-center gap-1">
+                              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-4 border-warm-ivory flex-shrink-0">
+                                <IconComponent className="w-5 h-5 text-brand-primary" />
+                              </div>
+                              <span className="text-4xl font-bold text-brand-primary">
+                                {displayValue}
+                              </span>
+                            </div>
+                            <p className="text-xs text-text-muted mt-1 leading-tight">{measure.label}</p>
+                            {deltaDisplay && (
+                              <p className="text-xs text-brand-primary mt-1 font-medium">
+                                {deltaDisplay}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-xs text-text-subtle text-center mt-3">
+                      Baseline recorded{" "}
+                      {new Date(baseline.completedAt!).toLocaleDateString("en-AU", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                )}
               </div>
             </section>
-
-            {/* Energy Level */}
-            {recentCheckIns.length > 0 && (
-              <section className="mb-6">
-                <h2 className="text-xs font-medium text-text-muted mb-1">
-                  This Week&apos;s Energy
-                </h2>
-                <p className="text-xs text-text-subtle mb-3">vs last check-in</p>
-                <div className="bg-warm-ivory rounded-2xl p-5 text-center">
-                  {(() => {
-                    // Get most recent check-in
-                    const latest = recentCheckIns[recentCheckIns.length - 1];
-                    const currentEnergy = latest.energyLevel;
-                    
-                    // Get previous check-in for comparison, or fall back to baseline
-                    const previous = recentCheckIns.length > 1 
-                      ? recentCheckIns[recentCheckIns.length - 2] 
-                      : null;
-                    
-                    // Compare to previous check-in if available, otherwise compare to baseline
-                    const previousEnergy = previous 
-                      ? previous.energyLevel 
-                      : baseline.energyLevel;
-                    
-                    const delta = previousEnergy !== undefined ? currentEnergy - previousEnergy : null;
-                    const comparisonLabel = previous ? "from last week" : "from baseline";
-                    
-                    // Determine trend indicator
-                    let trendIcon: string;
-                    let trendLabel: string;
-                    
-                    if (delta === null) {
-                      trendIcon = "";
-                      trendLabel = "No previous data";
-                    } else if (delta > 0) {
-                      trendIcon = "↑";
-                      trendLabel = `+${delta} ${comparisonLabel}`;
-                    } else if (delta < 0) {
-                      trendIcon = "↓";
-                      trendLabel = `${delta} ${comparisonLabel}`;
-                    } else {
-                      trendIcon = "";
-                      trendLabel = `Same as ${previous ? "last week" : "baseline"}`;
-                    }
-                    
-                    return (
-                      <>
-                        <div className="flex items-center justify-center gap-3">
-                          <span className="text-5xl font-light text-brand-primary">
-                            {currentEnergy}
-                          </span>
-                          {trendIcon && (
-                            <span className="text-3xl text-brand-primary">
-                              {trendIcon}
-                            </span>
-                          )}
-                        </div>
-                        {trendLabel && (
-                          <p className="text-sm text-text-muted mt-2">
-                            {trendLabel}
-                          </p>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-              </section>
-            )}
-
-            {/* Impact Measures (Baseline Comparison) */}
-            {hasBaseline && (
-              <section className="mb-6">
-                <h2 className="text-xs font-medium text-text-muted mb-1">
-                  Where You Stand Now
-                </h2>
-                <p className="text-xs text-text-subtle mb-3">vs where you started</p>
-                <div className="grid grid-cols-3 gap-4">
-                  {impactMeasures
-                    .filter((m) => m.baseline !== undefined)
-                    .map((measure) => {
-                      const IconComponent = measure.icon;
-                      const baselineValue = measure.baseline!;
-                      const currentValue = measure.current;
-                      
-                      // Show current value if available, otherwise baseline
-                      const displayValue = currentValue !== undefined && currentValue !== null
-                        ? Math.round(currentValue)
-                        : baselineValue;
-                      
-                      // Calculate delta from baseline if current data exists
-                      let deltaDisplay = null;
-                      if (currentValue !== undefined && currentValue !== null) {
-                        const delta = currentValue - baselineValue;
-                        if (Math.round(delta) !== 0) {
-                          const sign = delta > 0 ? "+" : "";
-                          const arrow = delta > 0 ? "↑" : "↓";
-                          deltaDisplay = `${arrow} ${sign}${Math.round(delta)}`;
-                        }
-                      }
-                      
-                      return (
-                      <div
-                        key={measure.label}
-                        className="bg-warm-ivory rounded-2xl p-3 text-center aspect-square flex flex-col items-center justify-center"
-                      >
-                        {/* Icon and stat in a row */}
-                        <div className="flex items-center justify-center gap-1">
-                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-4 border-warm-ivory flex-shrink-0">
-                            <IconComponent className="w-5 h-5 text-brand-primary" />
-                          </div>
-                          <span className="text-4xl font-bold text-brand-primary">
-                            {displayValue}
-                          </span>
-                        </div>
-                        <p className="text-xs text-text-muted mt-1 leading-tight">{measure.label}</p>
-                        {deltaDisplay && (
-                          <p className="text-xs text-brand-primary mt-1 font-medium">
-                            {deltaDisplay}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-                <p className="text-xs text-text-subtle text-center mt-3">
-                  Baseline recorded{" "}
-                  {new Date(baseline.completedAt!).toLocaleDateString("en-AU", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-              </section>
-            )}
           </>
         )}
       </div>

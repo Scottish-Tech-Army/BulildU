@@ -8,7 +8,6 @@ import {
   RatingScale,
   ChoiceChips,
 } from "@/components";
-import { BackButton } from "@/components/ui/BackButton";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import {
   saveBaselineResponse,
@@ -91,9 +90,11 @@ export default function BaselinePage() {
   const handleBack = () => {
     if (currentSection > 0) {
       setCurrentSection(currentSection - 1);
-    } else {
-      router.push("/onboarding/welcome");
     }
+  };
+
+  const handleCancel = () => {
+    router.push("/onboarding/welcome");
   };
 
   const section = SECTIONS[currentSection];
@@ -121,9 +122,18 @@ export default function BaselinePage() {
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-sm mx-auto px-6 py-6">
-          {/* Back button */}
-          <div className="mb-4">
-            <BackButton onClick={handleBack} />
+          {/* Header with Cancel */}
+          <div className="flex items-center mb-4">
+            <button
+              onClick={handleCancel}
+              className="text-brand-primary text-sm"
+            >
+              Cancel
+            </button>
+            <span className="flex-1 text-center text-2xl text-[var(--color-charcoal)]">
+              Baseline Quiz
+            </span>
+            <div className="w-12" />
           </div>
 
           {/* Large animated progress percentage */}
@@ -309,9 +319,20 @@ export default function BaselinePage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <PrimaryButton onClick={handleNext} disabled={!isSectionComplete()}>
-          {isLastSection ? "Continue" : "Next"}
-        </PrimaryButton>
+        <div className="flex items-center gap-4">
+          <div className="w-1/2 flex justify-start">
+            {currentSection > 0 && (
+              <PrimaryButton onClick={handleBack} variant="secondary" className="w-full">
+                BACK
+              </PrimaryButton>
+            )}
+          </div>
+          <div className="w-1/2 flex justify-end">
+            <PrimaryButton onClick={handleNext} disabled={!isSectionComplete()} className="w-full">
+              {isLastSection ? "Continue" : "Next"}
+            </PrimaryButton>
+          </div>
+        </div>
       </FullScreenLayout.Footer>
     </FullScreenLayout>
   );

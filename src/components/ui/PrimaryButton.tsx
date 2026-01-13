@@ -6,8 +6,8 @@ interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   /** Full width button (default: true) */
   fullWidth?: boolean;
-  /** Button variant: 'default' (magenta) or 'white' (for gradient backgrounds) */
-  variant?: "default" | "white";
+  /** Button variant: 'default' (magenta), 'white' (for gradients), or 'secondary' (outlined) */
+  variant?: "default" | "white" | "secondary";
 }
 
 /**
@@ -35,10 +35,11 @@ export function PrimaryButton({
 }: PrimaryButtonProps) {
   const isDisabled = disabled || loading;
 
-  const variantStyles =
-    variant === "white"
-      ? "bg-white text-[var(--color-magenta)]"
-      : "bg-[var(--color-magenta)] text-white";
+  const variantStyles = {
+    default: "bg-[var(--color-magenta)] text-white",
+    white: "bg-white text-[var(--color-magenta)]",
+    secondary: "bg-transparent border-2 border-[var(--color-magenta)] text-[var(--color-magenta)]",
+  }[variant];
 
   return (
     <button
