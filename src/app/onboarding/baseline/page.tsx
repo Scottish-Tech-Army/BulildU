@@ -307,14 +307,14 @@ export default function BaselinePage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-2">
           <div className="w-24">
             {currentSection > 0 && (
               <button
                 onClick={handleBack}
                 className="py-3 text-brand-primary font-medium flex items-center gap-1"
               >
-                ← BACK
+                ← Back
               </button>
             )}
           </div>
@@ -323,7 +323,7 @@ export default function BaselinePage() {
             disabled={!isSectionComplete()}
             className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLastSection ? "CONTINUE" : "NEXT"} →
+            {isLastSection ? "Continue" : "Next"} →
           </button>
         </div>
       </FullScreenLayout.Footer>

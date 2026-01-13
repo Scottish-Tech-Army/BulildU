@@ -106,19 +106,19 @@ export default function ReminderPage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-2">
           <button
             onClick={() => router.push("/onboarding/baseline")}
             className="py-3 text-brand-primary font-medium flex items-center gap-1"
           >
-            ← BACK
+            ← Back
           </button>
           <button
             onClick={handleComplete}
             disabled={!canContinue}
             className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            COMPLETE →
+            Complete →
           </button>
         </div>
       </FullScreenLayout.Footer>

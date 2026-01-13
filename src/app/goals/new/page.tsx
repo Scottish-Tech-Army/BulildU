@@ -520,14 +520,14 @@ export default function NewGoalPage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-2">
           <div className="w-24">
             {currentStepIndex > 0 && (
               <button
                 onClick={handleBack}
                 className="py-3 text-brand-primary font-medium flex items-center gap-1"
               >
-                ← BACK
+                ← Back
               </button>
             )}
           </div>
@@ -536,7 +536,7 @@ export default function NewGoalPage() {
             disabled={!canProceed()}
             className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {step === "confirm" ? "CREATE GOAL" : "NEXT"} →
+            {step === "confirm" ? "Create Goal" : "Next"} →
           </button>
         </div>
       </FullScreenLayout.Footer>
