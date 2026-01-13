@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FullScreenLayout, PrimaryButton, CelebrationScreen } from "@/components";
+import { FullScreenLayout, CelebrationScreen } from "@/components";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { TextAreaField } from "@/components/ui/TextAreaField";
 import { MilestoneInput } from "@/components/ui/MilestoneInput";
@@ -520,19 +520,24 @@ export default function NewGoalPage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <div className="flex items-center gap-4">
-          <div className="w-1/2 flex justify-start">
+        <div className="flex items-center justify-between">
+          <div className="w-24">
             {currentStepIndex > 0 && (
-              <PrimaryButton onClick={handleBack} variant="secondary" className="w-full">
-                BACK
-              </PrimaryButton>
+              <button
+                onClick={handleBack}
+                className="py-3 text-brand-primary font-medium flex items-center gap-1"
+              >
+                ← BACK
+              </button>
             )}
           </div>
-          <div className="w-1/2 flex justify-end">
-            <PrimaryButton onClick={handleNext} disabled={!canProceed()} className="w-full">
-              {step === "confirm" ? "Create Goal" : "Next"}
-            </PrimaryButton>
-          </div>
+          <button
+            onClick={handleNext}
+            disabled={!canProceed()}
+            className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {step === "confirm" ? "CREATE GOAL" : "NEXT"} →
+          </button>
         </div>
       </FullScreenLayout.Footer>
     </FullScreenLayout>

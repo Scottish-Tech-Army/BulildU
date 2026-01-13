@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FullScreenLayout, PrimaryButton, CelebrationScreen } from "@/components";
+import { FullScreenLayout, CelebrationScreen } from "@/components";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { WizardHeader } from "@/components/ui/WizardHeader";
 import { TimeOption } from "@/components/ui/TimeOption";
@@ -106,17 +106,20 @@ export default function ReminderPage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <div className="flex items-center gap-4">
-          <div className="w-1/2 flex justify-start">
-            <PrimaryButton onClick={() => router.push("/onboarding/baseline")} variant="secondary" className="w-full">
-              BACK
-            </PrimaryButton>
-          </div>
-          <div className="w-1/2 flex justify-end">
-            <PrimaryButton onClick={handleComplete} disabled={!canContinue} className="w-full">
-              Complete setup
-            </PrimaryButton>
-          </div>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => router.push("/onboarding/baseline")}
+            className="py-3 text-brand-primary font-medium flex items-center gap-1"
+          >
+            ← BACK
+          </button>
+          <button
+            onClick={handleComplete}
+            disabled={!canContinue}
+            className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            COMPLETE →
+          </button>
         </div>
       </FullScreenLayout.Footer>
     </FullScreenLayout>

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   FullScreenLayout,
-  PrimaryButton,
   RatingScale,
   ChoiceChips,
 } from "@/components";
@@ -308,19 +307,24 @@ export default function BaselinePage() {
       </div>
 
       <FullScreenLayout.Footer>
-        <div className="flex items-center gap-4">
-          <div className="w-1/2 flex justify-start">
+        <div className="flex items-center justify-between">
+          <div className="w-24">
             {currentSection > 0 && (
-              <PrimaryButton onClick={handleBack} variant="secondary" className="w-full">
-                BACK
-              </PrimaryButton>
+              <button
+                onClick={handleBack}
+                className="py-3 text-brand-primary font-medium flex items-center gap-1"
+              >
+                ← BACK
+              </button>
             )}
           </div>
-          <div className="w-1/2 flex justify-end">
-            <PrimaryButton onClick={handleNext} disabled={!isSectionComplete()} className="w-full">
-              {isLastSection ? "Continue" : "Next"}
-            </PrimaryButton>
-          </div>
+          <button
+            onClick={handleNext}
+            disabled={!isSectionComplete()}
+            className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLastSection ? "CONTINUE" : "NEXT"} →
+          </button>
         </div>
       </FullScreenLayout.Footer>
     </FullScreenLayout>
