@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FullScreenLayout, PrimaryButton, CelebrationScreen } from "@/components";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
+import { WizardHeader } from "@/components/ui/WizardHeader";
 import { TimeOption } from "@/components/ui/TimeOption";
 import { completeOnboarding, saveOnboardingState } from "@/lib/storage";
 import { Sunrise, Sunset } from "lucide-react";
@@ -59,19 +60,7 @@ export default function ReminderPage() {
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-sm mx-auto px-6 py-6">
-          {/* Header with Cancel */}
-          <div className="flex items-center mb-4">
-            <button
-              onClick={() => router.push("/onboarding/welcome")}
-              className="text-brand-primary text-sm"
-            >
-              Cancel
-            </button>
-            <span className="flex-1 text-center text-2xl text-[var(--color-charcoal)]">
-              Reminder Setup
-            </span>
-            <div className="w-12" />
-          </div>
+          <WizardHeader title="Reminder Setup" onCancel={() => router.push("/onboarding/welcome")} />
 
           {/* Large animated progress percentage - 5/6 complete */}
           <ProgressDisplay 

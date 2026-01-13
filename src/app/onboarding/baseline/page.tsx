@@ -9,6 +9,7 @@ import {
   ChoiceChips,
 } from "@/components";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
+import { WizardHeader } from "@/components/ui/WizardHeader";
 import {
   saveBaselineResponse,
   completeBaseline,
@@ -122,19 +123,7 @@ export default function BaselinePage() {
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-sm mx-auto px-6 py-6">
-          {/* Header with Cancel */}
-          <div className="flex items-center mb-4">
-            <button
-              onClick={handleCancel}
-              className="text-brand-primary text-sm"
-            >
-              Cancel
-            </button>
-            <span className="flex-1 text-center text-2xl text-[var(--color-charcoal)]">
-              Baseline Quiz
-            </span>
-            <div className="w-12" />
-          </div>
+          <WizardHeader title="Baseline Quiz" onCancel={handleCancel} />
 
           {/* Large animated progress percentage */}
           <ProgressDisplay 

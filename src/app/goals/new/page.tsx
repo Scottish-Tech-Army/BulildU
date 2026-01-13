@@ -9,6 +9,7 @@ import { MilestoneInput } from "@/components/ui/MilestoneInput";
 import { MilestoneItem } from "@/components/ui/MilestoneItem";
 import { RatingScale } from "@/components/ui/RatingScale";
 import { StepHeader } from "@/components/ui/StepHeader";
+import { WizardHeader } from "@/components/ui/WizardHeader";
 import { GoalCategory, createGoal, generateId } from "@/lib/storage";
 import { Lightbulb, Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, DollarSign, Home, Sprout, HeartPulse } from "lucide-react";
 
@@ -151,17 +152,7 @@ export default function NewGoalPage() {
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
-        {/* Header with Cancel and centered title */}
-        <div className="px-6 pt-6 pb-2 flex items-center">
-          <button
-            onClick={() => router.back()}
-            className="text-brand-primary text-sm"
-          >
-            Cancel
-          </button>
-          <span className="flex-1 text-center text-3xl text-[var(--color-charcoal)]">Create Goal</span>
-          <div className="w-14" />
-        </div>
+        <WizardHeader title="Create Goal" onCancel={() => router.back()} />
         
         <div className="max-w-sm lg:max-w-2xl mx-auto px-6 pb-6">
 
