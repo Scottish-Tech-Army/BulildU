@@ -122,8 +122,8 @@ export default function BaselinePage() {
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-sm mx-auto px-6 py-6">
-          <WizardHeader title="Baseline Quiz" onCancel={handleCancel} />
+        <WizardHeader title="Baseline Quiz" onCancel={handleCancel} />
+        <div className="max-w-sm mx-auto px-6 pb-6">
 
           {/* Large animated progress percentage */}
           <ProgressDisplay 
