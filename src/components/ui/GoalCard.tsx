@@ -1,0 +1,58 @@
+"use client";
+
+import Link from "next/link";
+import { Goal, getGoalProgress } from "@/lib/storage";
+
+interface GoalCardProps {
+  goal: Goal;
+}
+
+export default function GoalCard({ goal }: GoalCardProps) {
+  const progress = getGoalProgress(goal);
+  
+  // Format date: e.g. "Oct 20"
+  const formattedDate = goal.targetDate 
+    ? new Date(goal.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    : "No date";
+
+  return (
+    <Link
+      href={`/goals/${goal.id}`}
+      className="block bg-warm-ivory rounded-2xl p-4 group hover:bg-[var(--color-magenta)]/5 transition-all"
+    >
+      <div className="flex justify-between items-center gap-4">
+        {/* Left: Title, Category & Date */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--color-deep-violet)] text-white uppercase tracking-wide">
+              {goal.category}
+            </span>
+            {goal.status === "paused" && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700 uppercase tracking-wide">
+                Paused
+              </span>
+            )}
+            {goal.status === "completed" && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700 uppercase tracking-wide">
+                Completed
+              </span>
+            )}
+          </div>
+          <h3 className="text-lg font-medium text-[var(--color-charcoal)] truncate group-hover:text-[var(--color-magenta)] transition-colors mb-0.5">
+            {goal.title}
+          </h3>
+          <p className="text-xs text-text-muted">
+             Target: {formattedDate}
+           </p>
+        </div>
+
+        {/* Right: Percentage - vertically centered and large */}
+        <div className="flex items-center justify-center shrink-0">
+           <div className="text-4xl font-light text-brand-primary leading-none">
+             {progress}%
+           </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
