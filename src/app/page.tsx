@@ -150,6 +150,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Quick Stats - stacks vertically in left column on large screens */}
             <div className="lg:col-span-1">
+              <h2 className="text-sm text-text-muted uppercase tracking-wide mb-3">Your Stats</h2>
               <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
                 {/* Momentum */}
                 <div className="bg-warm-ivory rounded-2xl p-4 text-center">
@@ -159,7 +160,7 @@ export default function DashboardPage() {
                     ) : "—"}
                   </p>
                   <p className="text-xs text-text-muted mt-1">
-                    {momentum === 1 ? "week" : "weeks"}
+                    {momentum === 1 ? "week streak" : "weeks streak"}
                   </p>
                 </div>
 
@@ -169,7 +170,7 @@ export default function DashboardPage() {
                     {activeGoals.length}
                   </p>
                   <p className="text-xs text-text-muted mt-1">
-                    {activeGoals.length === 1 ? "goal" : "goals"}
+                    active {activeGoals.length === 1 ? "goal" : "goals"}
                   </p>
                 </div>
 
@@ -178,7 +179,7 @@ export default function DashboardPage() {
                   <p className="text-2xl font-bold text-[var(--color-charcoal)]">
                     {completedMilestones}/{totalMilestones}
                   </p>
-                  <p className="text-xs text-text-muted mt-1">done</p>
+                  <p className="text-xs text-text-muted mt-1">milestones done</p>
                 </div>
               </div>
             </div>
@@ -275,15 +276,6 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {/* Dev Tools - temporary easy access to reset */}
-        <section className="mt-8 pt-4 border-t border-gray-100">
-          <Link
-            href="/reset"
-            className="text-xs text-text-subtle hover:text-brand-primary"
-          >
-            🔧 Reset App (dev)
-          </Link>
-        </section>
       </div>
 
       <BottomNav />
