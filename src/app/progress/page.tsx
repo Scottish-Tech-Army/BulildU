@@ -244,12 +244,18 @@ export default function ProgressPage() {
                     const latest = recentCheckIns[recentCheckIns.length - 1];
                     const currentEnergy = latest.energyLevel;
                     
-                    // Get previous check-in for comparison
+                    // Get previous check-in for comparison, or fall back to baseline
                     const previous = recentCheckIns.length > 1 
                       ? recentCheckIns[recentCheckIns.length - 2] 
                       : null;
                     
-                    const delta = previous ? currentEnergy - previous.energyLevel : null;
+                    // Compare to previous check-in if available, otherwise compare to baseline
+                    const previousEnergy = previous 
+                      ? previous.energyLevel 
+                      : baseline.energyLevel;
+                    
+                    const delta = previousEnergy !== undefined ? currentEnergy - previousEnergy : null;
+                    const comparisonLabel = previous ? "from last week" : "from baseline";
                     
                     // Determine trend indicator
                     let trendIcon: string;
@@ -260,13 +266,13 @@ export default function ProgressPage() {
                       trendLabel = "No previous data";
                     } else if (delta > 0) {
                       trendIcon = "↑";
-                      trendLabel = `+${delta} from last week`;
+                      trendLabel = `+${delta} ${comparisonLabel}`;
                     } else if (delta < 0) {
                       trendIcon = "↓";
-                      trendLabel = `${delta} from last week`;
+                      trendLabel = `${delta} ${comparisonLabel}`;
                     } else {
                       trendIcon = "";
-                      trendLabel = "Same as last week";
+                      trendLabel = `Same as ${previous ? "last week" : "baseline"}`;
                     }
                     
                     return (
@@ -297,13 +303,14 @@ export default function ProgressPage() {
             {hasBaseline && (
               <section className="mb-6">
                 <h2 className="text-xs font-medium text-text-muted mb-1">
-                  Since You Started
+                  Where You Stand Now
                 </h2>
-                <p className="text-xs text-text-subtle mb-3">vs your baseline</p>
-                <div className="grid grid-cols-3 gap-2">
+                <p className="text-xs text-text-subtle mb-3">vs where you started</p>
+                <div className="grid grid-cols-3 gap-4">
                   {impactMeasures
                     .filter((m) => m.baseline !== undefined)
                     .map((measure) => {
+                      const IconComponent = measure.icon;
                       const baselineValue = measure.baseline!;
                       const currentValue = measure.current;
                       
@@ -328,9 +335,15 @@ export default function ProgressPage() {
                         key={measure.label}
                         className="bg-warm-ivory rounded-2xl p-3 text-center aspect-square flex flex-col items-center justify-center"
                       >
-                        <span className="text-2xl font-bold text-brand-primary">
-                          {displayValue}
-                        </span>
+                        {/* Icon and stat in a row */}
+                        <div className="flex items-center justify-center gap-1">
+                          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-4 border-warm-ivory flex-shrink-0">
+                            <IconComponent className="w-5 h-5 text-brand-primary" />
+                          </div>
+                          <span className="text-4xl font-bold text-brand-primary">
+                            {displayValue}
+                          </span>
+                        </div>
                         <p className="text-xs text-text-muted mt-1 leading-tight">{measure.label}</p>
                         {deltaDisplay && (
                           <p className="text-xs text-brand-primary mt-1 font-medium">
