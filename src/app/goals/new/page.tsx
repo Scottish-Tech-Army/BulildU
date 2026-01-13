@@ -10,10 +10,11 @@ import { MilestoneInput } from "@/components/ui/MilestoneInput";
 import { MilestoneItem } from "@/components/ui/MilestoneItem";
 import { RatingScale } from "@/components/ui/RatingScale";
 import { GoalCategory, createGoal, generateId } from "@/lib/storage";
-import { Lightbulb, Heart, Target, Ruler, BarChart3, Calendar, Pencil } from "lucide-react";
+import { Lightbulb, Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, DollarSign, Home, Sprout, HeartPulse } from "lucide-react";
 
 type WizardStep =
   | "why"         // Relevant
+  | "category"    // Category
   | "title"       // Specific
   | "measurable"  // Measurable
   | "achievable"  // Achievable
@@ -57,6 +58,7 @@ export default function NewGoalPage() {
 
   const stepOrder: WizardStep[] = [
     "why",
+    "category",
     "title",
     "measurable",
     "achievable",
@@ -112,6 +114,7 @@ export default function NewGoalPage() {
   const canProceed = () => {
     switch (step) {
       case "why": return draft.whyMatters.trim().length > 0;
+      case "category": return draft.category !== undefined;
       case "title": return draft.title.trim().length > 0;
       case "measurable": return draft.successCriteria.trim().length > 0;
       case "achievable": return draft.confidence !== null;
@@ -153,7 +156,7 @@ export default function NewGoalPage() {
           <BackButton onClick={handleBack} />
         </div>
         
-        <div className="max-w-sm mx-auto px-6 pb-6">
+        <div className="max-w-sm lg:max-w-2xl mx-auto px-6 pb-6">
 
           {/* Progress display */}
           <ProgressDisplay 
@@ -185,7 +188,49 @@ export default function NewGoalPage() {
               </div>
             )}
 
-            {/* Step 2: Specific (Title) */}
+            {/* Step 2: Category */}
+            {step === "category" && (
+              <div className="space-y-6">
+                <div>
+                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
+                    What area of life is this goal for?
+                  </h1>
+                  <p className="text-[var(--color-text-muted)]">
+                    Choose a category to help organise your goals.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {([
+                    { value: "Health" as GoalCategory, label: "Health", icon: HeartPulse },
+                    { value: "Career" as GoalCategory, label: "Career", icon: Briefcase },
+                    { value: "Money" as GoalCategory, label: "Money", icon: DollarSign },
+                    { value: "Growth" as GoalCategory, label: "Growth", icon: Sprout },
+                    { value: "Family" as GoalCategory, label: "Family", icon: Home },
+                  ]).map(({ value, label, icon: Icon }) => (
+                    <button
+                      key={value}
+                      onClick={() => setDraft({ ...draft, category: value })}
+                      className={`p-4 rounded-2xl border text-left transition-all flex items-center gap-3 ${
+                        draft.category === value
+                          ? "border-[var(--color-magenta)] bg-[var(--color-magenta)]/5"
+                          : "border-gray-200 hover:border-[var(--color-magenta)]/50"
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        draft.category === value
+                          ? "bg-[var(--color-magenta)] text-white"
+                          : "bg-warm-ivory text-brand-primary"
+                      }`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[var(--color-charcoal)]">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Specific (Title) */}
             {step === "title" && (
               <div className="space-y-6">
                 <div>
@@ -366,7 +411,7 @@ export default function NewGoalPage() {
             {/* Step 7: Confirm */}
             {step === "confirm" && (
               <div className="space-y-6">
-                <div>
+                <div className="text-center">
                   <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
                     Review your Goal
                   </h1>
@@ -375,11 +420,11 @@ export default function NewGoalPage() {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                   {/* Specific (Goal Title) */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("title")}>
                     <div className="flex justify-between items-start mb-2">
-                      <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
                         <Target className="w-3 h-3" /> Specific
                       </p>
                     </div>
@@ -396,7 +441,7 @@ export default function NewGoalPage() {
                   {/* Relevant (Why) */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("why")}>
                     <div className="flex justify-between items-start mb-2">
-                      <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
                         <Heart className="w-3 h-3" /> Relevant
                       </p>
                     </div>
@@ -411,7 +456,7 @@ export default function NewGoalPage() {
                   {/* Measurable */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("measurable")}>
                     <div className="flex justify-between items-start mb-2">
-                      <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
                         <Ruler className="w-3 h-3" /> Measurable
                       </p>
                     </div>
@@ -426,7 +471,7 @@ export default function NewGoalPage() {
                   {/* Achievable */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("achievable")}>
                     <div className="flex justify-between items-start mb-2">
-                      <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
                         <BarChart3 className="w-3 h-3" /> Achievable
                       </p>
                     </div>
@@ -451,7 +496,7 @@ export default function NewGoalPage() {
                   {/* Time-bound */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("targetDate")}>
                     <div className="flex justify-between items-start mb-2">
-                      <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
                         <Calendar className="w-3 h-3" /> Time-bound
                       </p>
                     </div>
@@ -471,7 +516,7 @@ export default function NewGoalPage() {
                   {/* Milestones */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("milestones")}>
                     <div className="flex justify-between items-start mb-3">
-                      <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wide flex items-center gap-1">
+                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
                         <Target className="w-3 h-3" /> Action Plan
                       </p>
                     </div>
