@@ -523,3 +523,86 @@ export function getMomentumDays(): number {
   return momentum;
 }
 
+// =============================================================================
+// Weekly Momentum Data for Charts
+// =============================================================================
+
+export interface WeeklyMomentumData {
+  weekStart: Date;
+  weekLabel: string; // e.g., "Jan 01"
+  hasCheckIn: boolean;
+  avgEnergy: number | null; // 1-5 scale, null if no check-in
+  milestonesCompleted: number;
+  score: number; // 0-100 performance velocity score
+}
+
+/**
+ * Get weekly momentum data for the past N weeks (default 8)
+ * Used for rendering the momentum line chart
+ */
+export function getWeeklyMomentumData(weeksCount: number = 8): WeeklyMomentumData[] {
+  const checkIns = getCheckIns();
+  const goals = getGoals();
+  const totalMilestones = goals.reduce((sum, g) => sum + g.milestones.length, 0);
+  
+  const weeks: WeeklyMomentumData[] = [];
+  const now = new Date();
+  
+  for (let i = weeksCount - 1; i >= 0; i--) {
+    const weekStart = getWeekStart(new Date(now));
+    weekStart.setDate(weekStart.getDate() - (i * 7));
+    
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7);
+    
+    // Find check-ins for this week
+    const weekCheckIns = checkIns.filter(c => {
+      const checkInDate = new Date(c.createdAt);
+      return checkInDate >= weekStart && checkInDate < weekEnd;
+    });
+    
+    const hasCheckIn = weekCheckIns.length > 0;
+    
+    // Calculate average energy for the week
+    const avgEnergy = hasCheckIn
+      ? weekCheckIns.reduce((sum, c) => sum + c.energyLevel, 0) / weekCheckIns.length
+      : null;
+    
+    // Count milestones completed this week
+    const milestonesCompleted = weekCheckIns.reduce(
+      (sum, c) => sum + c.milestonesCompleted.length,
+      0
+    );
+    
+    // Calculate performance velocity score (0-100)
+    // - Check-in completion: 40 points (did they check in?)
+    // - Energy level: 30 points (normalized from 1-5 to 0-30)
+    // - Milestone progress: 30 points (based on total milestones)
+    let score = 0;
+    
+    if (hasCheckIn) {
+      score += 40; // Check-in bonus
+      score += avgEnergy ? ((avgEnergy - 1) / 4) * 30 : 0; // Energy (1-5 -> 0-30)
+      score += totalMilestones > 0 
+        ? Math.min(30, (milestonesCompleted / totalMilestones) * 100 * 0.3)
+        : 0;
+    }
+    
+    // Format week label
+    const weekLabel = weekStart.toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+    });
+    
+    weeks.push({
+      weekStart,
+      weekLabel,
+      hasCheckIn,
+      avgEnergy,
+      milestonesCompleted,
+      score: Math.round(score),
+    });
+  }
+  
+  return weeks;
+}

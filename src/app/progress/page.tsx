@@ -8,7 +8,6 @@ import {
   getBaselineResponse,
   getCheckIns,
   getGoals,
-  getGoalProgress,
   getMomentumDays,
   hasCheckedInThisWeek,
   CheckIn,
@@ -45,6 +44,7 @@ export default function ProgressPage() {
   const [momentum] = useState(() => getMomentumDays());
   const [checkInDue] = useState(() => !hasCheckedInThisWeek());
   const [celebrationDismissed, setCelebrationDismissed] = useState(false);
+  const [period, setPeriod] = useState<"week" | "month" | "year">("week");
 
 
 
@@ -142,44 +142,6 @@ export default function ProgressPage() {
           </section>
         ) : (
           <>
-            {/* Momentum & Stats */}
-            <section className="mb-6">
-              <div
-                className={`bg-brand-gradient rounded-2xl p-5 text-white transition-transform ${
-                  checkInDue ? "cursor-pointer hover:scale-[1.02] active:scale-[0.98]" : ""
-                }`}
-                onClick={() => checkInDue && router.push("/checkin")}
-                role={checkInDue ? "button" : undefined}
-                tabIndex={checkInDue ? 0 : undefined}
-                onKeyDown={(e) => checkInDue && e.key === "Enter" && router.push("/checkin")}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white/80 text-sm">Your Momentum</p>
-                    <p className="text-4xl font-bold flex items-center gap-2">
-                      {momentum > 0 ? (
-                        <><Flame className="w-8 h-8" />{momentum}</>
-                      ) : "—"}
-                    </p>
-                    <p className="text-white/80 text-sm">
-                      {momentum === 0
-                        ? "Complete a check-in to start"
-                        : checkInDue
-                        ? "Tap to check in this week"
-                        : momentum === 1
-                        ? "week streak"
-                        : "weeks in a row"}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                      <BarChart3 className="w-6 h-6" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
             {/* Celebration - dismissible */}
             {!celebrationDismissed && (completedMilestones > 0 || completedGoals.length > 0) && (
               <section className="mb-6">
@@ -210,98 +172,165 @@ export default function ProgressPage() {
               </section>
             )}
 
-            {/* Goals Progress + Where You Stand Now - responsive two-column layout */}
+            {/* Your Momentum Section */}
             <section className="mb-6">
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                {/* Left column: Goals Progress stats stacked - slimmer */}
-                <div className="lg:col-span-1">
-                  <h2 className="text-xs font-medium text-text-muted mb-1">
-                    Goals Progress
-                  </h2>
-                  <p className="text-xs text-text-subtle mb-3">your journey so far</p>
-                  <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
-                    <div className="bg-warm-ivory rounded-2xl p-4 text-center aspect-square flex flex-col items-center justify-center">
-                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                        {completedGoals.length}
-                      </p>
-                      <p className="text-xs text-text-muted mt-1">Goals completed</p>
-                    </div>
-                    <div className="bg-warm-ivory rounded-2xl p-4 text-center aspect-square flex flex-col items-center justify-center">
-                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                        {completedMilestones}/{totalMilestones}
-                      </p>
-                      <p className="text-xs text-text-muted mt-1">Milestones done</p>
-                    </div>
+              <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                {/* Header with period tabs */}
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
+                      Your Momentum
+                    </h2>
+                    <p className="text-sm text-text-muted">
+                      {period === "week" && "This week's stats"}
+                      {period === "month" && "This month's stats"}
+                      {period === "year" && "This year's stats"}
+                    </p>
+                  </div>
+                  <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                    {(["week", "month", "year"] as const).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPeriod(p)}
+                        className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                          period === p
+                            ? "bg-white text-[var(--color-charcoal)] shadow-sm"
+                            : "text-text-muted hover:text-[var(--color-charcoal)]"
+                        }`}
+                      >
+                        {p.charAt(0).toUpperCase() + p.slice(1)}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                {/* Right column: Where You Stand Now - 3x2 grid - wider */}
-                {hasBaseline && (
-                  <div className="lg:col-span-3">
-                    <h2 className="text-xs font-medium text-text-muted mb-1">
-                      Where You Stand Now
-                    </h2>
-                    <p className="text-xs text-text-subtle mb-3">vs where you started</p>
-                    <div className="grid grid-cols-3 gap-3">
-                      {impactMeasures
-                        .filter((m) => m.baseline !== undefined)
-                        .map((measure) => {
-                          const IconComponent = measure.icon;
-                          const baselineValue = measure.baseline!;
-                          const currentValue = measure.current;
-                          
-                          // Show current value if available, otherwise baseline
-                          const displayValue = currentValue !== undefined && currentValue !== null
-                            ? Math.round(currentValue)
-                            : baselineValue;
-                          
-                          // Calculate delta from baseline if current data exists
-                          let deltaDisplay = null;
-                          if (currentValue !== undefined && currentValue !== null) {
-                            const delta = currentValue - baselineValue;
-                            if (Math.round(delta) !== 0) {
-                              const sign = delta > 0 ? "+" : "";
-                              const arrow = delta > 0 ? "↑" : "↓";
-                              deltaDisplay = `${arrow} ${sign}${Math.round(delta)}`;
-                            }
-                          }
-                          
-                          return (
-                          <div
-                            key={measure.label}
-                            className="bg-warm-ivory rounded-2xl p-3 text-center aspect-square flex flex-col items-center justify-center"
-                          >
-                            {/* Icon and stat in a row */}
-                            <div className="flex items-center justify-center gap-1">
-                              <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-4 border-warm-ivory flex-shrink-0">
-                                <IconComponent className="w-5 h-5 text-brand-primary" />
-                              </div>
-                              <span className="text-4xl font-bold text-brand-primary">
-                                {displayValue}
-                              </span>
-                            </div>
-                            <p className="text-xs text-text-muted mt-1 leading-tight">{measure.label}</p>
-                            {deltaDisplay && (
-                              <p className="text-xs text-brand-primary mt-1 font-medium">
-                                {deltaDisplay}
-                              </p>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <p className="text-xs text-text-subtle text-center mt-3">
-                      Baseline recorded{" "}
-                      {new Date(baseline.completedAt!).toLocaleDateString("en-AU", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                {/* Stats Row */}
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  {/* Goals Completed */}
+                  <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
+                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                      Goals Completed
+                    </p>
+                    <p className="text-3xl font-bold text-[var(--color-charcoal)]">
+                      {completedGoals.length}
+                    </p>
+                    <p className="text-xs text-text-subtle mt-2">
+                      {goals.length > 0 ? `${goals.length} total` : "Set your first goal"}
                     </p>
                   </div>
+
+                  {/* Milestones Done */}
+                  <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
+                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                      Milestones Done
+                    </p>
+                    <p className="text-3xl font-bold text-[var(--color-charcoal)]">
+                      {completedMilestones}/{totalMilestones}
+                    </p>
+                    <p className="text-xs text-text-subtle mt-2">
+                      {totalMilestones > 0 
+                        ? `${Math.round((completedMilestones / totalMilestones) * 100)}% complete`
+                        : "Add milestones to goals"}
+                    </p>
+                  </div>
+
+                  {/* Streak */}
+                  <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
+                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                      Streak
+                    </p>
+                    <p className="text-3xl font-bold text-[var(--color-charcoal)] flex items-center gap-1">
+                      {momentum > 0 && <Flame className="w-6 h-6 text-brand-primary" />}
+                      {momentum}
+                      <span className="text-sm font-normal text-text-muted">
+                        {momentum === 1 ? "week" : "weeks"}
+                      </span>
+                    </p>
+                    <p className="text-xs text-text-subtle mt-2">
+                      {checkInDue ? "Check in to extend!" : "Keep it going!"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Check-in prompt */}
+                {checkInDue && (
+                  <button
+                    onClick={() => router.push("/checkin")}
+                    className="w-full mt-4 py-3 text-brand-primary font-medium text-sm hover:bg-brand-primary/5 rounded-lg transition-colors"
+                  >
+                    Complete your weekly check-in →
+                  </button>
                 )}
               </div>
             </section>
+
+            {/* Where You Stand Now */}
+            {hasBaseline && (
+              <section className="mb-6">
+                <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                  <div className="mb-4">
+                    <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
+                      Where You Stand Now
+                    </h2>
+                    <p className="text-sm text-text-muted">vs where you started</p>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {impactMeasures
+                      .filter((m) => m.baseline !== undefined)
+                      .map((measure) => {
+                        const IconComponent = measure.icon;
+                        const baselineValue = measure.baseline!;
+                        const currentValue = measure.current;
+                        
+                        const displayValue = currentValue !== undefined && currentValue !== null
+                          ? Math.round(currentValue)
+                          : baselineValue;
+                        
+                        let deltaDisplay = null;
+                        if (currentValue !== undefined && currentValue !== null) {
+                          const delta = currentValue - baselineValue;
+                          if (Math.round(delta) !== 0) {
+                            const arrow = delta > 0 ? "↗" : "↘";
+                            deltaDisplay = `${arrow} ${Math.abs(Math.round(delta * 20))}%`;
+                          }
+                        }
+                        
+                        return (
+                          <div
+                            key={measure.label}
+                            className="bg-warm-ivory rounded-2xl p-4"
+                          >
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center">
+                                <IconComponent className="w-5 h-5 text-brand-primary" />
+                              </div>
+                              {deltaDisplay && (
+                                <span className="text-xs font-medium text-brand-primary">
+                                  {deltaDisplay}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-text-muted mb-1">{measure.label}</p>
+                            <p className="text-3xl font-bold text-[var(--color-charcoal)]">
+                              {displayValue}
+                              <span className="text-base font-normal text-text-muted ml-1">/ 5</span>
+                            </p>
+                          </div>
+                        );
+                      })}
+                  </div>
+                  <p className="text-xs text-text-subtle text-center mt-4">
+                    Baseline recorded{" "}
+                    {new Date(baseline.completedAt!).toLocaleDateString("en-AU", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              </section>
+            )}
+
           </>
         )}
       </div>
