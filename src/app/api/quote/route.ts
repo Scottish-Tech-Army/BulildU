@@ -5,11 +5,15 @@ import { NextResponse } from "next/server";
  * 
  * ZenQuotes requires an API key for CORS headers, so we proxy
  * through our own API route to avoid browser CORS restrictions.
+ * 
+ * Uses no-store to avoid stale caching on Vercel edge. The client-side
+ * component (DailyQuote) handles caching in localStorage by date.
  */
 export async function GET() {
   try {
+    // Fetch fresh quote - no server-side caching to ensure daily updates work
     const response = await fetch("https://zenquotes.io/api/today", {
-      next: { revalidate: 3600 }, // Cache for 1 hour (quote changes at midnight CST)
+      cache: "no-store",
     });
 
     if (!response.ok) {
@@ -20,7 +24,13 @@ export async function GET() {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    
+    // Return with short cache headers - client handles daily caching
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      },
+    });
   } catch {
     return NextResponse.json(
       { error: "Failed to fetch quote" },
