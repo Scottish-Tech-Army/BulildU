@@ -15,6 +15,7 @@ export const STORAGE_KEYS = {
   GOALS: `${STORAGE_PREFIX}goals`,
   CHECKINS: `${STORAGE_PREFIX}checkins`,
   PREFERENCES: `${STORAGE_PREFIX}preferences`,
+  QUOTE: "empwru_daily_quote", // Note: legacy key without prefix
 } as const;
 
 // Onboarding state
