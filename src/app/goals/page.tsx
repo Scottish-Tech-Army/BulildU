@@ -4,10 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { Goal, getGoals } from "@/lib/storage";
 import GoalCard from "@/components/ui/GoalCard";
-import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import BottomNav from "@/components/ui/BottomNav";
 
-import { Target, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 /**
  * Goals list page - Shows all goals with option to create new
@@ -44,18 +43,18 @@ export default function GoalsPage() {
         </header>
 
         {goals.length === 0 ? (
-          /* Empty State */
-          <section className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mb-4">
-              <Target className="w-8 h-8 text-brand-primary" />
-            </div>
-            <h2 className="text-xl text-gray-900 mb-2">No goals yet</h2>
-            <p className="text-gray-500 mb-6 max-w-xs">
-              What do you want to achieve? Start with something meaningful to
-              you.
-            </p>
-            <Link href="/goals/new" className="w-full max-w-xs">
-              <PrimaryButton>Create your first goal</PrimaryButton>
+          /* Empty State - dotted border style matching home page */
+          <section className="py-12">
+            <Link href="/goals/new">
+              <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-colors">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <Plus className="w-5 h-5 text-brand-primary" />
+                  <span className="text-brand-primary">Set your first goal</span>
+                </div>
+                <p className="text-sm text-text-muted">
+                  Start with something meaningful to you.
+                </p>
+              </div>
             </Link>
           </section>
         ) : (
