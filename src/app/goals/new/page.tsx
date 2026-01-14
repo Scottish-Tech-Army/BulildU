@@ -386,20 +386,18 @@ export default function NewGoalPage() {
                     Review your Goal
                   </h1>
                   <p className="text-[var(--color-text-muted)]">
-                    Make sure clearly defined and achievable.
+                    Make sure your goals are clearly defined and achievable.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                  {/* Specific (Goal Title) */}
+                  {/* What (Goal Title) */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("title")}>
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
-                        <Target className="w-3 h-3" /> Specific
-                      </p>
-                    </div>
-                    <div className="flex-1 flex items-center">
-                      <h2 className="text-lg text-[var(--color-charcoal)] font-medium break-words leading-tight line-clamp-4">
+                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
+                      <Target className="w-3 h-3" /> What
+                    </p>
+                    <div className="flex-1 flex items-center justify-center">
+                      <h2 className="text-lg text-[var(--color-charcoal)] font-medium break-words leading-tight line-clamp-4 text-center">
                         {draft.title}
                       </h2>
                     </div>
@@ -408,43 +406,41 @@ export default function NewGoalPage() {
                     </div>
                   </div>
 
-                  {/* Relevant (Why) */}
+                  {/* Why */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("why")}>
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
-                        <Heart className="w-3 h-3" /> Relevant
+                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
+                      <Heart className="w-3 h-3" /> Why
+                    </p>
+                    <div className="flex-1 flex items-center justify-center">
+                      <p className="text-sm text-[var(--color-charcoal)] break-words leading-snug line-clamp-5 text-center">
+                        {draft.whyMatters}
                       </p>
                     </div>
-                    <p className="text-sm text-[var(--color-charcoal)] break-words leading-snug line-clamp-5">
-                      {draft.whyMatters}
-                    </p>
                     <div className="absolute bottom-3 right-3">
                       <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
                     </div>
                   </div>
 
-                  {/* Measurable */}
+                  {/* How You'll Know */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("measurable")}>
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
-                        <Ruler className="w-3 h-3" /> Measurable
+                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
+                      <Ruler className="w-3 h-3" /> How You&apos;ll Know
+                    </p>
+                    <div className="flex-1 flex items-center justify-center">
+                      <p className="text-sm text-[var(--color-charcoal)] break-words leading-snug line-clamp-5 text-center">
+                        {draft.successCriteria}
                       </p>
                     </div>
-                    <p className="text-sm text-[var(--color-charcoal)] break-words leading-snug line-clamp-5">
-                      {draft.successCriteria}
-                    </p>
                     <div className="absolute bottom-3 right-3">
                       <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
                     </div>
                   </div>
 
-                  {/* Achievable */}
+                  {/* Readiness */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("achievable")}>
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
-                        <BarChart3 className="w-3 h-3" /> Achievable
-                      </p>
-                    </div>
+                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
+                      <BarChart3 className="w-3 h-3" /> Readiness
+                    </p>
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
                         <span className="block text-4xl font-semibold text-[var(--color-charcoal)] mb-1">
@@ -463,15 +459,13 @@ export default function NewGoalPage() {
                     </div>
                   </div>
 
-                  {/* Time-bound */}
+                  {/* When */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("targetDate")}>
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> Time-bound
-                      </p>
-                    </div>
-                    <div className="flex-1 flex items-center">
-                      <p className="text-lg text-[var(--color-charcoal)] leading-tight text-center w-full">
+                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
+                      <Calendar className="w-3 h-3" /> When
+                    </p>
+                    <div className="flex-1 flex items-center justify-center">
+                      <p className="text-lg text-[var(--color-charcoal)] leading-tight text-center">
                         {new Date(draft.targetDate).toLocaleDateString(
                           "en-AU",
                           { day: "numeric", month: "short", year: "numeric" }
@@ -483,30 +477,20 @@ export default function NewGoalPage() {
                     </div>
                   </div>
 
-                  {/* Milestones */}
+                  {/* First Steps (Milestones count only) */}
                   <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("milestones")}>
-                    <div className="flex justify-between items-start mb-3">
-                      <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1">
-                        <Target className="w-3 h-3" /> Action Plan
-                      </p>
-                    </div>
-                    <div className="space-y-2 flex-1 overflow-hidden">
-                      {draft.milestones.slice(0, 2).map((m, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-2 text-xs text-[var(--color-charcoal)]"
-                        >
-                          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[var(--color-magenta)]/10 text-[var(--color-magenta)] flex items-center justify-center text-[10px] font-bold">
-                            {i + 1}
-                          </span>
-                          <span className="break-words line-clamp-2 leading-snug">{m.title}</span>
-                        </div>
-                      ))}
-                      {draft.milestones.length > 2 && (
-                        <p className="text-[10px] text-[var(--color-text-muted)] pl-7 mt-1">
-                          +{draft.milestones.length - 2} more steps...
-                        </p>
-                      )}
+                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
+                      <Target className="w-3 h-3" /> First Steps
+                    </p>
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <span className="block text-4xl font-semibold text-[var(--color-charcoal)] mb-1">
+                          {draft.milestones.length}
+                        </span>
+                        <span className="text-xs text-[var(--color-text-muted)]">
+                          {draft.milestones.length === 1 ? "milestone" : "milestones"}
+                        </span>
+                      </div>
                     </div>
                     <div className="absolute bottom-3 right-3">
                       <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
