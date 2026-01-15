@@ -15,7 +15,7 @@ export const STORAGE_KEYS = {
   GOALS: `${STORAGE_PREFIX}goals`,
   CHECKINS: `${STORAGE_PREFIX}checkins`,
   PREFERENCES: `${STORAGE_PREFIX}preferences`,
-  QUOTE: "empwru_daily_quote", // Note: legacy key without prefix
+  DAILY_QUOTE: "empwru_daily_quote", // Standardized name
 } as const;
 
 // Onboarding state
@@ -120,7 +120,8 @@ export interface BaselineResponse {
   // Section 5: Wellbeing
   energyLevel?: number; // 1-5
   stressLevel?: number; // 1-5 (inverted: 1=high stress, 5=low stress)
-  hasBalance?: "yes" | "no" | "unsure";
+  lifeBalance?: number; // 1-5
+  hasBalance?: "yes" | "no" | "unsure"; // Legacy field
 
   // Metadata
   completedAt?: string; // ISO date string
@@ -343,6 +344,25 @@ export function deleteMilestone(goalId: string, milestoneId: string): boolean {
 
   if (goal.milestones.length === initialLength) return false;
 
+  updateGoal(goalId, { milestones: goal.milestones });
+  return true;
+}
+
+/**
+ * Update a milestone's details
+ */
+export function updateMilestone(
+  goalId: string,
+  milestoneId: string,
+  updates: Partial<Omit<Milestone, "id">>
+): boolean {
+  const goal = getGoalById(goalId);
+  if (!goal) return false;
+
+  const milestone = goal.milestones.find((m) => m.id === milestoneId);
+  if (!milestone) return false;
+
+  Object.assign(milestone, updates);
   updateGoal(goalId, { milestones: goal.milestones });
   return true;
 }

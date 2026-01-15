@@ -49,7 +49,7 @@ export default function ReminderPage() {
       <CelebrationScreen
         progress={100}
         title="You're all set!"
-        subtitle="Welcome to empwrU. Let's start building momentum towards your goals."
+        subtitle="Welcome to empwrU. Let’s start moving towards your potential."
         buttonText="Go to dashboard"
         onButtonClick={() => router.push("/")}
       />

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Goal, getGoals } from "@/lib/storage";
 import GoalCard from "@/components/ui/GoalCard";
 import BottomNav from "@/components/ui/BottomNav";
+import { QuoteCard } from "@/components";
 
 import { Plus } from "lucide-react";
 
@@ -28,7 +29,7 @@ export default function GoalsPage() {
   const completedGoals = goals.filter((g) => g.status === "completed");
 
   return (
-    <div className="min-h-dvh bg-brand-surface pb-20">
+    <div className="min-h-dvh bg-brand-surface pb-32">
       <div className="px-6 pt-8 pb-4">
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
@@ -41,6 +42,14 @@ export default function GoalsPage() {
             <Plus className="w-5 h-5" />
           </Link>
         </header>
+
+        {/* Inspirational Quote */}
+        <div className="mb-6">
+          <QuoteCard 
+            quote="Whatever the mind can conceive and believe, it can achieve!"
+            author="Napoleon Hill"
+          />
+        </div>
 
         {goals.length === 0 ? (
           /* Empty State - dotted border style matching home page */

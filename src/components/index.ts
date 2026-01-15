@@ -11,3 +11,5 @@ export { ChoiceChips } from "./ui/ChoiceChips";
 export { FocusCard } from "./ui/FocusCard";
 export { TimeOption } from "./ui/TimeOption";
 export { CelebrationScreen } from "./ui/CelebrationScreen";
+export { TipBox } from "./ui/TipBox";
+export { QuoteCard } from "./ui/QuoteCard";

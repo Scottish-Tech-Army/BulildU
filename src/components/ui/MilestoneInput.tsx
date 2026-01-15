@@ -12,7 +12,7 @@ interface MilestoneInputProps {
  */
 export function MilestoneInput({
   onAdd,
-  placeholder = "e.g., Complete first training week",
+  placeholder = "e.g. update CV",
 }: MilestoneInputProps) {
   const [title, setTitle] = useState("");
   const [targetDate, setTargetDate] = useState("");

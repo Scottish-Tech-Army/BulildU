@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FullScreenLayout, CelebrationScreen } from "@/components";
+import { FullScreenLayout, CelebrationScreen, TipBox, QuoteCard } from "@/components";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { TextAreaField } from "@/components/ui/TextAreaField";
 import { MilestoneInput } from "@/components/ui/MilestoneInput";
@@ -11,7 +11,7 @@ import { RatingScale } from "@/components/ui/RatingScale";
 import { StepHeader } from "@/components/ui/StepHeader";
 import { WizardHeader } from "@/components/ui/WizardHeader";
 import { GoalCategory, createGoal, generateId } from "@/lib/storage";
-import { Lightbulb, Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, DollarSign, Home, Sprout, HeartPulse } from "lucide-react";
+import { Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, DollarSign, Home, Sprout, HeartPulse } from "lucide-react";
 
 type WizardStep =
   | "why"         // Relevant
@@ -53,14 +53,14 @@ export default function NewGoalPage() {
     successCriteria: "",
     confidence: null,
     targetDate: "",
-    category: "Growth",
+    category: "Health",
     milestones: [],
   });
 
   const stepOrder: WizardStep[] = [
-    "why",
     "category",
     "title",
+    "why",
     "measurable",
     "achievable",
     "targetDate",
@@ -154,12 +154,11 @@ export default function NewGoalPage() {
       <div className="flex-1 overflow-y-auto">
         <WizardHeader title="Create Goal" onCancel={() => router.back()} />
         
-        <div className="max-w-sm lg:max-w-2xl mx-auto px-6 pb-6">
+        <div className="max-w-sm lg:max-w-3xl mx-auto px-6 pb-6">
 
           {/* Progress display */}
           <ProgressDisplay 
             progress={Math.round((currentStepIndex / totalSteps) * 100)}
-            label={`Step ${currentStepIndex + 1} of ${totalSteps}`}
           />
 
           <div className="flex-1">
@@ -168,8 +167,16 @@ export default function NewGoalPage() {
               <div className="space-y-6">
               <StepHeader
                 title="Why does this goal matter to you?"
-                subtitle="(Relevant) Understanding your 'why' helps you stay motivated when things get tough."
               />
+                <TipBox>
+                  Think about what achieving this goal will bring you, what does it change, how does it make you feel – the more detail, the better.
+                </TipBox>
+                
+                <QuoteCard 
+                  quote="When the why gets stronger, the how gets easier."
+                  author="Jim Rohn"
+                />
+                
                 <TextAreaField
                   label=""
                   placeholder="I want to achieve this because..."
@@ -187,8 +194,10 @@ export default function NewGoalPage() {
               <div className="space-y-6">
               <StepHeader
                 title="What area of life is this goal for?"
-                subtitle="Choose a category to help organise your goals."
               />
+                <TipBox>
+                  Choose a category to help organise your goals.
+                </TipBox>
                 <div className="grid grid-cols-2 gap-3">
                   {([
                     { value: "Health" as GoalCategory, label: "Health", icon: HeartPulse },
@@ -225,18 +234,18 @@ export default function NewGoalPage() {
               <div className="space-y-6">
               <StepHeader
                 title="What is your specific goal?"
-                subtitle="(Specific) Keep it clear and simple. You can add more details later."
               />
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="e.g., Run a 5K race"
-                    value={draft.title}
-                    onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                    autoFocus
-                    className="w-full px-4 py-3 text-base text-[var(--color-charcoal)] bg-white rounded-2xl border-2 border-gray-200 focus:border-[var(--color-magenta)] focus:outline-none placeholder:text-gray-400 transition-colors"
-                  />
-                </div>
+                <TipBox>
+                  Keep it clear and simple.
+                </TipBox>
+                <input
+                  type="text"
+                  placeholder="e.g., Run a 5K race"
+                  value={draft.title}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                  autoFocus
+                  className="w-full px-4 py-3 text-base text-[var(--color-charcoal)] bg-white rounded-2xl border-2 border-gray-200 focus:border-[var(--color-magenta)] focus:outline-none placeholder:text-gray-400 transition-colors"
+                />
               </div>
             )}
 
@@ -244,12 +253,11 @@ export default function NewGoalPage() {
             {step === "measurable" && (
               <div className="space-y-6">
               <StepHeader
-                title="How will you know you've achieved it?"
-                subtitle="(Measurable) Define what success looks like."
+                title="Decide how progress will be tracked."
               />
                 <TextAreaField
                   label=""
-                  placeholder="I will know I've succeeded when..."
+                  placeholder="examples: apply for 3 jobs, complete 1 online accredited course, secure 1 interview"
                   value={draft.successCriteria}
                   onChange={(e) =>
                     setDraft({ ...draft, successCriteria: e.target.value })
@@ -264,8 +272,10 @@ export default function NewGoalPage() {
               <div className="space-y-6">
               <StepHeader
                 title="Is this achievable for you right now?"
-                subtitle="(Achievable) Rate your confidence level. If it's low, consider scaling back."
               />
+                <TipBox>
+                  Rate your confidence level. If it&apos;s low, consider scaling back.
+                </TipBox>
                 
                 <div className="py-4">
                   <RatingScale
@@ -284,8 +294,10 @@ export default function NewGoalPage() {
               <div className="space-y-6">
               <StepHeader
                 title="When would you like to achieve this by?"
-                subtitle="(Time-bound) A deadline helps you stay focused."
               />
+                <TipBox>
+                  A deadline helps you stay focused and track your progress.
+                </TipBox>
 
                 {/* Suggested timeframes */}
                 <div className="space-y-3">
@@ -343,8 +355,10 @@ export default function NewGoalPage() {
               <div className="space-y-6">
               <StepHeader
                 title="Let's break it down"
-                subtitle="Create your first milestone to get started. Aim for something you can do in 1-2 weeks."
               />
+                <TipBox>
+                  Create your first milestone to get started. Aim for something you can do in 1-2 weeks.
+                </TipBox>
 
                 <MilestoneInput onAdd={addMilestone} />
 
@@ -363,16 +377,6 @@ export default function NewGoalPage() {
                         />
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {/* Helpful tip */}
-                {draft.milestones.length === 0 && (
-                  <div className="bg-[var(--color-magenta)]/5 rounded-xl p-4 flex items-start gap-3">
-                    <Lightbulb className="w-5 h-5 text-[var(--color-magenta)] flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-[var(--color-charcoal)]">
-                      <strong>Tip:</strong> Good milestones are specific and time-bound.
-                    </p>
                   </div>
                 )}
               </div>
@@ -503,27 +507,59 @@ export default function NewGoalPage() {
         </div>
       </div>
 
-      <FullScreenLayout.Footer>
-        <div className="flex items-center justify-between px-2">
-          <div className="w-24">
-            {currentStepIndex > 0 && (
-              <button
-                onClick={handleBack}
-                className="py-3 text-brand-primary font-medium flex items-center gap-1"
-              >
-                ← Back
-              </button>
-            )}
+      {/* Contextual Action Bar */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50">
+        <div className="flex justify-around items-center h-16 max-w-md mx-auto">
+          {/* Back */}
+          <button
+            onClick={handleBack}
+            disabled={currentStepIndex === 0}
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
+              currentStepIndex === 0 
+                ? "text-gray-300 cursor-not-allowed" 
+                : "text-gray-400 hover:text-brand-primary"
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+            <span className="text-xs mt-1">Back</span>
+          </button>
+          
+          {/* Progress indicator */}
+          <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
+            <span className="text-sm font-medium text-brand-primary">{currentStepIndex + 1}/{totalSteps}</span>
+            <span className="text-xs mt-0.5">Steps</span>
           </div>
+          
+          {/* Next/Create */}
           <button
             onClick={handleNext}
             disabled={!canProceed()}
-            className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
+              canProceed() 
+                ? "text-brand-primary" 
+                : "text-gray-300 cursor-not-allowed"
+            }`}
           >
-            {step === "confirm" ? "Create Goal" : "Next"} →
+            {step === "confirm" ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">Create</span>
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+                <span className="text-xs mt-1">Next</span>
+              </>
+            )}
           </button>
         </div>
-      </FullScreenLayout.Footer>
+      </nav>
     </FullScreenLayout>
   );
 }

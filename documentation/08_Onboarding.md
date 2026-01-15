@@ -34,7 +34,7 @@ Communicate core value and motivate continuation in 5 seconds.
           2 minutes daily →<br />
           career confidence
         </h1>
-        <p className="text-white/80 text-lg">Small steps, real progress</p>
+        <p className="text-white/80 text-lg">Move towards your potential</p>
       </div>
     </div>
   </div>

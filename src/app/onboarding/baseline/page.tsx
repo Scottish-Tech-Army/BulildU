@@ -6,16 +6,20 @@ import {
   FullScreenLayout,
   RatingScale,
   ChoiceChips,
+  TipBox,
 } from "@/components";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { WizardHeader } from "@/components/ui/WizardHeader";
+import { TimeOption } from "@/components/ui/TimeOption";
 import {
   saveBaselineResponse,
   completeBaseline,
   saveOnboardingState,
+  completeOnboarding,
   type WorkStatus,
   type BaselineResponse,
 } from "@/lib/storage";
+import { Sunrise, Sunset } from "lucide-react";
 
 // =============================================================================
 // Question Data
@@ -29,25 +33,27 @@ const WORK_STATUS_OPTIONS = [
   { value: "other", label: "Other" },
 ];
 
-const YES_NO_OPTIONS = [
-  { value: "yes", label: "Yes" },
-  { value: "no", label: "No" },
-];
-
-const YES_NO_UNSURE_OPTIONS = [
-  { value: "yes", label: "Yes" },
-  { value: "no", label: "No" },
-  { value: "unsure", label: "Unsure" },
-];
-
 // Section definitions
 const SECTIONS = [
   { id: "situation", title: "Current Situation" },
   { id: "confidence", title: "Confidence & Self-Esteem" },
   { id: "aspirations", title: "Aspirations for the Future" },
-  { id: "skills", title: "Skills, Learning & Progression" },
   { id: "wellbeing", title: "Wellbeing & Balance" },
+  { id: "reminder", title: "Weekly Check-in" },
 ] as const;
+
+const DAY_OPTIONS = [
+  { value: "sunday", label: "Sunday" },
+  { value: "monday", label: "Monday" },
+  { value: "tuesday", label: "Tuesday" },
+  { value: "wednesday", label: "Wednesday" },
+  { value: "thursday", label: "Thursday" },
+  { value: "friday", label: "Friday" },
+  { value: "saturday", label: "Saturday" },
+];
+
+type ReminderTime = "morning" | "evening";
+type ReminderDay = "sunday" | "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday";
 
 // =============================================================================
 // Component
@@ -67,6 +73,10 @@ export default function BaselinePage() {
 
   // Form state - all questions
   const [responses, setResponses] = useState<Partial<BaselineResponse>>({});
+  
+  // Reminder state
+  const [reminderDay, setReminderDay] = useState<ReminderDay | null>(null);
+  const [reminderTime, setReminderTime] = useState<ReminderTime | null>(null);
 
   const updateResponse = <K extends keyof BaselineResponse>(
     key: K,
@@ -79,11 +89,23 @@ export default function BaselinePage() {
     if (currentSection < SECTIONS.length - 1) {
       setCurrentSection(currentSection + 1);
     } else {
-      // Final section - save and continue to reminder
+      // Final section - save and go to dashboard
       saveBaselineResponse(responses);
       completeBaseline();
-      saveOnboardingState({ currentStep: 7 });
-      router.push("/onboarding/reminder");
+      
+      // Calculate reminder date as one week from now
+      const nextWeek = new Date();
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      
+      // Save reminder preferences and mark complete
+      saveOnboardingState({
+        currentStep: 7,
+        completed: true,
+        reminderDate: nextWeek.toISOString(),
+        reminderTime: reminderTime ?? undefined,
+      });
+      completeOnboarding();
+      router.push("/");
     }
   };
 
@@ -106,13 +128,13 @@ export default function BaselinePage() {
       case "situation":
         return responses.workStatus != null && responses.situationSatisfaction != null;
       case "confidence":
-        return responses.confidence != null && responses.selfEsteem != null;
+        return responses.confidence != null;
       case "aspirations":
         return responses.futureClarity != null && responses.futureHope != null;
-      case "skills":
-        return responses.buildingSkills != null && responses.learningMotivation != null;
       case "wellbeing":
-        return responses.energyLevel != null && responses.stressLevel != null && responses.hasBalance != null;
+        return responses.stressLevel != null && responses.energyLevel != null && responses.lifeBalance != null;
+      case "reminder":
+        return reminderDay != null && reminderTime != null;
       default:
         return false;
     }
@@ -121,13 +143,12 @@ export default function BaselinePage() {
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
-        <WizardHeader title="Baseline Quiz" onCancel={handleCancel} />
+        <WizardHeader title="About You" onCancel={handleCancel} />
         <div className="max-w-sm mx-auto px-6 pb-6">
 
           {/* Large animated progress percentage */}
           <ProgressDisplay 
-            progress={Math.round((currentSection / 6) * 100)}
-            label={`Section ${currentSection + 1} of 6`}
+            progress={Math.round((currentSection / SECTIONS.length) * 100)}
           />
 
           {/* Section title centered */}
@@ -182,20 +203,6 @@ export default function BaselinePage() {
                     highLabel="Very confident"
                   />
                 </div>
-
-                {responses.confidence != null && (
-                  <div className="space-y-4 animate-fade-in">
-                    <p className="text-[var(--color-charcoal)] text-2xl">
-                      How would you rate your self-esteem?
-                    </p>
-                    <RatingScale
-                      value={responses.selfEsteem ?? null}
-                      onChange={(v) => updateResponse("selfEsteem", v)}
-                      lowLabel="Low"
-                      highLabel="High"
-                    />
-                  </div>
-                )}
               </>
             )}
 
@@ -216,43 +223,13 @@ export default function BaselinePage() {
                 {responses.futureClarity != null && (
                   <div className="space-y-4 animate-fade-in">
                     <p className="text-[var(--color-charcoal)] text-2xl">
-                      How hopeful do you feel about your future?
+                      How positive do you feel about your future?
                     </p>
                     <RatingScale
                       value={responses.futureHope ?? null}
                       onChange={(v) => updateResponse("futureHope", v)}
-                      lowLabel="Not hopeful"
-                      highLabel="Very hopeful"
-                    />
-                  </div>
-                )}
-              </>
-            )}
-
-            {section.id === "skills" && (
-              <>
-                <div className="space-y-4">
-                  <p className="text-[var(--color-charcoal)] text-2xl">
-                    Are you currently building your skills?
-                  </p>
-                  <ChoiceChips
-                    className="justify-start"
-                    options={YES_NO_OPTIONS}
-                    value={responses.buildingSkills ?? null}
-                    onChange={(v) => updateResponse("buildingSkills", v as "yes" | "no")}
-                  />
-                </div>
-
-                {responses.buildingSkills != null && (
-                  <div className="space-y-4 animate-fade-in">
-                    <p className="text-[var(--color-charcoal)] text-2xl">
-                      How motivated are you to learn new skills right now?
-                    </p>
-                    <RatingScale
-                      value={responses.learningMotivation ?? null}
-                      onChange={(v) => updateResponse("learningMotivation", v)}
-                      lowLabel="Not motivated"
-                      highLabel="Very motivated"
+                      lowLabel="Not positive"
+                      highLabel="Very positive"
                     />
                   </div>
                 )}
@@ -263,40 +240,80 @@ export default function BaselinePage() {
               <>
                 <div className="space-y-4">
                   <p className="text-[var(--color-charcoal)] text-2xl">
-                    How would you rate your energy most days?
+                    How well do you manage stress?
                   </p>
                   <RatingScale
-                    value={responses.energyLevel ?? null}
-                    onChange={(v) => updateResponse("energyLevel", v)}
-                    lowLabel="Very low"
-                    highLabel="Very high"
+                    value={responses.stressLevel ?? null}
+                    onChange={(v) => updateResponse("stressLevel", v)}
+                    lowLabel="Not well"
+                    highLabel="Very well"
                   />
                 </div>
-
-                {responses.energyLevel != null && (
-                  <div className="space-y-4 animate-fade-in">
-                    <p className="text-[var(--color-charcoal)] text-2xl">
-                      How would you rate your stress levels?
-                    </p>
-                    <RatingScale
-                      value={responses.stressLevel ?? null}
-                      onChange={(v) => updateResponse("stressLevel", v)}
-                      lowLabel="Very stressed"
-                      highLabel="Not stressed"
-                    />
-                  </div>
-                )}
 
                 {responses.stressLevel != null && (
                   <div className="space-y-4 animate-fade-in">
                     <p className="text-[var(--color-charcoal)] text-2xl">
-                      Do you feel you have a good balance in life?
+                      How would you rate your energy most days?
                     </p>
-                    <ChoiceChips
-                      className="justify-start"
-                      options={YES_NO_UNSURE_OPTIONS}
-                      value={responses.hasBalance ?? null}
-                      onChange={(v) => updateResponse("hasBalance", v as "yes" | "no" | "unsure")}
+                    <RatingScale
+                      value={responses.energyLevel ?? null}
+                      onChange={(v) => updateResponse("energyLevel", v)}
+                      lowLabel="Very low"
+                      highLabel="Very high"
+                    />
+                  </div>
+                )}
+
+                {responses.energyLevel != null && (
+                  <div className="space-y-4 animate-fade-in">
+                    <p className="text-[var(--color-charcoal)] text-2xl">
+                      How would you rate your life balance right now?
+                    </p>
+                    <RatingScale
+                      value={responses.lifeBalance ?? null}
+                      onChange={(v) => updateResponse("lifeBalance", v)}
+                      lowLabel="Out of balance"
+                      highLabel="Well balanced"
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            {section.id === "reminder" && (
+              <>
+                <TipBox>
+                  Choose a day and time that is quiet and allows you to focus on you. Sunday&apos;s can be a good day to reflect on the week past and plan for the week ahead.
+                </TipBox>
+
+                <div className="space-y-4 mt-6">
+                  <p className="text-gray-900 font-medium">Pick a day</p>
+                  <ChoiceChips
+                    className="justify-start flex-wrap"
+                    options={DAY_OPTIONS}
+                    value={reminderDay}
+                    onChange={(v) => setReminderDay(v as ReminderDay)}
+                  />
+                </div>
+
+                {reminderDay != null && (
+                  <div className="space-y-3 mt-6 animate-fade-in" role="radiogroup" aria-label="Weekly check-in time">
+                    <p className="text-gray-900 font-medium">Pick a time</p>
+                    <TimeOption
+                      time="8:00 AM"
+                      label="Morning"
+                      description="Start your week with reflection"
+                      icon={Sunrise}
+                      selected={reminderTime === "morning"}
+                      onSelect={() => setReminderTime("morning")}
+                    />
+                    <TimeOption
+                      time="6:00 PM"
+                      label="Evening"
+                      description="Wind down and plan your week"
+                      icon={Sunset}
+                      selected={reminderTime === "evening"}
+                      onSelect={() => setReminderTime("evening")}
                     />
                   </div>
                 )}
@@ -306,27 +323,59 @@ export default function BaselinePage() {
         </div>
       </div>
 
-      <FullScreenLayout.Footer>
-        <div className="flex items-center justify-between px-2">
-          <div className="w-24">
-            {currentSection > 0 && (
-              <button
-                onClick={handleBack}
-                className="py-3 text-brand-primary font-medium flex items-center gap-1"
-              >
-                ← Back
-              </button>
-            )}
+      {/* Contextual Action Bar */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50">
+        <div className="flex justify-around items-center h-16 max-w-md mx-auto">
+          {/* Back */}
+          <button
+            onClick={handleBack}
+            disabled={currentSection === 0}
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
+              currentSection === 0 
+                ? "text-gray-300 cursor-not-allowed" 
+                : "text-gray-400 hover:text-brand-primary"
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+            <span className="text-xs mt-1">Back</span>
+          </button>
+          
+          {/* Progress indicator */}
+          <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
+            <span className="text-sm font-medium text-brand-primary">{currentSection + 1}/{SECTIONS.length}</span>
+            <span className="text-xs mt-0.5">Steps</span>
           </div>
+          
+          {/* Next/Continue */}
           <button
             onClick={handleNext}
             disabled={!isSectionComplete()}
-            className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
+              isSectionComplete() 
+                ? "text-brand-primary" 
+                : "text-gray-300 cursor-not-allowed"
+            }`}
           >
-            {isLastSection ? "Continue" : "Next"} →
+            {isLastSection ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+                <span className="text-xs mt-1 font-medium">Continue</span>
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                </svg>
+                <span className="text-xs mt-1">Next</span>
+              </>
+            )}
           </button>
         </div>
-      </FullScreenLayout.Footer>
+      </nav>
     </FullScreenLayout>
   );
 }

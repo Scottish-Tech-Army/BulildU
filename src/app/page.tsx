@@ -123,7 +123,7 @@ export default function DashboardPage() {
             <GreetingIcon className="w-6 h-6 text-brand-primary" />
             {greeting}
           </h1>
-          <p className="text-text-muted">Small steps, real progress</p>
+          <p className="text-text-muted">Move towards your potential</p>
         </header>
 
         {/* Weekly Check-in Prompt */}
