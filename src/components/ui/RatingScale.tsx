@@ -39,39 +39,42 @@ export function RatingScale({
 }: RatingScaleProps) {
   return (
     <div 
-      className="space-y-3"
+      className="space-y-4"
       role="radiogroup"
       aria-label={question || "Rating scale from 1 to 5"}
     >
-      {/* Rating buttons - single row */}
-      <div className="flex justify-between gap-2">
-        {[1, 2, 3, 4, 5].map((num) => (
-          <button
-            key={num}
-            onClick={() => onChange(num)}
-            role="radio"
-            aria-checked={value === num}
-            aria-label={`${num} out of 5: ${RATING_LABELS[num - 1]}`}
-            className={`
-              w-14 h-14 rounded-full font-semibold text-lg
-              transition-all duration-150
-              focus-ring
-              ${
-                value === num
-                  ? "bg-[var(--color-magenta)] text-white scale-110 shadow-lg"
-                  : "bg-[var(--color-warm-ivory)] text-[var(--color-charcoal)] hover:bg-[var(--color-magenta)]/20 hover:scale-105"
-              }
-            `}
-          >
-            {num}
-          </button>
-        ))}
-      </div>
+      {/* Centered Rating Control Container */}
+      <div className="max-w-md mx-auto">
+        {/* Rating buttons - centered row with fixed gaps */}
+        <div className="flex justify-center gap-3 sm:gap-4 mb-4">
+          {[1, 2, 3, 4, 5].map((num) => (
+            <button
+              key={num}
+              onClick={() => onChange(num)}
+              role="radio"
+              aria-checked={value === num}
+              aria-label={`${num} out of 5: ${RATING_LABELS[num - 1]}`}
+              className={`
+                w-12 h-12 sm:w-14 sm:h-14 rounded-full font-semibold text-lg
+                transition-all duration-150
+                focus-ring
+                ${
+                  value === num
+                    ? "bg-[var(--color-magenta)] text-white scale-110 shadow-lg"
+                    : "bg-[var(--color-warm-ivory)] text-[var(--color-charcoal)] hover:bg-[var(--color-magenta)]/20 hover:scale-105"
+                }
+              `}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
 
-      {/* Scale labels */}
-      <div className="flex justify-between text-sm text-[var(--color-charcoal)]/60 px-2">
-        <span>{lowLabel}</span>
-        <span>{highLabel}</span>
+        {/* Scale labels aligned to buttons */}
+        <div className="flex justify-between text-sm text-[var(--color-charcoal)]/60 px-4">
+          <span>{lowLabel}</span>
+          <span>{highLabel}</span>
+        </div>
       </div>
     </div>
   );

@@ -9,7 +9,8 @@ import DailyQuote from "@/components/ui/DailyQuote";
 import { BottomSheet, GoalFilters, GoalSort } from "@/components";
 import { GoalFilterState, DEFAULT_FILTERS, CATEGORIES, STATUS_OPTIONS } from "@/components/ui/GoalFilters";
 
-import { Plus, SlidersHorizontal, RotateCcw, ArrowUpDown } from "lucide-react";
+import { Plus, SlidersHorizontal, RotateCcw, ArrowUpDown, Target } from "lucide-react";
+import { DottedEmptyState } from "@/components";
 
 /**
  * Smart "At Risk" logic:
@@ -149,10 +150,13 @@ export default function GoalsPage() {
 
   return (
     <div className="min-h-dvh bg-brand-surface flex flex-col">
-      <div className="px-6 pt-8 flex-1 flex flex-col">
+      <div className="px-6 pt-8 flex-1 flex flex-col max-w-5xl mx-auto w-full">
         {/* Header */}
         <header className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl text-[var(--color-charcoal)]">Goals</h1>
+          <div className="flex items-center gap-3">
+            <Target className="w-8 h-8 text-brand-primary" />
+            <h1 className="text-2xl text-[var(--color-charcoal)]">Goals</h1>
+          </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSortOpen(true)}
@@ -199,23 +203,15 @@ export default function GoalsPage() {
         </div>
 
         {goals.length === 0 ? (
-          /* Initial Empty State (No goals created) - Now takes full remaining space */
-          <section className="flex-1 flex flex-col pb-8">
-            <Link href="/goals/new" className="flex-1 flex flex-col outline-none">
-              <div className="flex-1 border-2 border-dashed border-gray-200 rounded-[2.5rem] p-8 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-all duration-300 flex flex-col items-center justify-center group active:scale-[0.99]">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <div className="p-3 bg-brand-primary/10 rounded-2xl group-hover:bg-brand-primary group-hover:text-white transition-colors">
-                    <Plus className="w-8 h-8 text-brand-primary group-hover:text-white transition-colors" />
-                  </div>
-                </div>
-                <h2 className="text-xl font-semibold text-brand-primary uppercase tracking-tight mb-2">
-                  Set your first goal
-                </h2>
-                <p className="text-sm text-text-muted max-w-[240px] leading-relaxed">
-                  Start with something meaningful to you and track your journey to potential.
-                </p>
-              </div>
-            </Link>
+          /* Initial Empty State (No goals created) */
+          <section className="flex-1 flex flex-col pb-8 h-full">
+            <DottedEmptyState
+              href="/goals/new"
+              title="Set your first goal"
+              description="Start with something meaningful to you and track your journey to potential."
+              icon={Plus}
+              className="flex-1 h-full"
+            />
           </section>
         ) : processedGoals.length === 0 ? (
           /* Filtered Empty State (No matches) */

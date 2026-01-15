@@ -134,11 +134,17 @@ export default function ProgressPage() {
 
   return (
     <div className="min-h-dvh bg-brand-surface pb-32 overflow-y-auto">
-      <div className="px-6 pt-8 pb-4">
+      <div className="px-6 pt-8 pb-4 max-w-5xl mx-auto w-full">
         {/* Header */}
-        <header className="mb-6">
+        <header className="mb-6 flex items-center gap-3">
+          <BarChart3 className="w-8 h-8 text-brand-primary" />
           <h1 className="text-2xl text-[var(--color-charcoal)]">Progress</h1>
         </header>
+
+        {/* Inspirational Quote */}
+        <div className="mb-6">
+          <DailyQuote />
+        </div>
 
         {!hasData && !hasBaseline ? (
           /* Empty State */
@@ -358,10 +364,6 @@ export default function ProgressPage() {
           </>
         )}
 
-        {/* Inspirational Quote */}
-        <div className="mt-6">
-          <DailyQuote />
-        </div>
       </div>
 
       <BottomNav />

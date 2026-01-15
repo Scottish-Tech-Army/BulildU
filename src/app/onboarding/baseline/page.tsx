@@ -6,11 +6,11 @@ import {
   FullScreenLayout,
   RatingScale,
   ChoiceChips,
-  TipBox,
+  Tooltip,
+  ProgressDisplay,
+  WizardHeader,
+  TimeOption,
 } from "@/components";
-import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
-import { WizardHeader } from "@/components/ui/WizardHeader";
-import { TimeOption } from "@/components/ui/TimeOption";
 import {
   saveBaselineResponse,
   completeBaseline,
@@ -143,8 +143,8 @@ export default function BaselinePage() {
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
-        <WizardHeader title="About You" onCancel={handleCancel} />
-        <div className="max-w-sm mx-auto px-6 pb-6">
+        <WizardHeader title="About U" onCancel={handleCancel} />
+        <div className="max-w-5xl mx-auto px-6 pb-6 w-full">
 
           {/* Large animated progress percentage */}
           <ProgressDisplay 
@@ -156,18 +156,28 @@ export default function BaselinePage() {
             <h1 className="text-2xl font-semibold text-[var(--color-charcoal)]">
               {section.title}
             </h1>
+            {section.id === "reminder" && (
+              <div className="flex items-center justify-center gap-2 mt-8">
+                <p className="text-[var(--color-charcoal)] text-2xl">
+                  Pick a day
+                </p>
+                <Tooltip 
+                  content="Choose a day and time that is quiet and allows you to focus on you. Sundays can be a good day to reflect and plan."
+                />
+              </div>
+            )}
           </div>
 
           {/* Section content */}
-          <div className="space-y-8">
+          <div className="space-y-12">
             {section.id === "situation" && (
               <>
-                <div className="space-y-4">
+                <div className="space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-2xl">
                     Which best describes where you&apos;re at right now?
                   </p>
                   <ChoiceChips
-                    className="justify-start"
+                    className="justify-center"
                     options={WORK_STATUS_OPTIONS}
                     value={responses.workStatus ?? null}
                     onChange={(v) => updateResponse("workStatus", v as WorkStatus)}
@@ -175,8 +185,8 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.workStatus != null && (
-                  <div className="space-y-4 animate-fade-in">
-                    <p className="text-[var(--color-charcoal)] text-2xl">
+                  <div className="space-y-6 animate-fade-in text-center">
+                    <p className="text-[var(--color-charcoal)] text-2xl text-center">
                       How satisfied are you with your current situation?
                     </p>
                     <RatingScale
@@ -192,7 +202,7 @@ export default function BaselinePage() {
 
             {section.id === "confidence" && (
               <>
-                <div className="space-y-4">
+                <div className="space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-2xl">
                     How confident do you feel in yourself right now?
                   </p>
@@ -208,7 +218,7 @@ export default function BaselinePage() {
 
             {section.id === "aspirations" && (
               <>
-                <div className="space-y-4">
+                <div className="space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-2xl">
                     How clear do you feel about what you want for your future?
                   </p>
@@ -221,7 +231,7 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.futureClarity != null && (
-                  <div className="space-y-4 animate-fade-in">
+                  <div className="space-y-6 animate-fade-in text-center">
                     <p className="text-[var(--color-charcoal)] text-2xl">
                       How positive do you feel about your future?
                     </p>
@@ -238,7 +248,7 @@ export default function BaselinePage() {
 
             {section.id === "wellbeing" && (
               <>
-                <div className="space-y-4">
+                <div className="space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-2xl">
                     How well do you manage stress?
                   </p>
@@ -251,7 +261,7 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.stressLevel != null && (
-                  <div className="space-y-4 animate-fade-in">
+                  <div className="space-y-6 animate-fade-in text-center">
                     <p className="text-[var(--color-charcoal)] text-2xl">
                       How would you rate your energy most days?
                     </p>
@@ -265,7 +275,7 @@ export default function BaselinePage() {
                 )}
 
                 {responses.energyLevel != null && (
-                  <div className="space-y-4 animate-fade-in">
+                  <div className="space-y-6 animate-fade-in text-center">
                     <p className="text-[var(--color-charcoal)] text-2xl">
                       How would you rate your life balance right now?
                     </p>
@@ -282,39 +292,38 @@ export default function BaselinePage() {
 
             {section.id === "reminder" && (
               <>
-                <TipBox>
-                  Choose a day and time that is quiet and allows you to focus on you. Sunday&apos;s can be a good day to reflect on the week past and plan for the week ahead.
-                </TipBox>
-
-                <div className="space-y-4 mt-6">
-                  <p className="text-gray-900 font-medium">Pick a day</p>
-                  <ChoiceChips
-                    className="justify-start flex-wrap"
-                    options={DAY_OPTIONS}
-                    value={reminderDay}
-                    onChange={(v) => setReminderDay(v as ReminderDay)}
-                  />
+                <div className="mt-6 text-center">
+                  <div className="max-w-md mx-auto">
+                    <ChoiceChips
+                      className="justify-center flex-wrap"
+                      options={DAY_OPTIONS}
+                      value={reminderDay}
+                      onChange={(v) => setReminderDay(v as ReminderDay)}
+                    />
+                  </div>
                 </div>
 
                 {reminderDay != null && (
-                  <div className="space-y-3 mt-6 animate-fade-in" role="radiogroup" aria-label="Weekly check-in time">
+                  <div className="space-y-3 mt-6 animate-fade-in text-center" role="radiogroup" aria-label="Weekly check-in time">
                     <p className="text-gray-900 font-medium">Pick a time</p>
-                    <TimeOption
-                      time="8:00 AM"
-                      label="Morning"
-                      description="Start your week with reflection"
-                      icon={Sunrise}
-                      selected={reminderTime === "morning"}
-                      onSelect={() => setReminderTime("morning")}
-                    />
-                    <TimeOption
-                      time="6:00 PM"
-                      label="Evening"
-                      description="Wind down and plan your week"
-                      icon={Sunset}
-                      selected={reminderTime === "evening"}
-                      onSelect={() => setReminderTime("evening")}
-                    />
+                    <div className="max-w-md mx-auto space-y-3">
+                      <TimeOption
+                        time="8:00 AM"
+                        label="Morning"
+                        description="Start your week with reflection"
+                        icon={Sunrise}
+                        selected={reminderTime === "morning"}
+                        onSelect={() => setReminderTime("morning")}
+                      />
+                      <TimeOption
+                        time="6:00 PM"
+                        label="Evening"
+                        description="Wind down and plan your week"
+                        icon={Sunset}
+                        selected={reminderTime === "evening"}
+                        onSelect={() => setReminderTime("evening")}
+                      />
+                    </div>
                   </div>
                 )}
               </>
@@ -325,7 +334,7 @@ export default function BaselinePage() {
 
       {/* Contextual Action Bar */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50">
-        <div className="flex justify-around items-center h-16 max-w-md mx-auto">
+        <div className="flex justify-between items-center h-16 max-w-5xl mx-auto w-full px-6">
           {/* Back */}
           <button
             onClick={handleBack}

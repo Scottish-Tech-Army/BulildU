@@ -60,7 +60,7 @@ export default function ReminderPage() {
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
         <WizardHeader title="Reminder Setup" onCancel={() => router.push("/onboarding/welcome")} />
-        <div className="max-w-sm mx-auto px-6 pb-6">
+        <div className="max-w-5xl mx-auto px-6 pb-6 w-full">
 
           {/* Large animated progress percentage - 5/6 complete */}
           <ProgressDisplay 
@@ -69,8 +69,8 @@ export default function ReminderPage() {
           />
 
           {/* Question */}
-          <div className="text-center mb-8 text-left">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2 text-left">
+          <div className="text-center mb-16">
+            <h1 className="text-2xl font-semibold text-gray-900 mb-4">
               When works best for your weekly check-in?
             </h1>
             <p className="text-gray-500">
@@ -78,48 +78,50 @@ export default function ReminderPage() {
             </p>
           </div>
 
-
-
           {/* Time options */}
-          <div className="space-y-3" role="radiogroup" aria-label="Weekly check-in time">
-            <p className="text-gray-900 font-medium text-left">
+          <div className="space-y-6 text-center" role="radiogroup" aria-label="Weekly check-in time">
+            <p className="text-gray-900 font-medium mb-4">
               Pick a time
             </p>
-            <TimeOption
-              time="8:00 AM"
-              label="Morning"
-              description="Start your week with reflection"
-              icon={Sunrise}
-              selected={selectedTime === "morning"}
-              onSelect={() => setSelectedTime("morning")}
-            />
-            <TimeOption
-              time="6:00 PM"
-              label="Evening"
-              description="Wind down and plan your week"
-              icon={Sunset}
-              selected={selectedTime === "evening"}
-              onSelect={() => setSelectedTime("evening")}
-            />
+            <div className="max-w-md mx-auto space-y-4">
+              <TimeOption
+                time="8:00 AM"
+                label="Morning"
+                description="Start your week with reflection"
+                icon={Sunrise}
+                selected={selectedTime === "morning"}
+                onSelect={() => setSelectedTime("morning")}
+              />
+              <TimeOption
+                time="6:00 PM"
+                label="Evening"
+                description="Wind down and plan your week"
+                icon={Sunset}
+                selected={selectedTime === "evening"}
+                onSelect={() => setSelectedTime("evening")}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       <FullScreenLayout.Footer>
-        <div className="flex items-center justify-between px-2">
-          <button
-            onClick={() => router.push("/onboarding/baseline")}
-            className="py-3 text-brand-primary font-medium flex items-center gap-1"
-          >
-            ← Back
-          </button>
-          <button
-            onClick={handleComplete}
-            disabled={!canContinue}
-            className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Complete →
-          </button>
+        <div className="max-w-5xl mx-auto w-full">
+          <div className="flex items-center justify-between px-6">
+            <button
+              onClick={() => router.push("/onboarding/baseline")}
+              className="py-3 text-brand-primary font-medium flex items-center gap-1"
+            >
+              ← Back
+            </button>
+            <button
+              onClick={handleComplete}
+              disabled={!canContinue}
+              className="py-3 text-brand-primary font-medium flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Complete →
+            </button>
+          </div>
         </div>
       </FullScreenLayout.Footer>
     </FullScreenLayout>

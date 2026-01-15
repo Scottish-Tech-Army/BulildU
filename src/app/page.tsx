@@ -14,7 +14,7 @@ import {
 import BottomNav from "@/components/ui/BottomNav";
 import {
   Flame,
-  MessageCircle,
+  Bell,
   Plus,
   Sun,
   Sunset,
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import GoalCard from "@/components/ui/GoalCard";
 import DailyQuote from "@/components/ui/DailyQuote";
+import { DottedEmptyState } from "@/components";
 
 
 
@@ -81,7 +82,7 @@ export default function DashboardPage() {
       <div className="px-6 pt-8 max-w-5xl mx-auto w-full flex-1 flex flex-col">
         {/* Header */}
         <header className="mb-8 md:col-span-12">
-          <h1 className="text-3xl font-bold text-[var(--color-charcoal)] mb-1 flex items-center gap-3">
+          <h1 className="text-2xl text-[var(--color-charcoal)] mb-1 flex items-center gap-3">
             <GreetingIcon className="w-8 h-8 text-brand-primary" />
             {greeting}
           </h1>
@@ -100,7 +101,7 @@ export default function DashboardPage() {
                       <h2 className="text-2xl font-bold">How are you doing today?</h2>
                     </div>
                     <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl">
-                      <MessageCircle className="w-8 h-8" />
+                      <Bell className="w-8 h-8" />
                     </div>
                   </div>
                 </div>
@@ -111,7 +112,7 @@ export default function DashboardPage() {
           {/* Stats Column */}
           <div className="md:col-span-4 grid grid-cols-3 md:grid-cols-1 gap-4">
             {/* Momentum */}
-            <div className="bg-warm-ivory rounded-3xl p-6 text-center border border-white/40 flex flex-col items-center justify-center hover:bg-white/50 transition-colors">
+            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-brand-primary flex items-center gap-2">
                 {momentum > 0 && <Flame className="w-8 h-8" />}
                 {momentum}
@@ -122,7 +123,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Active Goals */}
-            <div className="bg-warm-ivory rounded-3xl p-6 text-center border border-white/40 flex flex-col items-center justify-center hover:bg-white/50 transition-colors">
+            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-[var(--color-charcoal)]">
                 {activeGoals.length}
               </span>
@@ -132,7 +133,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Milestones Progress */}
-            <div className="bg-warm-ivory rounded-3xl p-6 text-center border border-white/40 flex flex-col items-center justify-center hover:bg-white/50 transition-colors">
+            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-[var(--color-charcoal)]">
                 {totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0}%
               </span>
@@ -177,20 +178,14 @@ export default function DashboardPage() {
               </section>
             ) : (
               /* Empty State */
-              <section className="mb-8">
-                <Link href="/goals/new" className="block outline-none">
-                  <div className="border-2 border-dashed border-warm-ivory rounded-[2.5rem] p-12 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-all duration-300 flex flex-col items-center justify-center group">
-                    <div className="bg-brand-primary text-white p-4 rounded-2xl mb-6 shadow-brand-primary/20 group-hover:scale-110 transition-transform">
-                      <Plus className="w-8 h-8" />
-                    </div>
-                    <h2 className="text-xl font-bold text-[var(--color-charcoal)] mb-2">
-                      Set Your First Goal
-                    </h2>
-                    <p className="text-text-muted max-w-sm">
-                      Start with something meaningful to you and track your journey to potential.
-                    </p>
-                  </div>
-                </Link>
+              <section className="flex-1 flex flex-col mb-8">
+                <DottedEmptyState
+                  href="/goals/new"
+                  title="Set Your First Goal"
+                  description="Start with something meaningful to you and track your journey to potential."
+                  icon={Plus}
+                  className="flex-1 h-full"
+                />
               </section>
             )}
 

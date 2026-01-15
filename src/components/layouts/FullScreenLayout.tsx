@@ -49,7 +49,7 @@ function Content({ children, centered = true }: ContentProps) {
         centered ? "flex items-center justify-center" : ""
       }`}
     >
-      <div className="w-full max-w-sm mx-auto">{children}</div>
+      <div className="w-full max-w-5xl mx-auto">{children}</div>
     </div>
   );
 }

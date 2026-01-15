@@ -136,7 +136,7 @@ export function CelebrationScreen({
 
       {/* Sticky bottom CTA */}
       <div className="sticky bottom-0 p-6 pb-safe">
-        <div className="max-w-sm mx-auto">
+        <div className="max-w-5xl mx-auto w-full">
           <PrimaryButton variant="white" onClick={onButtonClick}>
             {buttonText}
           </PrimaryButton>
