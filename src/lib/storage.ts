@@ -166,7 +166,7 @@ export function completeBaseline(): void {
 // Goals
 // =============================================================================
 
-export type GoalCategory = "Health" | "Career" | "Money" | "Growth" | "Family";
+export type GoalCategory = "Wellbeing" | "Career" | "Finances" | "Growth" | "Family";
 
 export interface Action {
   id: string;

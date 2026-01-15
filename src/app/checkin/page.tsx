@@ -45,10 +45,13 @@ export default function CheckInPage() {
   });
   const [momentumDays, setMomentumDays] = useState(0);
 
-  const currentStepIndex = ["energy", "goals", "reflection", "celebration"].indexOf(
-    step
-  );
-  const totalSteps = goals.length > 0 ? 4 : 3; // Skip goals step if no goals
+  // Build the actual step order based on whether there are goals
+  const stepOrder: CheckInStep[] = goals.length > 0 
+    ? ["energy", "goals", "reflection", "celebration"]
+    : ["energy", "reflection", "celebration"];
+  
+  const currentStepIndex = stepOrder.indexOf(step);
+  const totalSteps = stepOrder.length - 1; // Exclude celebration as it's the end screen
 
   const handleNext = () => {
     if (step === "energy") {

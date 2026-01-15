@@ -11,7 +11,7 @@ import { RatingScale } from "@/components/ui/RatingScale";
 import { StepHeader } from "@/components/ui/StepHeader";
 import { WizardHeader } from "@/components/ui/WizardHeader";
 import { GoalCategory, createGoal, generateId } from "@/lib/storage";
-import { Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, DollarSign, Home, Sprout, HeartPulse } from "lucide-react";
+import { Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, PoundSterling, Home, Sprout, HeartPulse } from "lucide-react";
 
 type WizardStep =
   | "why"         // Relevant
@@ -46,14 +46,14 @@ interface GoalDraft {
  */
 export default function NewGoalPage() {
   const router = useRouter();
-  const [step, setStep] = useState<WizardStep>("why");
+  const [step, setStep] = useState<WizardStep>("category");
   const [draft, setDraft] = useState<GoalDraft>({
     whyMatters: "",
     title: "",
     successCriteria: "",
     confidence: null,
     targetDate: "",
-    category: "Health",
+    category: "Wellbeing",
     milestones: [],
   });
 
@@ -200,9 +200,9 @@ export default function NewGoalPage() {
                 </TipBox>
                 <div className="grid grid-cols-2 gap-3">
                   {([
-                    { value: "Health" as GoalCategory, label: "Health", icon: HeartPulse },
+                    { value: "Wellbeing" as GoalCategory, label: "Wellbeing", icon: HeartPulse },
                     { value: "Career" as GoalCategory, label: "Career", icon: Briefcase },
-                    { value: "Money" as GoalCategory, label: "Money", icon: DollarSign },
+                    { value: "Finances" as GoalCategory, label: "Finances", icon: PoundSterling },
                     { value: "Growth" as GoalCategory, label: "Growth", icon: Sprout },
                     { value: "Family" as GoalCategory, label: "Family", icon: Home },
                   ]).map(({ value, label, icon: Icon }) => (
