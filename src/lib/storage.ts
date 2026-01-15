@@ -292,6 +292,28 @@ export function deleteGoal(id: string): boolean {
 }
 
 /**
+ * Helper to sync goal status based on milestone completion
+ */
+function syncGoalStatus(goal: Goal): Goal {
+  if (goal.milestones.length === 0) {
+    if (goal.status === "completed") {
+      goal.status = "active";
+    }
+    return goal;
+  }
+
+  const allCompleted = goal.milestones.every((m) => m.completed);
+  
+  if (allCompleted && goal.status !== "completed") {
+    goal.status = "completed";
+  } else if (!allCompleted && goal.status === "completed") {
+    goal.status = "active";
+  }
+
+  return goal;
+}
+
+/**
  * Add a milestone to a goal
  */
 export function addMilestone(
@@ -308,7 +330,14 @@ export function addMilestone(
   };
 
   goal.milestones.push(newMilestone);
-  updateGoal(goalId, { milestones: goal.milestones });
+  
+  // Sync status
+  syncGoalStatus(goal);
+  
+  updateGoal(goalId, { 
+    milestones: goal.milestones,
+    status: goal.status 
+  });
 
   return newMilestone;
 }
@@ -327,7 +356,14 @@ export function toggleMilestone(
   if (!milestone) return false;
 
   milestone.completed = !milestone.completed;
-  updateGoal(goalId, { milestones: goal.milestones });
+  
+  // Sync status
+  syncGoalStatus(goal);
+  
+  updateGoal(goalId, { 
+    milestones: goal.milestones,
+    status: goal.status 
+  });
 
   return true;
 }
@@ -344,7 +380,13 @@ export function deleteMilestone(goalId: string, milestoneId: string): boolean {
 
   if (goal.milestones.length === initialLength) return false;
 
-  updateGoal(goalId, { milestones: goal.milestones });
+  // Sync status
+  syncGoalStatus(goal);
+
+  updateGoal(goalId, { 
+    milestones: goal.milestones,
+    status: goal.status 
+  });
   return true;
 }
 
@@ -363,7 +405,14 @@ export function updateMilestone(
   if (!milestone) return false;
 
   Object.assign(milestone, updates);
-  updateGoal(goalId, { milestones: goal.milestones });
+  
+  // Sync status (in case completion was updated manually via updates)
+  syncGoalStatus(goal);
+
+  updateGoal(goalId, { 
+    milestones: goal.milestones,
+    status: goal.status 
+  });
   return true;
 }
 

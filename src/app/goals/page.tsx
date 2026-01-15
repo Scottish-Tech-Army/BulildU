@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Goal, getGoals, getGoalProgress } from "@/lib/storage";
 import GoalCard from "@/components/ui/GoalCard";
 import BottomNav from "@/components/ui/BottomNav";
-import { QuoteCard, BottomSheet, GoalFilters } from "@/components";
-import { GoalFilterState, DEFAULT_FILTERS } from "@/components/ui/GoalFilters";
+import DailyQuote from "@/components/ui/DailyQuote";
+import { BottomSheet, GoalFilters, GoalSort } from "@/components";
+import { GoalFilterState, DEFAULT_FILTERS, CATEGORIES, STATUS_OPTIONS } from "@/components/ui/GoalFilters";
 
-import { Plus, SlidersHorizontal, RotateCcw } from "lucide-react";
+import { Plus, SlidersHorizontal, RotateCcw, ArrowUpDown } from "lucide-react";
 
 /**
  * Smart "At Risk" logic:
@@ -46,14 +47,16 @@ export default function GoalsPage() {
 
   // Filter and Sort state
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const [filters, setFilters] = useState<GoalFilterState>(DEFAULT_FILTERS);
 
   // Apply filters and sort to goals
   const processedGoals = useMemo(() => {
     // 1. Filter
     const filtered = goals.filter((g) => {
-      // Status filter
-      if (!filters.statuses.includes(g.status)) return false;
+      // Status filter (empty = all)
+      if (filters.statuses.length > 0 && !filters.statuses.includes(g.status))
+        return false;
 
       // Category filter (empty = all)
       if (
@@ -69,7 +72,7 @@ export default function GoalsPage() {
     });
 
     // 2. Sort
-    return filtered.sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       switch (filters.sortBy) {
         case "targetDate":
           // Sort by date soonest first, but keep "No Date" at the end
@@ -104,9 +107,37 @@ export default function GoalsPage() {
   const completedGoals = processedGoals.filter((g) => g.status === "completed");
 
   const activeFilterCount =
-    (filters.categories.length > 0 ? 1 : 0) +
-    (filters.statuses.length !== 1 || filters.statuses[0] !== "active" ? 1 : 0) +
+    filters.categories.length +
+    filters.statuses.length +
     (filters.atRiskOnly ? 1 : 0);
+
+  const isSorted = filters.sortBy !== DEFAULT_FILTERS.sortBy;
+
+  const facetCounts = useMemo(() => {
+    return {
+      categories: CATEGORIES.reduce((acc, cat) => {
+        acc[cat] = goals.filter(g => 
+          (filters.statuses.length === 0 || filters.statuses.includes(g.status)) &&
+          (!filters.atRiskOnly || isGoalAtRisk(g)) &&
+          g.category === cat
+        ).length;
+        return acc;
+      }, {} as Record<string, number>),
+      statuses: STATUS_OPTIONS.reduce((acc, status) => {
+        acc[status] = goals.filter(g => 
+          (filters.categories.length === 0 || filters.categories.includes(g.category)) &&
+          (!filters.atRiskOnly || isGoalAtRisk(g)) &&
+          g.status === status
+        ).length;
+        return acc;
+      }, {} as Record<string, number>),
+      atRisk: goals.filter(g => 
+        (filters.categories.length === 0 || filters.categories.includes(g.category)) &&
+        (filters.statuses.length === 0 || filters.statuses.includes(g.status)) &&
+        isGoalAtRisk(g)
+      ).length
+    };
+  }, [goals, filters.categories, filters.statuses, filters.atRiskOnly]);
 
   if (isLoading) {
     return (
@@ -123,15 +154,26 @@ export default function GoalsPage() {
         <header className="flex items-center justify-between mb-8">
           <h1 className="text-2xl text-[var(--color-charcoal)]">Goals</h1>
           <div className="flex items-center gap-3">
-            {/* Filter Toggle */}
+            <button
+              onClick={() => setIsSortOpen(true)}
+              className={`w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all ${
+                isSorted
+                  ? "border-brand-primary bg-brand-primary/5 text-brand-primary"
+                  : "border-brand-surface bg-white text-text-muted"
+              }`}
+              aria-label="Sort goals"
+            >
+              <ArrowUpDown className="w-5 h-5" />
+            </button>
+
             <button
               onClick={() => setIsFilterOpen(true)}
-              className={`relative w-10 h-10 flex items-center justify-center rounded-xl border-2 transition-all ${
+              className={`relative w-10 h-10 flex items-center justify-center rounded-full border-2 transition-all ${
                 activeFilterCount > 0
                   ? "border-brand-primary bg-brand-primary/5 text-brand-primary"
                   : "border-brand-surface bg-white text-text-muted"
               }`}
-              aria-label="Filter and sort goals"
+              aria-label="Filter goals"
             >
               <SlidersHorizontal className="w-5 h-5" />
               {activeFilterCount > 0 && (
@@ -141,10 +183,9 @@ export default function GoalsPage() {
               )}
             </button>
 
-            {/* Create Goal */}
             <Link
               href="/goals/new"
-              className="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-brand-primary text-brand-primary hover:bg-brand-primary/5 transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-brand-primary text-brand-primary hover:bg-brand-primary/5 transition-colors"
               aria-label="Create new goal"
             >
               <Plus className="w-5 h-5" />
@@ -154,10 +195,7 @@ export default function GoalsPage() {
 
         {/* Inspirational Quote */}
         <div className="mb-6">
-          <QuoteCard
-            quote="Whatever the mind can conceive and believe, it can achieve!"
-            author="Napoleon Hill"
-          />
+          <DailyQuote />
         </div>
 
         {goals.length === 0 ? (
@@ -215,7 +253,7 @@ export default function GoalsPage() {
                 <h2 className="text-sm text-text-muted uppercase tracking-wide mb-3">
                   Paused ({pausedGoals.length})
                 </h2>
-                <div className="space-y-4 opacity-60">
+                <div className="space-y-4">
                   {pausedGoals.map((goal) => (
                     <GoalCard key={goal.id} goal={goal} />
                   ))}
@@ -229,7 +267,7 @@ export default function GoalsPage() {
                 <h2 className="text-sm text-text-muted uppercase tracking-wide mb-3">
                   Completed ({completedGoals.length})
                 </h2>
-                <div className="space-y-4 opacity-60">
+                <div className="space-y-4">
                   {completedGoals.map((goal) => (
                     <GoalCard key={goal.id} goal={goal} />
                   ))}
@@ -243,19 +281,37 @@ export default function GoalsPage() {
       {/* Spacer for BottomNav */}
       <div className="h-20" />
 
+      {/* Sorting BottomSheet */}
+      <BottomSheet
+        isOpen={isSortOpen}
+        onClose={() => setIsSortOpen(false)}
+        title="Sort Goals"
+      >
+        <GoalSort
+          currentSort={filters.sortBy}
+          onSortChange={(sortBy) => setFilters({ ...filters, sortBy })}
+          onApply={() => setIsSortOpen(false)}
+        />
+      </BottomSheet>
+
+      {/* Filters BottomSheet */}
       <BottomSheet
         isOpen={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
-        title="Filter & Sort"
+        title="Filter Goals"
       >
         <GoalFilters
           filters={filters}
           onFiltersChange={setFilters}
           onApply={() => setIsFilterOpen(false)}
+          totalResults={processedGoals.length}
+          categoryCounts={facetCounts.categories}
+          statusCounts={facetCounts.statuses}
+          atRiskCount={facetCounts.atRisk}
         />
       </BottomSheet>
 
-      <BottomNav />
+      {!isFilterOpen && !isSortOpen && <BottomNav />}
     </div>
   );
 }

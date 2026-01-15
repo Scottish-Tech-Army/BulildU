@@ -18,7 +18,11 @@ export default function GoalCard({ goal }: GoalCardProps) {
   return (
     <Link
       href={`/goals/${goal.id}`}
-      className="block bg-warm-ivory rounded-2xl p-4 group hover:bg-[var(--color-magenta)]/5 transition-all"
+      className={`block rounded-2xl p-4 group transition-all ${
+        goal.status === "active" 
+          ? "bg-white border border-gray-100" 
+          : "bg-warm-ivory"
+      } hover:bg-[var(--color-magenta)]/5`}
     >
       <div className="flex justify-between items-center gap-4">
         {/* Left: Title, Category & Date */}
@@ -38,7 +42,9 @@ export default function GoalCard({ goal }: GoalCardProps) {
               </span>
             )}
           </div>
-          <h3 className="text-lg font-medium text-[var(--color-charcoal)] truncate group-hover:text-[var(--color-magenta)] transition-colors mb-0.5">
+          <h3 className={`text-lg font-medium truncate group-hover:text-[var(--color-magenta)] transition-colors mb-0.5 ${
+            goal.status === "completed" ? "text-brand-primary" : "text-[var(--color-charcoal)]"
+          }`}>
             {goal.title}
           </h3>
           <p className="text-xs text-text-muted">

@@ -136,8 +136,8 @@ export default function CheckInPage() {
             ? `You completed ${completedThisSession} milestone${completedThisSession !== 1 ? "s" : ""} this week!`
             : "Keep up the great work. Small steps lead to big changes."
         }
-        buttonText="Back to dashboard"
-        onButtonClick={() => router.push("/")}
+        buttonText="Back to Goals"
+        onButtonClick={() => router.push("/goals")}
       >
         {momentumDays > 0 && (
           <div className="border border-white/50 rounded-2xl px-8 py-6 text-center">

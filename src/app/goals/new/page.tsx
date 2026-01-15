@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FullScreenLayout, CelebrationScreen, TipBox, QuoteCard } from "@/components";
+import { FullScreenLayout, CelebrationScreen, TipBox } from "@/components";
+import DailyQuote from "@/components/ui/DailyQuote";
 import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { TextAreaField } from "@/components/ui/TextAreaField";
 import { MilestoneInput } from "@/components/ui/MilestoneInput";
@@ -172,10 +173,7 @@ export default function NewGoalPage() {
                   Think about what achieving this goal will bring you, what does it change, how does it make you feel – the more detail, the better.
                 </TipBox>
                 
-                <QuoteCard 
-                  quote="When the why gets stronger, the how gets easier."
-                  author="Jim Rohn"
-                />
+                <DailyQuote />
                 
                 <TextAreaField
                   label=""

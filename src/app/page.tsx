@@ -78,145 +78,137 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-dvh bg-brand-surface flex flex-col">
-      <div className="px-6 pt-8 flex-1 flex flex-col">
+      <div className="px-6 pt-8 max-w-5xl mx-auto w-full flex-1 flex flex-col">
         {/* Header */}
-        <header className="mb-6">
-          <h1 className="text-2xl text-[var(--color-charcoal)] mb-1 flex items-center gap-2">
-            <GreetingIcon className="w-6 h-6 text-brand-primary" />
+        <header className="mb-8 md:col-span-12">
+          <h1 className="text-3xl font-bold text-[var(--color-charcoal)] mb-1 flex items-center gap-3">
+            <GreetingIcon className="w-8 h-8 text-brand-primary" />
             {greeting}
           </h1>
-          <p className="text-text-muted">Move towards your potential</p>
+          <p className="text-text-muted mt-1">Move towards your potential</p>
         </header>
 
-        {/* Weekly Check-in Prompt */}
-        {showCheckInPrompt && (
-          <section className="mb-6">
-            <Link href="/checkin">
-              <div className="bg-brand-gradient rounded-2xl p-4 text-white">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-white/80 text-sm">Weekly check-in</p>
-                    <p className="text-lg font-medium">How are you doing?</p>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          {/* Weekly Check-in Prompt */}
+          {showCheckInPrompt && (
+            <section className="md:col-span-12">
+              <Link href="/checkin">
+                <div className="bg-brand-gradient rounded-3xl p-8 text-white relative overflow-hidden hover:scale-[1.01] transition-transform">
+                  <div className="relative z-10 flex justify-between items-center">
+                    <div>
+                      <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">Weekly check-in</p>
+                      <h2 className="text-2xl font-bold">How are you doing today?</h2>
+                    </div>
+                    <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl">
+                      <MessageCircle className="w-8 h-8" />
+                    </div>
                   </div>
-                  <div className="p-2 bg-white/20 rounded-full">
-                    <MessageCircle className="w-6 h-6" />
-                  </div>
                 </div>
-              </div>
-            </Link>
-          </section>
-        )}
+              </Link>
+            </section>
+          )}
 
-        {/* Stats + Quote Row - responsive layout */}
-        <section className="mb-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Quick Stats - stacks vertically in left column on large screens */}
-            <div className="lg:col-span-1">
-              <h2 className="text-sm text-text-muted uppercase tracking-wide mb-3">Your Achievements</h2>
-              <div className="grid grid-cols-3 lg:grid-cols-1 gap-3">
-                {/* Momentum */}
-                <div className="bg-warm-ivory rounded-2xl p-4 text-center">
-                  <p className="text-2xl font-bold text-brand-primary flex items-center justify-center gap-1">
-                    {momentum > 0 && <Flame className="w-5 h-5 text-brand-primary" />}
-                    {momentum}
-                  </p>
-                  <p className="text-xs text-text-muted mt-1">
-                    {momentum === 1 ? "week streak" : "weeks streak"}
-                  </p>
-                </div>
-
-                {/* Active Goals */}
-                <div className="bg-warm-ivory rounded-2xl p-4 text-center">
-                  <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                    {activeGoals.length}
-                  </p>
-                  <p className="text-xs text-text-muted mt-1">
-                    active {activeGoals.length === 1 ? "goal" : "goals"}
-                  </p>
-                </div>
-
-                {/* Milestones Progress */}
-                <div className="bg-warm-ivory rounded-2xl p-4 text-center">
-                  <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                    {completedMilestones}/{totalMilestones}
-                  </p>
-                  <p className="text-xs text-text-muted mt-1">milestones done</p>
-                </div>
-              </div>
+          {/* Stats Column */}
+          <div className="md:col-span-4 grid grid-cols-3 md:grid-cols-1 gap-4">
+            {/* Momentum */}
+            <div className="bg-warm-ivory rounded-3xl p-6 text-center border border-white/40 flex flex-col items-center justify-center hover:bg-white/50 transition-colors">
+              <span className="text-4xl font-black text-brand-primary flex items-center gap-2">
+                {momentum > 0 && <Flame className="w-8 h-8" />}
+                {momentum}
+              </span>
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">
+                {momentum === 1 ? "week streak" : "weeks streak"}
+              </p>
             </div>
 
-            {/* Daily Quote - takes 2 columns on large screens */}
-            <div className="lg:col-span-2 h-full">
-              <DailyQuote className="h-full" />
+            {/* Active Goals */}
+            <div className="bg-warm-ivory rounded-3xl p-6 text-center border border-white/40 flex flex-col items-center justify-center hover:bg-white/50 transition-colors">
+              <span className="text-4xl font-black text-[var(--color-charcoal)]">
+                {activeGoals.length}
+              </span>
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">
+                active {activeGoals.length === 1 ? "goal" : "goals"}
+              </p>
+            </div>
+
+            {/* Milestones Progress */}
+            <div className="bg-warm-ivory rounded-3xl p-6 text-center border border-white/40 flex flex-col items-center justify-center hover:bg-white/50 transition-colors">
+              <span className="text-4xl font-black text-[var(--color-charcoal)]">
+                {totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0}%
+              </span>
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">milestones done</p>
             </div>
           </div>
-        </section>
 
+          {/* Daily Quote / Inspiration */}
+          <div className="md:col-span-8">
+            <DailyQuote className="h-full min-h-[300px]" />
+          </div>
 
-        {/* Goals Overview (condensed) */}
-        {activeGoals.length > 0 ? (
-          <section className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm text-text-muted uppercase tracking-wide">
-                Your Goals
-              </h2>
-              <Link
-                href="/goals"
-                className="text-brand-primary text-sm hover:underline"
-              >
-                View all →
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {activeGoals.slice(0, 2).map((goal) => (
-                <GoalCard key={goal.id} goal={goal} />
-              ))}
-              {activeGoals.length > 2 && (
-                <Link
-                  href="/goals"
-                  className="block text-center text-sm text-text-muted py-2 hover:text-brand-primary"
-                >
-                  +{activeGoals.length - 2} more goal
-                  {activeGoals.length - 2 !== 1 ? "s" : ""}
-                </Link>
-              )}
-            </div>
-          </section>
-        ) : (
-          /* Empty State - Now consistent 'full space' design */
-          <section className="flex-1 flex flex-col pb-8">
-            <Link href="/goals/new" className="flex-1 flex flex-col outline-none">
-              <div className="flex-1 border-2 border-dashed border-warm-ivory-dark rounded-[2.5rem] p-8 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-all duration-300 flex flex-col items-center justify-center group active:scale-[0.99]">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <div className="p-3 bg-brand-primary/10 rounded-2xl group-hover:bg-brand-primary group-hover:text-white transition-colors">
-                    <Plus className="w-8 h-8 text-brand-primary group-hover:text-white transition-colors" />
-                  </div>
+          {/* Goals Overview / Empty State */}
+          <div className="md:col-span-12">
+            {activeGoals.length > 0 ? (
+              <section className="mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm text-text-muted uppercase tracking-wider font-bold">
+                    Your Goals
+                  </h2>
+                  <Link
+                    href="/goals"
+                    className="text-brand-primary text-sm hover:underline font-medium"
+                  >
+                    View all →
+                  </Link>
                 </div>
-                <h2 className="text-xl font-semibold text-brand-primary uppercase tracking-tight mb-2">
-                  Set your first goal
-                </h2>
-                <p className="text-sm text-text-muted max-w-[240px] leading-relaxed">
-                  Start with something meaningful to you and track your journey to potential.
-                </p>
-              </div>
-            </Link>
-          </section>
-        )}
+                <div className="grid grid-cols-1 gap-4">
+                  {activeGoals.slice(0, 2).map((goal) => (
+                    <GoalCard key={goal.id} goal={goal} />
+                  ))}
+                  {activeGoals.length > 2 && (
+                    <Link
+                      href="/goals"
+                      className="block text-center text-sm text-text-muted py-2 hover:text-brand-primary transition-colors"
+                    >
+                      +{activeGoals.length - 2} more goal
+                      {activeGoals.length - 2 !== 1 ? "s" : ""}
+                    </Link>
+                  )}
+                </div>
+              </section>
+            ) : (
+              /* Empty State */
+              <section className="mb-8">
+                <Link href="/goals/new" className="block outline-none">
+                  <div className="border-2 border-dashed border-warm-ivory rounded-[2.5rem] p-12 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-all duration-300 flex flex-col items-center justify-center group">
+                    <div className="bg-brand-primary text-white p-4 rounded-2xl mb-6 shadow-brand-primary/20 group-hover:scale-110 transition-transform">
+                      <Plus className="w-8 h-8" />
+                    </div>
+                    <h2 className="text-xl font-bold text-[var(--color-charcoal)] mb-2">
+                      Set Your First Goal
+                    </h2>
+                    <p className="text-text-muted max-w-sm">
+                      Start with something meaningful to you and track your journey to potential.
+                    </p>
+                  </div>
+                </Link>
+              </section>
+            )}
 
-        {/* Quick Action: Add Goal */}
-        {activeGoals.length > 0 && activeGoals.length < 3 && (
-          <section>
-            <Link href="/goals/new">
-              <div className="border-2 border-dashed border-warm-ivory rounded-2xl p-4 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-colors flex items-center justify-center gap-2">
-                <Plus className="w-5 h-5 text-text-subtle" />
-                <span className="text-text-muted hover:text-brand-primary">
-                  Add another goal
-                </span>
-              </div>
-            </Link>
-          </section>
-        )}
-
+            {/* Quick Action: Add Goal (if some goals exist) */}
+            {activeGoals.length > 0 && activeGoals.length < 3 && (
+              <section>
+                <Link href="/goals/new">
+                  <div className="border-2 border-dashed border-warm-ivory rounded-2xl p-4 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-colors flex items-center justify-center gap-2">
+                    <Plus className="w-5 h-5 text-text-subtle" />
+                    <span className="text-text-muted hover:text-brand-primary">
+                      Add another goal
+                    </span>
+                  </div>
+                </Link>
+              </section>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Spacer for BottomNav */}

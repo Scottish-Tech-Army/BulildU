@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { AppButton } from "@/components/ui/AppButton";
 import {
@@ -33,6 +33,7 @@ import {
   Target,
   ChevronDown,
 } from "lucide-react";
+import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 
 export default function GoalDetailPage() {
   const router = useRouter();
@@ -61,21 +62,37 @@ export default function GoalDetailPage() {
   
   const [showMoreDetails, setShowMoreDetails] = useState(false);
   const [showAIInsights, setShowAIInsights] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const hasTriggeredCelebration = useRef(false);
   
   const animationRef = useRef<number | null>(null);
 
+  const refreshGoal = useCallback((isInitial = false) => {
+    const loadedGoal = getGoalById(goalId);
+    if (!loadedGoal) return;
+
+    setGoal(loadedGoal);
+
+    if (loadedGoal.status === "completed" && !hasTriggeredCelebration.current) {
+      setShowCelebration(true);
+      hasTriggeredCelebration.current = true;
+    } else if (loadedGoal.status !== "completed") {
+      // Reset if it goes back to active
+      hasTriggeredCelebration.current = false;
+    }
+
+    if (isInitial) {
+      setIsLoading(false);
+    }
+  }, [goalId]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
-      const loadedGoal = getGoalById(goalId);
-      setGoal(loadedGoal);
-
-
-
-      setIsLoading(false);
+      refreshGoal(true);
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [goalId]);
+  }, [goalId, refreshGoal]);
 
   // Animated progress counter
   useEffect(() => {
@@ -109,7 +126,7 @@ export default function GoalDetailPage() {
   const handleMilestoneToggle = (milestoneId: string) => {
     if (!goal) return;
     toggleMilestone(goal.id, milestoneId);
-    setGoal(getGoalById(goalId));
+    refreshGoal();
   };
 
   const handleAddMilestone = () => {
@@ -120,7 +137,7 @@ export default function GoalDetailPage() {
       targetDate: newMilestoneDate || undefined,
     });
     
-    setGoal(getGoalById(goalId));
+    refreshGoal();
     setNewMilestoneTitle("");
     setNewMilestoneDate("");
     setIsAddingMilestone(false);
@@ -129,20 +146,14 @@ export default function GoalDetailPage() {
   const handleDeleteMilestone = (milestoneId: string) => {
     if (!goal) return;
     deleteMilestone(goal.id, milestoneId);
-    setGoal(getGoalById(goalId));
+    refreshGoal();
   };
 
   const handlePauseResume = () => {
     if (!goal) return;
     const newStatus = goal.status === "paused" ? "active" : "paused";
     updateGoal(goal.id, { status: newStatus });
-    setGoal(getGoalById(goalId));
-  };
-
-  const handleMarkComplete = () => {
-    if (!goal) return;
-    updateGoal(goal.id, { status: "completed" });
-    setGoal(getGoalById(goalId));
+    refreshGoal();
   };
 
   const handleStartEdit = (m: Milestone) => {
@@ -159,7 +170,7 @@ export default function GoalDetailPage() {
       targetDate: editingDate || undefined,
     });
     
-    setGoal(getGoalById(goalId));
+    refreshGoal();
     setEditingMilestoneId(null);
   };
 
@@ -184,7 +195,7 @@ export default function GoalDetailPage() {
       confidence: editGoalConfidence ?? undefined,
     });
     
-    setGoal(getGoalById(goalId));
+    refreshGoal();
     setIsEditingGoal(false);
   };
 
@@ -219,8 +230,19 @@ export default function GoalDetailPage() {
     );
   }
 
-  const progress = getGoalProgress(goal);
   const isCompleted = goal.status === "completed";
+
+  if (showCelebration) {
+    return (
+      <CelebrationScreen
+        progress={100}
+        title="Goal Achieved!"
+        subtitle={`Fantastic work on completing: ${goal.title}`}
+        buttonText="Done"
+        onButtonClick={() => router.push("/goals")}
+      />
+    );
+  }
 
   return (
     <div className="min-h-dvh bg-white pb-24 flex flex-col">
@@ -634,15 +656,10 @@ export default function GoalDetailPage() {
           {/* Pause/Resume */}
           {!isCompleted && (
             <button
-              onClick={progress === 100 ? handleMarkComplete : handlePauseResume}
+              onClick={handlePauseResume}
               className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors"
             >
-              {progress === 100 ? (
-                <>
-                  <Check className="w-6 h-6" />
-                  <span className="text-xs mt-1">Complete</span>
-                </>
-              ) : goal.status === "paused" ? (
+              {goal.status === "paused" ? (
                 <>
                   <PlayCircle className="w-6 h-6" />
                   <span className="text-xs mt-1">Resume</span>

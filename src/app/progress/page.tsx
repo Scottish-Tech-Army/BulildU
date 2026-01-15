@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/ui/BottomNav";
-import { QuoteCard } from "@/components";
+import DailyQuote from "@/components/ui/DailyQuote";
 
 import {
   getBaselineResponse,
@@ -360,10 +360,7 @@ export default function ProgressPage() {
 
         {/* Inspirational Quote */}
         <div className="mt-6">
-          <QuoteCard 
-            quote="The smallest of actions is always better than the noblest of intentions."
-            author="Robin Sharma"
-          />
+          <DailyQuote />
         </div>
       </div>
 

@@ -76,10 +76,10 @@ export function GoalProgressCard({
               <div className="flex-1">
                 <span
                   className={`text-sm ${
-                    milestone.completed
-                      ? "text-gray-400 line-through"
-                      : "text-gray-700"
-                  }`}
+                  milestone.completed
+                    ? "text-brand-primary font-medium"
+                    : "text-gray-700"
+                }`}
                 >
                   {milestone.title}
                 </span>

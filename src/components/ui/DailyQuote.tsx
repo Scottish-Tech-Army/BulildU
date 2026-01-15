@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Quote as QuoteIcon } from "lucide-react";
 
 interface Quote {
   q: string; // quote text
@@ -31,15 +30,24 @@ function getTodayDateString(): string {
  */
 interface DailyQuoteProps {
   className?: string;
+  quote?: string;
+  author?: string;
 }
 
-export default function DailyQuote({ className = "" }: DailyQuoteProps) {
+export default function DailyQuote({ className = "", quote: propQuote, author: propAuthor }: DailyQuoteProps) {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     async function loadQuote() {
+      // Check if we have props
+      if (propQuote) {
+        setQuote({ q: propQuote, a: propAuthor || "Unknown" });
+        setIsLoading(false);
+        return;
+      }
+
       const today = getTodayDateString();
       
       // Check localStorage for cached quote
@@ -83,7 +91,7 @@ export default function DailyQuote({ className = "" }: DailyQuoteProps) {
     }
 
     loadQuote();
-  }, []);
+  }, [propQuote, propAuthor]);
 
   if (isLoading) {
     return (
@@ -106,29 +114,25 @@ export default function DailyQuote({ className = "" }: DailyQuoteProps) {
   }
 
   return (
-    <section className={`flex flex-col ${className}`}>
-      <h2 className="text-sm text-text-muted uppercase tracking-wide mb-3">
-        Daily Inspiration
-      </h2>
-      <div className="bg-warm-ivory rounded-2xl py-8 px-12 flex-1 flex flex-col justify-center">
-        <div className="flex gap-4">
-          <QuoteIcon className="w-8 h-8 text-brand-primary flex-shrink-0" fill="currentColor" />
-          <div>
-            <blockquote className="text-[var(--color-charcoal)] italic leading-relaxed">
-              {quote.q}
-            </blockquote>
-            <footer className="mt-3 text-sm text-text-muted">
-              — {quote.a}
-            </footer>
-          </div>
+    <section className={`flex flex-col h-full ${className}`}>
+      <div className="bg-white p-10 rounded-3xl border border-slate-100 flex flex-col justify-between relative overflow-hidden h-full">
+        <div className="relative z-10">
+           <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-6">Daily Inspiration</p>
+           <svg className="h-10 w-10 text-brand-primary/10 absolute -top-2 -left-4 -z-10" fill="currentColor" viewBox="0 0 24 24">
+             <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.570 9-10.609l.996 2.151c-2.433.917-4.001 3.638-4.001 5.849h4v10h-10z"/>
+           </svg>
+           <blockquote className="text-2xl md:text-3xl font-sans font-medium text-[var(--color-charcoal)] leading-tight mb-4">
+            &ldquo;{quote.q.charAt(0).toUpperCase() + quote.q.slice(1)}&rdquo;
+           </blockquote>
+           <cite className="text-text-muted not-italic font-medium">— {quote.a}</cite>
         </div>
-        <p className="mt-4 text-xs text-text-subtle">
-          Inspirational quotes provided by{" "}
+        <p className="text-[10px] text-text-subtle mt-8">
+          Powered by{" "}
           <a
             href="https://zenquotes.io/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-brand-primary hover:underline"
+            className="hover:text-brand-primary transition-colors"
           >
             ZenQuotes API
           </a>
