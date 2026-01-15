@@ -13,3 +13,5 @@ export { TimeOption } from "./ui/TimeOption";
 export { CelebrationScreen } from "./ui/CelebrationScreen";
 export { TipBox } from "./ui/TipBox";
 export { QuoteCard } from "./ui/QuoteCard";
+export { default as BottomSheet } from "./ui/BottomSheet";
+export { default as GoalFilters } from "./ui/GoalFilters";

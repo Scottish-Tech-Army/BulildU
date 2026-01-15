@@ -77,8 +77,8 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="min-h-dvh bg-brand-surface pb-20">
-      <div className="px-6 pt-8 pb-4">
+    <div className="min-h-dvh bg-brand-surface flex flex-col">
+      <div className="px-6 pt-8 flex-1 flex flex-col">
         {/* Header */}
         <header className="mb-6">
           <h1 className="text-2xl text-[var(--color-charcoal)] mb-1 flex items-center gap-2">
@@ -183,16 +183,20 @@ export default function DashboardPage() {
             </div>
           </section>
         ) : (
-          /* Empty State - simpler dotted line style with explainer */
-          <section className="mb-6">
-            <Link href="/goals/new">
-              <div className="border-2 border-dashed border-warm-ivory rounded-2xl p-6 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-colors">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Plus className="w-5 h-5 text-brand-primary" />
-                  <span className="text-brand-primary">Set your first goal</span>
+          /* Empty State - Now consistent 'full space' design */
+          <section className="flex-1 flex flex-col pb-8">
+            <Link href="/goals/new" className="flex-1 flex flex-col outline-none">
+              <div className="flex-1 border-2 border-dashed border-warm-ivory-dark rounded-[2.5rem] p-8 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-all duration-300 flex flex-col items-center justify-center group active:scale-[0.99]">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <div className="p-3 bg-brand-primary/10 rounded-2xl group-hover:bg-brand-primary group-hover:text-white transition-colors">
+                    <Plus className="w-8 h-8 text-brand-primary group-hover:text-white transition-colors" />
+                  </div>
                 </div>
-                <p className="text-sm text-text-muted">
-                  Start with something that matters to you
+                <h2 className="text-xl font-semibold text-brand-primary uppercase tracking-tight mb-2">
+                  Set your first goal
+                </h2>
+                <p className="text-sm text-text-muted max-w-[240px] leading-relaxed">
+                  Start with something meaningful to you and track your journey to potential.
                 </p>
               </div>
             </Link>
@@ -214,6 +218,9 @@ export default function DashboardPage() {
         )}
 
       </div>
+
+      {/* Spacer for BottomNav */}
+      <div className="h-20" />
 
       <BottomNav />
     </div>
