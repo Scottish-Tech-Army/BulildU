@@ -18,7 +18,7 @@ export const AppButton = ({
 
   const variants = {
     primary:
-      "bg-[var(--color-magenta)] text-white hover:opacity-90 shadow-sm",
+      "bg-[var(--color-magenta)] text-white hover:opacity-90",
     secondary:
       "bg-white border-2 border-[var(--color-magenta)] text-[var(--color-magenta)] hover:bg-[var(--color-magenta)]/5",
     danger:

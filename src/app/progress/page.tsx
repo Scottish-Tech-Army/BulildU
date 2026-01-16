@@ -17,14 +17,15 @@ import {
 } from "@/lib/storage";
 import {
   Flame,
-  BarChart3,
   Sparkles,
   Target,
   Zap,
   Trophy,
   TrendingUp,
+  BarChart3,
   X,
   Activity,
+  ListTodo,
 } from "lucide-react";
 
 /**
@@ -33,7 +34,7 @@ import {
  * Shows:
  * - Baseline vs current comparison
  * - Energy trend from check-ins
- * - Goals/milestones completion stats
+ * - Goals/steps completion stats
  * - Celebrate wins
  */
 export default function ProgressPage() {
@@ -62,9 +63,9 @@ export default function ProgressPage() {
 
   // Calculate stats
   const completedGoals = goals.filter((g) => g.status === "completed");
-  const totalMilestones = goals.reduce((sum, g) => sum + g.milestones.length, 0);
-  const completedMilestones = goals.reduce(
-    (sum, g) => sum + g.milestones.filter((m) => m.completed).length,
+  const totalSteps = goals.reduce((sum, g) => sum + g.steps.length, 0);
+  const completedSteps = goals.reduce(
+    (sum, g) => sum + g.steps.filter((s) => s.completed).length,
     0
   );
 
@@ -82,49 +83,42 @@ export default function ProgressPage() {
       label: "Satisfaction",
       baseline: baseline.situationSatisfaction,
       icon: Flame,
-      iconColor: "text-brand-primary",
       category: "situation",
     },
     {
       label: "Confidence",
       baseline: baseline.confidence,
       icon: TrendingUp,
-      iconColor: "text-brand-primary",
       category: "mindset",
     },
     {
       label: "Future Clarity",
       baseline: baseline.futureClarity,
       icon: Target,
-      iconColor: "text-brand-primary",
       category: "vision",
     },
     {
       label: "Future Positivity",
       baseline: baseline.futureHope,
       icon: Sparkles,
-      iconColor: "text-brand-primary",
       category: "vision",
     },
     {
       label: "State of Calm",
       baseline: baseline.stressLevel,
       icon: Activity,
-      iconColor: "text-brand-primary",
       category: "wellbeing",
     },
     {
       label: "Energy Level",
       baseline: baseline.energyLevel,
       icon: Zap,
-      iconColor: "text-brand-primary",
       category: "wellbeing",
     },
     {
       label: "Balance",
       baseline: baseline.lifeBalance,
       icon: BarChart3,
-      iconColor: "text-brand-primary",
       category: "wellbeing",
     },
   ];
@@ -161,7 +155,7 @@ export default function ProgressPage() {
         ) : (
           <>
             {/* Celebration - dismissible */}
-            {!celebrationDismissed && (completedMilestones > 0 || completedGoals.length > 0) && (
+            {!celebrationDismissed && (completedSteps > 0 || completedGoals.length > 0) && (
               <section className="mb-6">
                 <div className="bg-brand-primary/10 rounded-2xl p-4 text-center relative">
                   <button
@@ -176,11 +170,11 @@ export default function ProgressPage() {
                   </div>
                   <p className="text-[var(--color-charcoal)] font-medium">
                     {completedGoals.length > 0
-                      ? `You've completed ${completedGoals.length} goal${
+                      ? `You've achieved ${completedGoals.length} goal${
                           completedGoals.length !== 1 ? "s" : ""
                         }!`
-                      : `You've hit ${completedMilestones} milestone${
-                          completedMilestones !== 1 ? "s" : ""
+                      : `You've hit ${completedSteps} step${
+                          completedSteps !== 1 ? "s" : ""
                         }!`}
                   </p>
                   <p className="text-text-muted text-sm mt-1">
@@ -190,7 +184,7 @@ export default function ProgressPage() {
               </section>
             )}
 
-            {/* Your Momentum Section */}
+            {/* Your Achievements Section */}
             <section className="mb-6">
               <div className="bg-white rounded-2xl p-5 border border-gray-100">
                 {/* Header with period tabs */}
@@ -227,7 +221,7 @@ export default function ProgressPage() {
                   {/* Goals Completed */}
                   <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
                     <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                      Goals Completed
+                      Goals Achieved
                     </p>
                     <p className="text-3xl font-bold text-[var(--color-charcoal)]">
                       {completedGoals.length}
@@ -237,18 +231,18 @@ export default function ProgressPage() {
                     </p>
                   </div>
 
-                  {/* Milestones Done */}
+                  {/* Steps Done */}
                   <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
                     <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                      Milestones Done
+                      Steps Done
                     </p>
                     <p className="text-3xl font-bold text-[var(--color-charcoal)]">
-                      {completedMilestones}/{totalMilestones}
+                      {completedSteps}/{totalSteps}
                     </p>
                     <p className="text-xs text-text-subtle mt-2">
-                      {totalMilestones > 0 
-                        ? `${Math.round((completedMilestones / totalMilestones) * 100)}% complete`
-                        : "Add milestones to goals"}
+                      {totalSteps > 0 
+                        ? `${Math.round((completedSteps / totalSteps) * 100)}% complete`
+                        : "Add steps to goals"}
                     </p>
                   </div>
 

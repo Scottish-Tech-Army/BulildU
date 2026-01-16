@@ -104,7 +104,7 @@ export interface BaselineResponse {
   // Section 1: Current Situation
   workStatus?: WorkStatus;
   situationSatisfaction?: number; // 1-5
-
+  
   // Section 2: Confidence & Self-Esteem
   confidence?: number; // 1-5
   selfEsteem?: number; // 1-5
@@ -166,7 +166,7 @@ export function completeBaseline(): void {
 // Goals
 // =============================================================================
 
-export type GoalCategory = "Wellbeing" | "Career" | "Finances" | "Growth" | "Family";
+export type GoalCategory = "Health" | "Wellbeing" | "Career" | "Personal" | "Finance" | "Finances" | "Growth" | "Family" | "other";
 
 export interface Action {
   id: string;
@@ -174,12 +174,15 @@ export interface Action {
   completed: boolean;
 }
 
-export interface Milestone {
+export interface Step {
   id: string;
   title: string;
   targetDate?: string; // ISO date
   completed: boolean;
 }
+
+/** Legacy support */
+export type Milestone = Step;
 
 export interface Goal {
   id: string;
@@ -201,19 +204,20 @@ export interface Goal {
 
   // Progress
   status: "active" | "completed" | "paused";
-  milestones: Milestone[];
+  steps: Step[];
+  milestones?: Step[]; // Keep for data migration/compatibility
   actions: Action[];
 }
 
 /**
- * Generate a unique ID for goals/milestones/actions
+ * Generate a unique ID for goals/steps
  */
 export function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
 /**
- * Get all goals from localStorage
+ * Get all goals from localStorage and ensure consistency
  */
 export function getGoals(): Goal[] {
   if (!isBrowser()) return [];
@@ -221,7 +225,17 @@ export function getGoals(): Goal[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.GOALS);
     if (!stored) return [];
-    return JSON.parse(stored) as Goal[];
+    const rawGoals = JSON.parse(stored) as any[];
+    
+    // Data Migration: Ensure 'steps' property exists
+    return rawGoals.map(g => {
+      if (!g.steps && g.milestones) {
+        g.steps = g.milestones;
+      } else if (!g.steps) {
+        g.steps = [];
+      }
+      return g as Goal;
+    });
   } catch {
     return [];
   }
@@ -247,14 +261,17 @@ function saveGoals(goals: Goal[]): void {
  * Create a new goal
  */
 export function createGoal(
-  goal: Omit<Goal, "id" | "createdAt" | "status">
+  goalData: Omit<Goal, "id" | "createdAt" | "status" | "steps"> & { steps?: Step[] }
 ): Goal {
   const newGoal: Goal = {
-    ...goal,
+    ...goalData,
+    steps: goalData.steps || [],
     id: generateId(),
     createdAt: new Date().toISOString(),
     status: "active",
-  };
+    actions: goalData.actions || [],
+    feelWhenDone: goalData.feelWhenDone || "",
+  } as Goal;
 
   const goals = getGoals();
   goals.push(newGoal);
@@ -292,17 +309,17 @@ export function deleteGoal(id: string): boolean {
 }
 
 /**
- * Helper to sync goal status based on milestone completion
+ * Helper to sync goal status based on steps completion
  */
 function syncGoalStatus(goal: Goal): Goal {
-  if (goal.milestones.length === 0) {
+  if (goal.steps.length === 0) {
     if (goal.status === "completed") {
       goal.status = "active";
     }
     return goal;
   }
 
-  const allCompleted = goal.milestones.every((m) => m.completed);
+  const allCompleted = goal.steps.every((s) => s.completed);
   
   if (allCompleted && goal.status !== "completed") {
     goal.status = "completed";
@@ -314,107 +331,112 @@ function syncGoalStatus(goal: Goal): Goal {
 }
 
 /**
- * Add a milestone to a goal
+ * Add a step to a goal
  */
 export function addMilestone(
   goalId: string,
-  milestone: Omit<Milestone, "id" | "completed">
-): Milestone | null {
+  stepData: Omit<Step, "id" | "completed">
+): Step | null {
   const goal = getGoalById(goalId);
   if (!goal) return null;
 
-  const newMilestone: Milestone = {
-    ...milestone,
+  const newStep: Step = {
+    ...stepData,
     id: generateId(),
     completed: false,
   };
 
-  goal.milestones.push(newMilestone);
-  
-  // Sync status
+  goal.steps.push(newStep);
   syncGoalStatus(goal);
   
   updateGoal(goalId, { 
-    milestones: goal.milestones,
+    steps: goal.steps,
     status: goal.status 
   });
 
-  return newMilestone;
+  return newStep;
 }
 
+/** Legacy alias */
+export const addStep = addMilestone;
+
 /**
- * Toggle milestone completion
+ * Toggle step completion
  */
 export function toggleMilestone(
   goalId: string,
-  milestoneId: string
+  stepId: string
 ): boolean {
   const goal = getGoalById(goalId);
   if (!goal) return false;
 
-  const milestone = goal.milestones.find((m) => m.id === milestoneId);
-  if (!milestone) return false;
+  const step = goal.steps.find((s) => s.id === stepId);
+  if (!step) return false;
 
-  milestone.completed = !milestone.completed;
-  
-  // Sync status
+  step.completed = !step.completed;
   syncGoalStatus(goal);
   
   updateGoal(goalId, { 
-    milestones: goal.milestones,
+    steps: goal.steps,
     status: goal.status 
   });
 
   return true;
 }
 
+/** Legacy alias */
+export const toggleStep = toggleMilestone;
+
 /**
- * Delete a milestone from a goal
+ * Delete a step from a goal
  */
-export function deleteMilestone(goalId: string, milestoneId: string): boolean {
+export function deleteMilestone(goalId: string, stepId: string): boolean {
   const goal = getGoalById(goalId);
   if (!goal) return false;
 
-  const initialLength = goal.milestones.length;
-  goal.milestones = goal.milestones.filter((m) => m.id !== milestoneId);
+  const initialLength = goal.steps.length;
+  goal.steps = goal.steps.filter((s) => s.id !== stepId);
 
-  if (goal.milestones.length === initialLength) return false;
+  if (goal.steps.length === initialLength) return false;
 
-  // Sync status
   syncGoalStatus(goal);
 
   updateGoal(goalId, { 
-    milestones: goal.milestones,
+    steps: goal.steps,
     status: goal.status 
   });
   return true;
 }
 
+/** Legacy alias */
+export const deleteStep = deleteMilestone;
+
 /**
- * Update a milestone's details
+ * Update a step's details
  */
 export function updateMilestone(
   goalId: string,
-  milestoneId: string,
-  updates: Partial<Omit<Milestone, "id">>
+  stepId: string,
+  updates: Partial<Omit<Step, "id">>
 ): boolean {
   const goal = getGoalById(goalId);
   if (!goal) return false;
 
-  const milestone = goal.milestones.find((m) => m.id === milestoneId);
-  if (!milestone) return false;
+  const step = goal.steps.find((s) => s.id === stepId);
+  if (!step) return false;
 
-  Object.assign(milestone, updates);
-  
-  // Sync status (in case completion was updated manually via updates)
+  Object.assign(step, updates);
   syncGoalStatus(goal);
 
   updateGoal(goalId, { 
-    milestones: goal.milestones,
+    steps: goal.steps,
     status: goal.status 
   });
   return true;
 }
+
+/** Legacy alias */
+export const updateStep = updateMilestone;
 
 /**
  * Add an action to a goal
@@ -462,12 +484,12 @@ export function getActiveGoalsCount(): number {
 }
 
 /**
- * Calculate goal progress (percentage of milestones completed)
+ * Calculate goal progress (percentage of steps completed)
  */
 export function getGoalProgress(goal: Goal): number {
-  if (goal.milestones.length === 0) return 0;
-  const completed = goal.milestones.filter((m) => m.completed).length;
-  return Math.round((completed / goal.milestones.length) * 100);
+  if (goal.steps.length === 0) return 0;
+  const completed = goal.steps.filter((s) => s.completed).length;
+  return Math.round((completed / goal.steps.length) * 100);
 }
 
 // =============================================================================
@@ -479,12 +501,13 @@ export interface CheckIn {
   date: string; // ISO date (YYYY-MM-DD)
   energyLevel: number; // 1-5 scale
   reflection?: string; // Optional weekly reflection
-  milestonesCompleted: string[]; // IDs of milestones marked complete this session
+  stepsCompleted: string[]; // IDs of steps marked complete this session
+  milestonesCompleted?: string[]; // Legacy
   createdAt: string; // ISO datetime
 }
 
 /**
- * Get all check-ins from localStorage
+ * Get all check-ins from localStorage and ensure consistency
  */
 export function getCheckIns(): CheckIn[] {
   if (!isBrowser()) return [];
@@ -492,7 +515,17 @@ export function getCheckIns(): CheckIn[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.CHECKINS);
     if (!stored) return [];
-    return JSON.parse(stored) as CheckIn[];
+    const rawCheckIns = JSON.parse(stored) as any[];
+    
+    // Data Migration: Ensure 'stepsCompleted' exists
+    return rawCheckIns.map(c => {
+      if (!c.stepsCompleted && c.milestonesCompleted) {
+        c.stepsCompleted = c.milestonesCompleted;
+      } else if (!c.stepsCompleted) {
+        c.stepsCompleted = [];
+      }
+      return c as CheckIn;
+    });
   } catch {
     return [];
   }
@@ -505,7 +538,6 @@ export function getLastCheckIn(): CheckIn | null {
   const checkIns = getCheckIns();
   if (checkIns.length === 0) return null;
   
-  // Sort by date descending and return the most recent
   return checkIns.sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )[0];
@@ -515,13 +547,14 @@ export function getLastCheckIn(): CheckIn | null {
  * Save a new check-in to localStorage
  */
 export function saveCheckIn(
-  checkIn: Omit<CheckIn, "id" | "createdAt">
+  checkIn: Omit<CheckIn, "id" | "createdAt" | "stepsCompleted"> & { stepsCompleted?: string[], milestonesCompleted?: string[] }
 ): CheckIn {
   const newCheckIn: CheckIn = {
     ...checkIn,
+    stepsCompleted: checkIn.stepsCompleted || checkIn.milestonesCompleted || [],
     id: generateId(),
     createdAt: new Date().toISOString(),
-  };
+  } as CheckIn;
 
   const checkIns = getCheckIns();
   checkIns.push(newCheckIn);
@@ -538,7 +571,7 @@ export function saveCheckIn(
 function getWeekStart(date: Date): Date {
   const d = new Date(date);
   const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
   d.setDate(diff);
   d.setHours(0, 0, 0, 0);
   return d;
@@ -559,13 +592,12 @@ export function hasCheckedInThisWeek(): boolean {
 }
 
 /**
- * Calculate momentum days (consecutive weeks with check-ins)
+ * Calculate momentum weeks (consecutive weeks with check-ins)
  */
 export function getMomentumDays(): number {
   const checkIns = getCheckIns();
   if (checkIns.length === 0) return 0;
 
-  // Sort check-ins by date descending
   const sorted = checkIns.sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
@@ -577,17 +609,13 @@ export function getMomentumDays(): number {
     const checkInDate = new Date(checkIn.createdAt);
     const checkInWeekStart = getWeekStart(checkInDate);
 
-    // If this check-in is in the current week we're checking
     if (checkInWeekStart.getTime() === currentWeekStart.getTime()) {
       momentum++;
-      // Move to previous week
       currentWeekStart = new Date(currentWeekStart);
       currentWeekStart.setDate(currentWeekStart.getDate() - 7);
     } else if (checkInWeekStart.getTime() < currentWeekStart.getTime()) {
-      // Gap in weeks, streak broken
       break;
     }
-    // If same week as already counted, continue to next check-in
   }
 
   return momentum;
@@ -599,21 +627,20 @@ export function getMomentumDays(): number {
 
 export interface WeeklyMomentumData {
   weekStart: Date;
-  weekLabel: string; // e.g., "Jan 01"
+  weekLabel: string;
   hasCheckIn: boolean;
-  avgEnergy: number | null; // 1-5 scale, null if no check-in
-  milestonesCompleted: number;
-  score: number; // 0-100 performance velocity score
+  avgEnergy: number | null;
+  stepsCompleted: number;
+  score: number;
 }
 
 /**
- * Get weekly momentum data for the past N weeks (default 8)
- * Used for rendering the momentum line chart
+ * Get weekly momentum data for the past N weeks
  */
 export function getWeeklyMomentumData(weeksCount: number = 8): WeeklyMomentumData[] {
   const checkIns = getCheckIns();
   const goals = getGoals();
-  const totalMilestones = goals.reduce((sum, g) => sum + g.milestones.length, 0);
+  const totalSteps = goals.reduce((sum, g) => sum + g.steps.length, 0);
   
   const weeks: WeeklyMomentumData[] = [];
   const now = new Date();
@@ -625,40 +652,30 @@ export function getWeeklyMomentumData(weeksCount: number = 8): WeeklyMomentumDat
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 7);
     
-    // Find check-ins for this week
     const weekCheckIns = checkIns.filter(c => {
       const checkInDate = new Date(c.createdAt);
       return checkInDate >= weekStart && checkInDate < weekEnd;
     });
     
     const hasCheckIn = weekCheckIns.length > 0;
-    
-    // Calculate average energy for the week
     const avgEnergy = hasCheckIn
       ? weekCheckIns.reduce((sum, c) => sum + c.energyLevel, 0) / weekCheckIns.length
       : null;
     
-    // Count milestones completed this week
-    const milestonesCompleted = weekCheckIns.reduce(
-      (sum, c) => sum + c.milestonesCompleted.length,
+    const stepsCompleted = weekCheckIns.reduce(
+      (sum, c) => sum + c.stepsCompleted.length,
       0
     );
     
-    // Calculate performance velocity score (0-100)
-    // - Check-in completion: 40 points (did they check in?)
-    // - Energy level: 30 points (normalized from 1-5 to 0-30)
-    // - Milestone progress: 30 points (based on total milestones)
     let score = 0;
-    
     if (hasCheckIn) {
-      score += 40; // Check-in bonus
-      score += avgEnergy ? ((avgEnergy - 1) / 4) * 30 : 0; // Energy (1-5 -> 0-30)
-      score += totalMilestones > 0 
-        ? Math.min(30, (milestonesCompleted / totalMilestones) * 100 * 0.3)
+      score += 40; 
+      score += avgEnergy ? ((avgEnergy - 1) / 4) * 30 : 0;
+      score += totalSteps > 0 
+        ? Math.min(30, (stepsCompleted / totalSteps) * 100 * 0.3)
         : 0;
     }
     
-    // Format week label
     const weekLabel = weekStart.toLocaleDateString("en-US", {
       month: "short",
       day: "2-digit",
@@ -669,7 +686,7 @@ export function getWeeklyMomentumData(weeksCount: number = 8): WeeklyMomentumDat
       weekLabel,
       hasCheckIn,
       avgEnergy,
-      milestonesCompleted,
+      stepsCompleted,
       score: Math.round(score),
     });
   }

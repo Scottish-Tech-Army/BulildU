@@ -62,7 +62,7 @@ export function ProgressDisplay({
 
   return (
     <div className="text-center py-6">
-      <div className="text-7xl font-light text-brand-primary">
+      <div className="text-6xl font-light text-brand-primary">
         {displayValue}%
       </div>
       {label && (

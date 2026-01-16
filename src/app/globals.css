@@ -13,6 +13,7 @@
   --color-deep-violet: #4a0f7e;
   --color-warm-ivory: #efebee;
   --color-pumpkin: #f27321;
+  --color-bg-card: #f8fafc;
 
   /* Semantic Colors */
   --background: var(--color-white);
@@ -66,6 +67,7 @@
   --color-text-subtle: var(--color-text-subtle);
   --color-bg-subtle: var(--color-bg-subtle);
   --color-warm-ivory: var(--color-warm-ivory);
+  --color-bg-card: var(--color-bg-card);
 
   /* Montserrat - Regular weight only per brand guidelines */
   --font-sans: var(--font-montserrat);
@@ -82,7 +84,7 @@ body {
 
 /* Typography - let Tailwind handle sizing, just set defaults */
 h1 {
-  font-size: 1.875rem; /* text-3xl */
+  font-size: 1.5rem; /* text-xl */
   line-height: 1.1;
 }
 h2 {

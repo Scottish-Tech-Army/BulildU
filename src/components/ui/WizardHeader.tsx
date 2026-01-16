@@ -19,9 +19,9 @@ export function WizardHeader({ title, onCancel }: WizardHeaderProps) {
         >
           Cancel
         </button>
-        <h1 className="flex-1 text-center text-base font-medium text-[var(--color-charcoal)] leading-6">
+        <p className="flex-1 text-center text-lg font-medium text-[var(--color-charcoal)] leading-6">
           {title}
-        </h1>
+        </p>
         <div className="w-16" />
       </div>
     </div>

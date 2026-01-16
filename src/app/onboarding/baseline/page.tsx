@@ -10,6 +10,7 @@ import {
   ProgressDisplay,
   WizardHeader,
   TimeOption,
+  CelebrationScreen,
 } from "@/components";
 import {
   saveBaselineResponse,
@@ -77,6 +78,7 @@ export default function BaselinePage() {
   // Reminder state
   const [reminderDay, setReminderDay] = useState<ReminderDay | null>(null);
   const [reminderTime, setReminderTime] = useState<ReminderTime | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const updateResponse = <K extends keyof BaselineResponse>(
     key: K,
@@ -84,29 +86,32 @@ export default function BaselinePage() {
   ) => {
     setResponses((prev) => ({ ...prev, [key]: value }));
   };
-
   const handleNext = () => {
     if (currentSection < SECTIONS.length - 1) {
       setCurrentSection(currentSection + 1);
     } else {
-      // Final section - save and go to dashboard
-      saveBaselineResponse(responses);
-      completeBaseline();
-      
-      // Calculate reminder date as one week from now
-      const nextWeek = new Date();
-      nextWeek.setDate(nextWeek.getDate() + 7);
-      
-      // Save reminder preferences and mark complete
-      saveOnboardingState({
-        currentStep: 7,
-        completed: true,
-        reminderDate: nextWeek.toISOString(),
-        reminderTime: reminderTime ?? undefined,
-      });
-      completeOnboarding();
-      router.push("/");
+      setShowCelebration(true);
     }
+  };
+
+  const handleFinish = () => {
+    // Final section - save and go to dashboard
+    saveBaselineResponse(responses);
+    completeBaseline();
+    
+    // Calculate reminder date as one week from now
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    
+    // Save reminder preferences and mark complete
+    saveOnboardingState({
+      currentStep: 7,
+      completed: true,
+      reminderDate: nextWeek.toISOString(),
+      reminderTime: reminderTime ?? undefined,
+    });
+    completeOnboarding();
+    router.push("/");
   };
 
   const handleBack = () => {
@@ -140,6 +145,18 @@ export default function BaselinePage() {
     }
   };
 
+  if (showCelebration) {
+    return (
+      <CelebrationScreen
+        progress={100}
+        title="You're All Set!"
+        subtitle="You've completed your baseline assessment. Now let's start making progress together."
+        buttonText="GO TO DASHBOARD"
+        onButtonClick={handleFinish}
+      />
+    );
+  }
+
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
@@ -153,12 +170,12 @@ export default function BaselinePage() {
 
           {/* Section title centered */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-[var(--color-charcoal)]">
+            <p className="text-2xl font-semibold text-[var(--color-charcoal)]">
               {section.title}
-            </h1>
+            </p>
             {section.id === "reminder" && (
               <div className="flex items-center justify-center gap-2 mt-8">
-                <p className="text-[var(--color-charcoal)] text-2xl">
+                <p className="text-[var(--color-charcoal)] text-[18px]">
                   Pick a day
                 </p>
                 <Tooltip 
@@ -173,7 +190,7 @@ export default function BaselinePage() {
             {section.id === "situation" && (
               <>
                 <div className="space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-2xl">
+                  <p className="text-[var(--color-charcoal)] text-[18px]">
                     Which best describes where you&apos;re at right now?
                   </p>
                   <ChoiceChips
@@ -186,7 +203,7 @@ export default function BaselinePage() {
 
                 {responses.workStatus != null && (
                   <div className="space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-2xl text-center">
+                    <p className="text-[var(--color-charcoal)] text-[18px] text-center">
                       How satisfied are you with your current situation?
                     </p>
                     <RatingScale
@@ -203,7 +220,7 @@ export default function BaselinePage() {
             {section.id === "confidence" && (
               <>
                 <div className="space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-2xl">
+                  <p className="text-[var(--color-charcoal)] text-[18px]">
                     How confident do you feel in yourself right now?
                   </p>
                   <RatingScale
@@ -219,7 +236,7 @@ export default function BaselinePage() {
             {section.id === "aspirations" && (
               <>
                 <div className="space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-2xl">
+                  <p className="text-[var(--color-charcoal)] text-[18px]">
                     How clear do you feel about what you want for your future?
                   </p>
                   <RatingScale
@@ -232,7 +249,7 @@ export default function BaselinePage() {
 
                 {responses.futureClarity != null && (
                   <div className="space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-2xl">
+                    <p className="text-[var(--color-charcoal)] text-[18px]">
                       How positive do you feel about your future?
                     </p>
                     <RatingScale
@@ -249,7 +266,7 @@ export default function BaselinePage() {
             {section.id === "wellbeing" && (
               <>
                 <div className="space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-2xl">
+                  <p className="text-[var(--color-charcoal)] text-[18px]">
                     How well do you manage stress?
                   </p>
                   <RatingScale
@@ -262,7 +279,7 @@ export default function BaselinePage() {
 
                 {responses.stressLevel != null && (
                   <div className="space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-2xl">
+                    <p className="text-[var(--color-charcoal)] text-[18px]">
                       How would you rate your energy most days?
                     </p>
                     <RatingScale
@@ -276,7 +293,7 @@ export default function BaselinePage() {
 
                 {responses.energyLevel != null && (
                   <div className="space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-2xl">
+                    <p className="text-[var(--color-charcoal)] text-[18px]">
                       How would you rate your life balance right now?
                     </p>
                     <RatingScale
@@ -293,7 +310,7 @@ export default function BaselinePage() {
             {section.id === "reminder" && (
               <>
                 <div className="mt-6 text-center">
-                  <div className="max-w-md mx-auto">
+                  <div className="max-w-xl mx-auto">
                     <ChoiceChips
                       className="justify-center flex-wrap"
                       options={DAY_OPTIONS}
@@ -306,7 +323,7 @@ export default function BaselinePage() {
                 {reminderDay != null && (
                   <div className="space-y-3 mt-6 animate-fade-in text-center" role="radiogroup" aria-label="Weekly check-in time">
                     <p className="text-gray-900 font-medium">Pick a time</p>
-                    <div className="max-w-md mx-auto space-y-3">
+                    <div className="max-w-md mx-auto grid grid-cols-1 md:grid-cols-2 gap-3">
                       <TimeOption
                         time="8:00 AM"
                         label="Morning"

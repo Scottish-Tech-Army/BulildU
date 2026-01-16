@@ -1,103 +1,103 @@
 "use client";
 
 import { Goal } from "@/lib/storage";
+import { Check, Calendar } from "lucide-react";
 
 interface GoalProgressCardProps {
   goal: Goal;
-  onMilestoneToggle: (milestoneId: string) => void;
+  onStepToggle: (stepId: string) => void;
 }
 
 /**
- * Displays a goal with toggleable milestones during check-in.
- * Uses the same layout as GoalCard with milestone toggles added.
+ * GoalProgressCard
+ * 
+ * Displays a goal with its steps as a toggleable list.
+ * Used in the check-in process.
  */
 export function GoalProgressCard({
   goal,
-  onMilestoneToggle,
+  onStepToggle,
 }: GoalProgressCardProps) {
-  const completedCount = goal.milestones.filter((m) => m.completed).length;
-  const totalMilestones = goal.milestones.length;
+  const completedCount = goal.steps.filter((s) => s.completed).length;
+  const totalSteps = goal.steps.length;
+  const progress = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
 
   return (
-    <div className="bg-white rounded-2xl p-4 border border-gray-100">
-      {/* Goal Header - matches GoalCard layout */}
-      <div className="mb-4">
-        {/* Milestones count, Title, and Category */}
-        <p className="text-sm text-gray-500 mb-1">
-          {completedCount}/{totalMilestones} milestones
-        </p>
-        <h3 className="text-lg font-medium text-gray-900 mb-2 line-clamp-2">
-          {goal.title}
-        </h3>
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-warm-ivory text-text-muted">
-          {goal.category}
-        </span>
+    <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden transition-shadow">
+      {/* Goal Header */}
+      <div className="p-6 border-b border-gray-50 flex items-center justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-primary/10 text-brand-primary uppercase tracking-wider">
+              {goal.category}
+            </span>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 truncate">
+            {goal.title}
+          </h3>
+          <p className="text-xs text-brand-primary font-bold mt-1">
+            {completedCount} of {totalSteps} steps completed ({progress}%)
+          </p>
+        </div>
+        
+        <div className="flex items-center justify-center shrink-0">
+          <div className="text-3xl font-light text-brand-primary">
+            {progress}%
+          </div>
+        </div>
       </div>
 
-      {/* Milestones List - toggleable */}
-      {totalMilestones > 0 && (
-        <div className="border-t border-gray-100 pt-4 space-y-3">
-          {goal.milestones.map((milestone) => (
-            <label
-              key={milestone.id}
-              className="flex items-start gap-3 cursor-pointer group"
+      <div className="bg-gray-50/30">
+        <div className="p-3 space-y-2">
+          {goal.steps.map((step) => (
+            <button
+              key={step.id}
+              onClick={() => onStepToggle(step.id)}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl transition-all border ${
+                step.completed
+                  ? "bg-warm-ivory border-brand-primary/20 text-brand-primary"
+                  : "bg-white border-gray-100 hover:border-brand-primary/20 text-gray-900"
+              }`}
             >
-              <div className="relative flex-shrink-0 mt-0.5">
-                <input
-                  type="checkbox"
-                  checked={milestone.completed}
-                  onChange={() => onMilestoneToggle(milestone.id)}
-                  className="sr-only peer"
-                />
-                <div
-                  className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                    milestone.completed
-                      ? "bg-brand-primary border-brand-primary"
-                      : "border-gray-300 group-hover:border-brand-primary"
-                  }`}
-                >
-                  {milestone.completed && (
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  )}
-                </div>
-              </div>
-              <div className="flex-1">
-                <span
-                  className={`text-sm ${
-                  milestone.completed
-                    ? "text-brand-primary font-medium"
-                    : "text-gray-700"
+              <div
+                className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-colors ${
+                  step.completed
+                    ? "bg-brand-primary border-brand-primary text-white"
+                    : "bg-transparent border-gray-200"
                 }`}
-                >
-                  {milestone.title}
-                </span>
-                {milestone.targetDate && (
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    Due:{" "}
-                    {new Date(milestone.targetDate).toLocaleDateString("en-AU", {
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </p>
+              >
+                {step.completed && <Check className="w-4 h-4" />}
+              </div>
+              
+              <div className="flex-1 text-left min-w-0">
+                <p className={`text-sm font-semibold truncate ${
+                  step.completed ? "text-brand-primary" : "text-gray-900"
+                }`}>
+                  {step.title}
+                </p>
+                {step.targetDate && (
+                  <div className="flex items-center gap-1.5 mt-0.5 opacity-60">
+                    <Calendar className="w-3 h-3" />
+                    <span className="text-[10px] font-medium">
+                      {new Date(step.targetDate).toLocaleDateString("en-AU", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+                  </div>
                 )}
               </div>
-            </label>
+            </button>
           ))}
+          
+          {goal.steps.length === 0 && (
+            <div className="p-6 text-center">
+              <p className="text-sm text-gray-400">No steps added yet</p>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
-

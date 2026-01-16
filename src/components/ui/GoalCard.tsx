@@ -1,7 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Goal, getGoalProgress } from "@/lib/storage";
+import { Goal, getGoalProgress, GoalCategory } from "@/lib/storage";
+import { 
+  Activity, 
+  Heart, 
+  Briefcase, 
+  Smile, 
+  Coins, 
+  Sprout, 
+  Home,
+  Tag,
+  type LucideIcon 
+} from "lucide-react";
 
 interface GoalCardProps {
   goal: Goal;
@@ -15,6 +26,20 @@ export default function GoalCard({ goal }: GoalCardProps) {
     ? new Date(goal.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "No date";
 
+  // Category icon map
+  const iconMap: Record<GoalCategory, LucideIcon> = {
+    Health: Activity,
+    Wellbeing: Heart,
+    Career: Briefcase,
+    Personal: Smile,
+    Finance: Coins,
+    Finances: Coins,
+    Growth: Sprout,
+    Family: Home,
+    other: Tag
+  };
+  const CategoryIcon = iconMap[goal.category] || Activity;
+
   return (
     <Link
       href={`/goals/${goal.id}`}
@@ -24,13 +49,15 @@ export default function GoalCard({ goal }: GoalCardProps) {
           : "bg-warm-ivory"
       } hover:bg-[var(--color-magenta)]/5`}
     >
-      <div className="flex justify-between items-center gap-4">
-        {/* Left: Title, Category & Date */}
+      <div className="flex items-center gap-4">
+        {/* Left: Category Icon in colored square */}
+        <div className="w-14 h-14 rounded-xl bg-[var(--color-deep-violet)] flex items-center justify-center shrink-0">
+          <CategoryIcon className="w-7 h-7 text-white" />
+        </div>
+
+        {/* Middle: Title & Date */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[var(--color-deep-violet)] text-white uppercase tracking-wide">
-              {goal.category}
-            </span>
             {goal.status === "paused" && (
               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700 uppercase tracking-wide">
                 Paused

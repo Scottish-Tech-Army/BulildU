@@ -1,480 +1,422 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { AppButton } from "@/components/ui/AppButton";
-import {
-  Goal,
-  Milestone,
-  getGoalById,
-  toggleMilestone,
+import { 
+  getGoalById, 
+  Step,
+  toggleStep,
   updateGoal,
   deleteGoal,
-  getGoalProgress,
-  addMilestone,
-  deleteMilestone,
-  updateMilestone,
+  addStep,
+  deleteStep,
+  updateStep,
+  Goal,
+  GoalCategory
 } from "@/lib/storage";
-import {
-  Calendar,
-  Clock,
-  PlayCircle,
-  PauseCircle,
-  Trash2,
-  Check,
-  Search,
-  Trophy,
+import { 
+  Calendar, 
+  Sparkles,
   Heart,
   Plus,
-  X,
-  Sparkles,
-  ListTodo,
+  Trash2,
   Pencil,
-  Target,
-  ChevronDown,
+  Check,
+  CheckCircle2,
+  AlertCircle,
+  Ruler,
+  Tag,
+  X,
+  Activity,
+  Briefcase,
+  Smile,
+  Coins,
+  Sprout,
+  Home,
+  type LucideIcon
 } from "lucide-react";
-import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
+import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
+import BottomSheet from "@/components/ui/BottomSheet";
 
 export default function GoalDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const goalId = params.id as string;
+  const id = params.id as string;
 
   const [goal, setGoal] = useState<Goal | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAIInsights, setShowAIInsights] = useState(false);
+  const [showWhyEditor, setShowWhyEditor] = useState(false);
+  const [editWhyTitle, setEditWhyTitle] = useState("");
+  const [editWhyMatters, setEditWhyMatters] = useState("");
+  const [showCategoryEditor, setShowCategoryEditor] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<GoalCategory | null>(null);
+  const [showSuccessEditor, setShowSuccessEditor] = useState(false);
+  const [editSuccessCriteria, setEditSuccessCriteria] = useState("");
+  const [showReadinessEditor, setShowReadinessEditor] = useState(false);
+  const [selectedReadiness, setSelectedReadiness] = useState<number | null>(null);
+  const [showTimelineEditor, setShowTimelineEditor] = useState(false);
+  const [editTargetDate, setEditTargetDate] = useState("");
 
-  const [animatedProgress, setAnimatedProgress] = useState(0);
-  const [isAddingMilestone, setIsAddingMilestone] = useState(false);
-  const [newMilestoneTitle, setNewMilestoneTitle] = useState("");
-  const [newMilestoneDate, setNewMilestoneDate] = useState("");
+  // New Step State
+  const [isAddingStep, setIsAddingStep] = useState(false);
+  const [newStepTitle, setNewStepTitle] = useState("");
+  const [newStepDate, setNewStepDate] = useState("");
   
-  const [editingMilestoneId, setEditingMilestoneId] = useState<string | null>(null);
+  // Edit Step State
+  const [editingStepId, setEditingStepId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [editingDate, setEditingDate] = useState("");
-  
-  const [isEditingGoal, setIsEditingGoal] = useState(false);
-  const [editGoalTitle, setEditGoalTitle] = useState("");
-  const [editGoalWhy, setEditGoalWhy] = useState("");
-  const [editGoalDate, setEditGoalDate] = useState("");
-  const [editGoalSuccess, setEditGoalSuccess] = useState("");
-  const [editGoalConfidence, setEditGoalConfidence] = useState<number | null>(null);
-  
-  const [showMoreDetails, setShowMoreDetails] = useState(false);
-  const [showAIInsights, setShowAIInsights] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
-  const hasTriggeredCelebration = useRef(false);
-  
-  const animationRef = useRef<number | null>(null);
 
-  const refreshGoal = useCallback((isInitial = false) => {
-    const loadedGoal = getGoalById(goalId);
-    if (!loadedGoal) return;
-
-    setGoal(loadedGoal);
-
-    if (loadedGoal.status === "completed" && !hasTriggeredCelebration.current) {
-      setShowCelebration(true);
-      hasTriggeredCelebration.current = true;
-    } else if (loadedGoal.status !== "completed") {
-      // Reset if it goes back to active
-      hasTriggeredCelebration.current = false;
+  const refreshGoal = useCallback(() => {
+    if (id) {
+      const data = getGoalById(id);
+      if (data) setGoal(data);
+      else router.push("/goals");
     }
-
-    if (isInitial) {
-      setIsLoading(false);
-    }
-  }, [goalId]);
+  }, [id, router]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      refreshGoal(true);
-    }, 0);
+    refreshGoal();
+  }, [refreshGoal]);
 
-    return () => clearTimeout(timer);
-  }, [goalId, refreshGoal]);
-
-  // Animated progress counter
-  useEffect(() => {
-    if (!goal || isLoading) return;
-
-    const targetProgress = getGoalProgress(goal);
-    const duration = 800; // ms
-    const startTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      // Easing function for smooth animation
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setAnimatedProgress(Math.round(eased * targetProgress));
-
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(animate);
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [goal, isLoading]);
-
-  const handleMilestoneToggle = (milestoneId: string) => {
+  const handleStepToggle = (stepId: string) => {
     if (!goal) return;
-    toggleMilestone(goal.id, milestoneId);
+    toggleStep(goal.id, stepId);
     refreshGoal();
   };
 
-  const handleAddMilestone = () => {
-    if (!goal || !newMilestoneTitle.trim()) return;
+  const handleAddStep = () => {
+    if (!goal || !newStepTitle.trim()) return;
     
-    addMilestone(goal.id, {
-      title: newMilestoneTitle.trim(),
-      targetDate: newMilestoneDate || undefined,
+    addStep(goal.id, {
+      title: newStepTitle.trim(),
+      targetDate: newStepDate || undefined,
     });
     
     refreshGoal();
-    setNewMilestoneTitle("");
-    setNewMilestoneDate("");
-    setIsAddingMilestone(false);
+    setNewStepTitle("");
+    setNewStepDate("");
+    setIsAddingStep(false);
   };
 
-  const handleDeleteMilestone = (milestoneId: string) => {
+  const handleDeleteStep = (stepId: string) => {
     if (!goal) return;
-    deleteMilestone(goal.id, milestoneId);
+    deleteStep(goal.id, stepId);
     refreshGoal();
   };
 
-  const handlePauseResume = () => {
-    if (!goal) return;
-    const newStatus = goal.status === "paused" ? "active" : "paused";
-    updateGoal(goal.id, { status: newStatus });
-    refreshGoal();
+  const handleStartEdit = (s: Step) => {
+    setEditingStepId(s.id);
+    setEditingTitle(s.title);
+    setEditingDate(s.targetDate || "");
   };
 
-  const handleStartEdit = (m: Milestone) => {
-    setEditingMilestoneId(m.id);
-    setEditingTitle(m.title);
-    setEditingDate(m.targetDate || "");
-  };
-
-  const handleSaveMilestoneEdit = () => {
-    if (!goal || !editingMilestoneId || !editingTitle.trim()) return;
+  const handleSaveEdit = () => {
+    if (!goal || !editingStepId || !editingTitle.trim()) return;
     
-    updateMilestone(goal.id, editingMilestoneId, {
+    updateStep(goal.id, editingStepId, {
       title: editingTitle.trim(),
       targetDate: editingDate || undefined,
     });
     
+    setEditingStepId(null);
     refreshGoal();
-    setEditingMilestoneId(null);
   };
 
-  const handleStartEditGoal = () => {
+  const handleUpdateGoal = (updates: Partial<Goal>) => {
     if (!goal) return;
-    setEditGoalTitle(goal.title);
-    setEditGoalWhy(goal.whyMatters);
-    setEditGoalDate(goal.targetDate || "");
-    setEditGoalSuccess(goal.successCriteria || "");
-    setEditGoalConfidence(goal.confidence ?? null);
-    setIsEditingGoal(true);
-  };
-
-  const handleSaveGoalEdit = () => {
-    if (!goal || !editGoalTitle.trim() || !editGoalWhy.trim()) return;
-    
-    updateGoal(goal.id, {
-      title: editGoalTitle.trim(),
-      whyMatters: editGoalWhy.trim(),
-      targetDate: editGoalDate || undefined,
-      successCriteria: editGoalSuccess.trim() || undefined,
-      confidence: editGoalConfidence ?? undefined,
-    });
-    
+    updateGoal(goal.id, updates);
     refreshGoal();
-    setIsEditingGoal(false);
   };
 
-  const handleDelete = () => {
+  const handleDeleteGoal = () => {
     if (!goal) return;
     deleteGoal(goal.id);
     router.push("/goals");
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-dvh flex items-center justify-center bg-white">
-        <div className="animate-pulse text-gray-400">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!goal) {
-    return (
-      <div className="min-h-dvh flex flex-col items-center justify-center bg-white px-6 text-center">
-        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-          <Search className="w-8 h-8 text-gray-400" />
-        </div>
-        <h1 className="text-xl text-gray-900 mb-2">Goal not found</h1>
-        <p className="text-gray-500 mb-6">
-          This goal may have been deleted or doesn&apos;t exist.
-        </p>
-        <AppButton variant="secondary" onClick={() => router.push("/goals")}>
-          Back to Goals
-        </AppButton>
-      </div>
-    );
-  }
+  if (!goal) return null;
 
   const isCompleted = goal.status === "completed";
+  const progress = goal.steps.length > 0 
+    ? Math.round((goal.steps.filter(s => s.completed).length / goal.steps.length) * 100) 
+    : 0;
 
-  if (showCelebration) {
-    return (
-      <CelebrationScreen
-        progress={100}
-        title="Goal Achieved!"
-        subtitle={`Fantastic work on completing: ${goal.title}`}
-        buttonText="Done"
-        onButtonClick={() => router.push("/goals")}
-      />
-    );
-  }
+  // Format date safely
+
+  // Calculate days remaining
+  const daysRemaining = goal.targetDate 
+    ? Math.ceil((new Date(goal.targetDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    : 0;
 
   return (
-    <div className="min-h-dvh bg-white pb-24 flex flex-col">
-
-      {/* Goal Title & Steps */}
-      <section className="bg-white px-6 lg:px-4 py-10">
-        <div className="max-w-[1000px] mx-auto flex items-center justify-between">
-          <div>
-            <p className="text-[12px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-              Goal
-            </p>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {goal.title}
-            </h1>
-            
-            {/* Pills: category, date, status */}
-            <div className="flex flex-wrap items-center gap-2 mt-4">
-              <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
-                {goal.category}
-              </span>
-              {goal.targetDate && (
-                <span className="px-3 py-1.5 rounded-full text-xs font-medium bg-brand-primary/10 text-brand-primary border border-brand-primary/20 flex items-center gap-1.5">
-                  <Calendar className="w-3 h-3" />
-                  {new Date(goal.targetDate).toLocaleDateString("en-AU", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </span>
-              )}
-              <span className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize ${
-                goal.status === "active"
-                  ? "bg-green-100 text-green-700"
-                  : goal.status === "paused"
-                  ? "bg-amber-100 text-amber-700"
-                  : "bg-brand-primary text-white"
-              }`}>
-                {goal.status}
-              </span>
-            </div>
-          </div>
-          
-          {/* Progress Display */}
-          <div className="text-center flex-shrink-0">
-            <div className="text-5xl font-light text-brand-primary">
-              {animatedProgress}%
-            </div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">
-              Complete
-            </p>
-          </div>
-        </div>
-        <hr className="max-w-[1000px] mx-auto mt-10 border-gray-200" />
-      </section>
-
-      {/* Main Content */}
-      <main className="flex-1 bg-white px-6 lg:px-4 pt-2 pb-10">
-        <div className="max-w-[1000px] mx-auto space-y-8">
-
-        {/* Why This Matters - Quote Card */}
-        <section className="bg-brand-gradient rounded-3xl px-8 py-10">
-          <div className="flex items-center gap-2 mb-4">
-            <Heart className="w-4 h-4 text-white" />
-            <span className="text-white/80 text-xs font-semibold uppercase tracking-wider">
-              Why this matters to me
-            </span>
-          </div>
-          <p className="text-2xl text-white font-medium leading-relaxed">
-            &ldquo;{goal.whyMatters}&rdquo;
+    <div className="min-h-dvh bg-bg-card pb-32">
+      <header className="pt-6 pb-4 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-6 flex items-center justify-center">
+          <p className="text-lg font-medium text-[var(--color-charcoal)]">
+            Your Goal
           </p>
-          
-          {/* Expandable More Details Section */}
-          {(goal.successCriteria || goal.confidence) && (
-            <>
-              <button
-                onClick={() => setShowMoreDetails(!showMoreDetails)}
-                className="mt-6 flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm font-medium"
-              >
-                <ChevronDown className={`w-4 h-4 transition-transform ${showMoreDetails ? 'rotate-180' : ''}`} />
-                {showMoreDetails ? 'Less details' : 'More details'}
-              </button>
-              
-              {showMoreDetails && (
-                <div className="mt-4 pt-4 border-t border-white/20 space-y-4 animate-in fade-in slide-in-from-top-2">
-                  {goal.successCriteria && (
-                    <div>
-                      <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                        <Target className="w-3.5 h-3.5" />
-                        How I&apos;ll Know
-                      </p>
-                      <p className="text-white/90 text-sm leading-relaxed">
-                        {goal.successCriteria}
-                      </p>
-                    </div>
-                  )}
-                  {goal.confidence && (
-                    <div>
-                      <p className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" />
-                        Confidence Level
-                      </p>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((level) => (
-                          <div
-                            key={level}
-                            className={`w-6 h-2 rounded-full ${
-                              level <= goal.confidence!
-                                ? 'bg-white'
-                                : 'bg-white/30'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
+        </div>
+      </header>
+
+      <FullScreenLayout.Content centered={false}>
+        <div className="space-y-6">
+        {/* Row 1: Primary Goal Card & Progress Card */}
+        <div className="grid grid-cols-1 md:grid-cols-[repeat(20,minmax(0,1fr))] gap-6">
+          {/* Goal Info Card (13/20 = 65%) */}
+          <div className="md:col-span-[13] bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 relative overflow-hidden group">
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
+                    <Heart className="w-5 h-5 text-brand-primary" />
+                  </div>
+                  <span className="text-xs font-bold text-brand-primary uppercase tracking-widest">Your WHY</span>
                 </div>
-              )}
-            </>
-          )}
-        </section>
-
-        {/* Divider */}
-        <hr className="border-gray-200" />
-
-        {/* Action Plan */}
-        <section className="space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center text-brand-primary">
-                <ListTodo className="w-5 h-5" />
+                <button
+                  onClick={() => {
+                    setEditWhyTitle(goal.title);
+                    setEditWhyMatters(goal.whyMatters);
+                    setShowWhyEditor(true);
+                  }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10"
+                  aria-label="Edit goal"
+                >
+                  <Pencil className="w-5 h-5" />
+                </button>
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Action Plan</h2>
-                <p className="text-[12px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
-                  Your next steps forward
+              
+              <div className="space-y-4 mb-8 overflow-hidden">
+                <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight pr-12 break-words">
+                  {goal.title}
+                </h1>
+                <p className="text-lg md:text-xl text-gray-500 leading-relaxed italic pr-8 break-words whitespace-pre-wrap">
+                  &quot;{goal.whyMatters}&quot;
                 </p>
               </div>
+
+
             </div>
-            <button 
-              onClick={() => setShowAIInsights(true)}
-              className="flex items-center gap-2 px-5 py-3 rounded-full bg-brand-primary/10 border border-brand-primary/20 text-brand-primary text-sm font-semibold hover:bg-brand-primary/15 transition-colors"
-            >
-              <Sparkles className="w-5 h-5" />
-              AI Insights
-            </button>
+            <Sparkles className="absolute -right-6 -top-6 w-40 h-40 text-brand-primary/5 transform -rotate-12 group-hover:scale-110 transition-transform duration-1000" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {/* Add Milestone Input - Always first */}
-            {!isCompleted && (
-              <div className="md:col-span-1">
-                {isAddingMilestone ? (
-                  <div className="md:col-span-1 p-4 bg-white rounded-2xl border-2 border-brand-primary shadow-xl animate-in fade-in zoom-in-95 space-y-4">
-                    <div className="space-y-1">
-                      <label className="text-[10px] font-bold text-brand-primary uppercase tracking-wider">
-                        Step Title
-                      </label>
-                      <input
-                        type="text"
-                        value={newMilestoneTitle}
-                        onChange={(e) => setNewMilestoneTitle(e.target.value)}
-                        placeholder="What needs to be done?"
-                        className="w-full text-base font-medium border-none focus:ring-0 placeholder:text-gray-300 bg-transparent p-0"
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && newMilestoneTitle.trim()) handleAddMilestone();
-                          if (e.key === "Escape") {
-                            setIsAddingMilestone(false);
-                            setNewMilestoneTitle("");
-                            setNewMilestoneDate("");
-                          }
-                        }}
-                      />
-                    </div>
-                    
-                    <div className="flex items-end justify-between gap-4 pt-3 border-t border-gray-50">
-                      <div className="flex-1 space-y-1">
-                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          Set Deadline
-                        </label>
-                        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group">
-                          <Calendar className="w-4 h-4 text-brand-primary group-hover:scale-110 transition-transform" />
-                          <input
-                            type="date"
-                            value={newMilestoneDate}
-                            onChange={(e) => setNewMilestoneDate(e.target.value)}
-                            className="flex-1 text-sm border-none focus:ring-0 p-0 text-gray-700 bg-transparent cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="flex gap-2 pb-1">
-                        <button
-                          onClick={() => {
-                            setIsAddingMilestone(false);
-                            setNewMilestoneTitle("");
-                            setNewMilestoneDate("");
-                          }}
-                          className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={handleAddMilestone}
-                          className="w-10 h-10 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-lg shadow-brand-primary/20 disabled:opacity-30 disabled:shadow-none transition-all active:scale-95"
-                          disabled={!newMilestoneTitle.trim()}
-                        >
-                          <Check className="w-5 h-5" />
-                        </button>
-                      </div>
+          {/* Progress Card (7/20 = 35%) */}
+          <div className="md:col-span-[7] bg-brand-primary rounded-[2.5rem] p-10 text-white flex flex-col justify-between relative overflow-hidden group">
+            <div className="relative z-10">
+              <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Overall progress</p>
+              
+              <div className="space-y-6 mb-8">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-8xl font-light tracking-tighter tabular-nums">{progress}</span>
+                  <span className="text-3xl font-light opacity-50">%</span>
+                </div>
+                
+                <div className="w-full h-3 bg-white/20 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-white transition-all duration-1000 ease-out rounded-full min-w-3"
+                    style={{ width: `${Math.max(progress, 2)}%` }}
+                  />
+                </div>
+              </div>
+
+              <p className="text-xs font-medium text-white/80 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                {isCompleted ? "Goal achieved!" : "Keep the momentum going"}
+              </p>
+            </div>
+            
+
+          </div>
+        </div>
+
+        {/* Row 2: Category (5/20 = 25%) | How You'll Know (15/20 = 75%) */}
+        <div className="grid grid-cols-1 md:grid-cols-[repeat(20,minmax(0,1fr))] gap-6">
+          {/* Category Card (25%) */}
+          <div className="md:col-span-[5] bg-[var(--color-deep-violet)] rounded-[2.5rem] p-10 border border-white/10 flex flex-col relative overflow-hidden group">
+            <div className="relative z-10 flex flex-col h-full">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest leading-none">Category</h3>
+                <button
+                  onClick={() => setShowCategoryEditor(true)}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-white/40 hover:text-white hover:bg-white/10"
+                  aria-label="Edit category"
+                >
+                  <Pencil className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="flex-1 flex flex-col justify-center items-center">
+                <div className="text-center">
+                  <div className="mb-4 flex justify-center">
+                    {(() => {
+                      const iconMap: Record<GoalCategory, LucideIcon> = {
+                        Health: Activity,
+                        Wellbeing: Heart,
+                        Career: Briefcase,
+                        Personal: Smile,
+                        Finance: Coins,
+                        Finances: Coins,
+                        Growth: Sprout,
+                        Family: Home,
+                        other: Tag
+                      };
+                      const Icon = iconMap[goal.category] || Activity;
+                      return <Icon className="w-12 h-12 text-white" />;
+                    })()}
+                  </div>
+                  <p className="text-2xl font-bold text-white capitalize tracking-tight">
+                    {goal.category}
+                  </p>
+                </div>
+              </div>
+            </div>
+            {(() => {
+              const iconMap: Record<GoalCategory, LucideIcon> = {
+                Health: Activity,
+                Wellbeing: Heart,
+                Career: Briefcase,
+                Personal: Smile,
+                Finance: Coins,
+                Finances: Coins,
+                Growth: Sprout,
+                Family: Home,
+                other: Tag
+              };
+              const Icon = iconMap[goal.category] || Activity;
+              return <Icon className="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 transform rotate-12 group-hover:scale-110 transition-transform duration-1000" />;
+            })()}
+          </div>
+
+          {/* How You'll Know Card (75%) */}
+          <div className="md:col-span-[15] bg-white rounded-[2.5rem] p-10 border border-gray-100 flex flex-col relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-widest leading-none">How You&apos;ll Know</h3>
+              <button
+                onClick={() => {
+                  setEditSuccessCriteria(goal.successCriteria || "");
+                  setShowSuccessEditor(true);
+                }}
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10"
+                aria-label="Edit success criteria"
+              >
+                <Pencil className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="flex-1 flex flex-col justify-start overflow-hidden">
+              <p className="text-lg font-medium text-gray-800 leading-relaxed break-words whitespace-pre-wrap">
+                {goal.successCriteria || "Define your win criteria."}
+              </p>
+            </div>
+            <Ruler className="absolute -right-6 -bottom-6 w-40 h-40 text-brand-primary/5 transform rotate-12 group-hover:scale-110 transition-transform duration-1000" />
+          </div>
+        </div>
+
+        {/* Row 3: Readiness (15/20 = 75%) | Timeline (5/20 = 25%) */}
+        <div className="grid grid-cols-1 md:grid-cols-[repeat(20,minmax(0,1fr))] gap-6">
+          {/* Readiness Card (75%) */}
+          <div className="md:col-span-[15] bg-warm-ivory rounded-[2.5rem] p-10 border border-brand-primary/10 flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-[10px] font-bold text-brand-primary/60 uppercase tracking-widest leading-none">Readiness</h3>
+              <button
+                onClick={() => {
+                  setSelectedReadiness(goal.confidence || null);
+                  setShowReadinessEditor(true);
+                }}
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-brand-primary/40 hover:text-brand-primary hover:bg-brand-primary/10"
+                aria-label="Edit readiness"
+              >
+                <Pencil className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="flex-1 flex flex-col justify-center space-y-6">
+              {/* Mobile: Large number display */}
+              <div className="flex md:hidden flex-col items-center justify-center text-center">
+                <span className="text-6xl font-black text-brand-primary leading-none">
+                  {goal.confidence || 0}
+                </span>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">OUT OF 5</p>
+              </div>
+
+              {/* Desktop: Scale display */}
+              <div className="hidden md:flex items-center justify-between px-2">
+                {[1, 2, 3, 4, 5].map((level) => (
+                  <div
+                    key={level}
+                    className="group relative flex flex-col items-center gap-3"
+                  >
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl transition-all duration-300 ${
+                      (goal.confidence || 0) >= level 
+                        ? "bg-brand-primary text-white" 
+                        : "bg-white text-gray-300 border border-gray-100"
+                    }`}>
+                      {level}
                     </div>
                   </div>
-                ) : (
-                  <button
-                    onClick={() => setIsAddingMilestone(true)}
-                    className="w-full h-full min-h-[80px] flex items-center justify-between px-6 py-4 border-2 border-dashed border-gray-300 rounded-2xl text-sm text-gray-600 hover:border-brand-primary/30 hover:text-brand-primary hover:bg-brand-primary/5 transition-all group"
-                  >
-                    <div className="flex flex-col items-start gap-1">
-                      <span className="font-semibold text-gray-700">Add new action step</span>
-                      <span className="text-xs text-gray-500 group-hover:text-brand-primary/60">Break it down into smaller tasks</span>
-                    </div>
-                    <div className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white shadow-lg shadow-brand-primary/20 transform group-hover:scale-110 transition-transform">
-                      <Plus className="w-6 h-6" />
-                    </div>
-                  </button>
-                )}
+                ))}
               </div>
-            )}
+              
+              <div className="hidden md:flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] px-4">
+                <span>Building up</span>
+                <span>Fully ready</span>
+              </div>
+            </div>
+          </div>
 
-            {/* Existing Milestones - sorted by urgency (earliest deadline first) */}
-            {[...goal.milestones]
+          {/* Timeline Card (25%) */}
+          <div className="md:col-span-[5] bg-white rounded-[2.5rem] p-10 border border-gray-100 flex flex-col relative overflow-hidden group">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Timeline</h3>
+              <button
+                onClick={() => {
+                  setEditTargetDate(goal.targetDate || "");
+                  setShowTimelineEditor(true);
+                }}
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10"
+                aria-label="Edit timeline"
+              >
+                <Pencil className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <Calendar className="w-10 h-10 text-brand-primary mb-4" />
+              <span className="text-3xl font-black text-brand-primary leading-none">
+                {daysRemaining > 0 ? daysRemaining : 0} Days
+              </span>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">REMAINING</p>
+            </div>
+            <Calendar className="absolute -right-6 -bottom-6 w-32 h-32 text-brand-primary/5 transform rotate-12 group-hover:scale-110 transition-transform duration-1000" />
+          </div>
+        </div>
+
+        {/* Row 3: Action Steps List (Full Width) */}
+        <section className="bg-white rounded-[2.5rem] p-6 md:p-10 border border-gray-100 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-4">
+                Action Plan
+                <div className="bg-gray-100 text-brand-primary text-xs py-1.5 px-4 rounded-full font-black tracking-widest">
+                  {goal.steps.filter(s => s.completed).length} / {goal.steps.length}
+                </div>
+              </h2>
+              <p className="text-gray-400 text-sm mt-1">Break your goal down into small, manageable wins.</p>
+            </div>
+            
+            {!isCompleted && !isAddingStep && (
+              <button
+                onClick={() => setIsAddingStep(true)}
+                className="flex items-center gap-2 py-3 px-6 rounded-2xl bg-brand-primary text-white font-bold text-sm hover:scale-[1.02] active:scale-95 transition-all"
+              >
+                <Plus className="w-5 h-5" />
+                ADD NEW STEP
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {[...goal.steps]
               .sort((a, b) => {
                 // Completed items go to the end
                 if (a.completed && !b.completed) return 1;
@@ -488,457 +430,462 @@ export default function GoalDetailPage() {
                 }
                 return 0;
               })
-              .map((milestone) => (
-              <div key={milestone.id} className="group relative">
-                {editingMilestoneId === milestone.id ? (
-                  <div className="p-4 bg-white rounded-2xl border-2 border-brand-primary shadow-lg space-y-3 animate-in fade-in zoom-in-95">
-                    <input
-                      type="text"
-                      value={editingTitle}
-                      onChange={(e) => setEditingTitle(e.target.value)}
-                      className="w-full text-sm font-medium border-none focus:ring-0 p-0 bg-transparent"
-                      autoFocus
-                    />
-                    <div className="flex items-center justify-between gap-3 pt-2 border-t border-gray-50">
-                      <div className="flex items-center gap-2 flex-1">
-                        <Calendar className="w-3.5 h-3.5 text-brand-primary/60" />
+              .map((step) => (
+              <div key={step.id} className="group relative">
+                {editingStepId === step.id ? (
+                  <div className="p-6 bg-white rounded-3xl border-2 border-brand-primary animate-in fade-in zoom-in-95 h-full">
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-brand-primary uppercase px-1">What&apos;s the step?</label>
                         <input
-                          type="date"
-                          value={editingDate}
-                          onChange={(e) => setEditingDate(e.target.value)}
-                          className="flex-1 text-[10px] border-none focus:ring-0 p-0 text-gray-600 bg-transparent"
+                          autoFocus
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                          className="w-full text-base font-bold bg-gray-50 p-3 rounded-xl border-none focus:ring-0 text-gray-900"
                         />
                       </div>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => setEditingMilestoneId(null)}
-                          className="p-1.5 text-gray-400 hover:text-gray-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={handleSaveMilestoneEdit}
-                          className="p-1.5 bg-brand-primary text-white rounded-lg"
-                        >
-                          <Check className="w-4 h-4" />
-                        </button>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold text-brand-primary uppercase px-1">Target Date</label>
+                        <div className="flex items-center gap-2 text-gray-500 bg-gray-50 p-3 rounded-xl">
+                          <Calendar className="w-4 h-4 text-brand-primary" />
+                          <input
+                            type="date"
+                            value={editingDate}
+                            onChange={(e) => setEditingDate(e.target.value)}
+                            className="text-xs border-none focus:ring-0 p-0 bg-transparent flex-1 cursor-pointer font-bold"
+                          />
+                        </div>
                       </div>
+                    </div>
+                    <div className="flex gap-2 mt-6">
+                      <button
+                        onClick={handleSaveEdit}
+                        className="flex-1 bg-brand-primary text-white py-3 rounded-xl text-xs font-black active:scale-95 transition-transform"
+                      >
+                        SAVE CHANGES
+                      </button>
+                      <button
+                        onClick={() => setEditingStepId(null)}
+                        className="px-4 py-3 text-gray-400 hover:text-gray-600 font-bold text-xs"
+                      >
+                        CANCEL
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  <>
-                    <button
-                      onClick={() => !isCompleted && handleMilestoneToggle(milestone.id)}
-                      disabled={isCompleted}
-                      className={`w-full flex items-center gap-3 text-left p-5 rounded-2xl transition-all border h-full ${
-                        milestone.completed
-                          ? "bg-warm-ivory border-brand-primary/20 text-brand-primary shadow-sm"
+                  <div className="h-full">
+                    <div
+                      className={`w-full flex items-center gap-4 text-left p-6 rounded-3xl transition-all border min-h-[100px] h-full ${
+                        step.completed
+                          ? "bg-warm-ivory border-brand-primary/20 text-brand-primary"
                           : "bg-white border-gray-100 hover:border-brand-primary/20 text-gray-900"
                       }`}
                     >
-                      <div
-                        className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-colors ${
-                          milestone.completed
-                            ? "bg-brand-primary border-brand-primary text-white"
-                            : "bg-transparent border-gray-200"
-                        }`}
+                      <button
+                        onClick={() => !isCompleted && handleStepToggle(step.id)}
+                        disabled={isCompleted}
+                        className="flex items-center gap-4 flex-1 min-w-0"
                       >
-                        {milestone.completed && <Check className="w-4 h-4" />}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0 pr-24">
-                        <p className={`text-sm font-medium leading-tight ${
-                          milestone.completed ? "text-brand-primary" : "text-gray-900"
+                        <div className={`flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-all duration-300 ${
+                          step.completed
+                            ? "bg-brand-primary border-brand-primary text-white scale-110"
+                            : "bg-transparent border-gray-200"
                         }`}>
-                          {milestone.title}
-                        </p>
-                        {milestone.targetDate && !milestone.completed && (() => {
-                          const now = new Date();
-                          now.setHours(0, 0, 0, 0);
-                          const target = new Date(milestone.targetDate);
-                          target.setHours(0, 0, 0, 0);
-                          const diffTime = target.getTime() - now.getTime();
-                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                          
-                          return (
-                            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-bold ring-1 ring-brand-primary/20">
-                              <Clock className="w-3.5 h-3.5" />
-                              {diffDays < 0 
-                                ? `${Math.abs(diffDays)}d overdue` 
-                                : diffDays === 0 
-                                ? "Due today" 
-                                : `${diffDays}d left`}
-                            </div>
-                          );
-                        })()}
-                        {!milestone.targetDate && !milestone.completed && (
-                          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-bold">
-                            <Calendar className="w-3.5 h-3.5" />
-                            No date set
-                          </div>
-                        )}
-                        {milestone.completed && (
-                          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-bold ring-1 ring-brand-primary/20">
-                            <Check className="w-3.5 h-3.5" />
-                            Completed
-                          </div>
-                        )}
-                      </div>
-                    </button>
+                          {step.completed && <Check className="w-5 h-5 stroke-[3]" />}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0 text-left">
+                          <p className={`text-base font-bold leading-tight ${
+                            step.completed ? "text-brand-primary line-through opacity-60" : "text-gray-900"
+                          }`}>
+                            {step.title}
+                          </p>
+                          {step.targetDate && !step.completed && (() => {
+                            const target = new Date(step.targetDate);
+                            const today = new Date();
+                            const isOverdue = target < today;
+                            
+                            return (
+                              <div className={`flex items-center gap-1.5 mt-2 ${isOverdue ? "text-red-500" : "text-gray-400"}`}>
+                                <Calendar className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-black uppercase tracking-wider">
+                                  {target.toLocaleDateString("en-AU", { day: "numeric", month: "short" })}
+                                </span>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      </button>
 
-                    {/* Milestone Actions - Only visible on non-completed goals */}
-                    {!isCompleted && (
-                      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleStartEdit(milestone);
-                          }}
-                          className="w-11 h-11 rounded-xl flex items-center justify-center transition-all text-brand-primary hover:bg-brand-primary/10"
-                          aria-label="Edit milestone"
-                        >
-                          <Pencil className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteMilestone(milestone.id);
-                          }}
-                          className="w-11 h-11 rounded-xl flex items-center justify-center transition-all text-brand-primary hover:bg-brand-primary/10"
-                          aria-label="Delete milestone"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    )}
-                  </>
+                      {/* Step Actions - Always visible on the right */}
+                      {!isCompleted && (
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartEdit(step);
+                            }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10"
+                            aria-label="Edit step"
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteStep(step.id);
+                            }}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-gray-400 hover:text-red-500 hover:bg-red-50"
+                            aria-label="Delete step"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
               </div>
             ))}
-          </div>
 
-
-
-          {isCompleted && (
-            <div className="bg-brand-primary/5 rounded-3xl p-8 text-center border border-brand-primary/10">
-              <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Trophy className="w-8 h-8 text-brand-primary" />
+            {/* Add Step Inline Form */}
+            {!isCompleted && isAddingStep && (
+              <div className="p-6 bg-white rounded-3xl border-2 border-brand-primary animate-in fade-in zoom-in-95 min-h-[100px] h-full flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-brand-primary uppercase px-1">What&apos;s the next win?</label>
+                    <input
+                      autoFocus
+                      value={newStepTitle}
+                      onChange={(e) => setNewStepTitle(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && handleAddStep()}
+                      className="w-full text-base font-bold bg-gray-50 p-3 rounded-xl border-none focus:ring-0 text-gray-900"
+                      placeholder="e.g. Schedule first session"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold text-brand-primary uppercase px-1">Target Date</label>
+                    <div className="flex items-center gap-2 text-gray-500 bg-gray-50 p-3 rounded-xl">
+                      <Calendar className="w-4 h-4 text-brand-primary" />
+                      <input
+                        type="date"
+                        value={newStepDate}
+                        onChange={(e) => setNewStepDate(e.target.value)}
+                        className="text-xs border-none focus:ring-0 p-0 bg-transparent flex-1 cursor-pointer font-bold"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-6">
+                  <button
+                    onClick={handleAddStep}
+                    disabled={!newStepTitle.trim()}
+                    className="flex-1 bg-brand-primary text-white py-3 rounded-xl text-xs font-black active:scale-95 transition-transform disabled:opacity-50"
+                  >
+                    ADD STEP
+                  </button>
+                  <button
+                    onClick={() => setIsAddingStep(false)}
+                    className="px-4 py-3 text-gray-400 hover:text-gray-600 font-bold text-xs"
+                  >
+                    CANCEL
+                  </button>
+                </div>
               </div>
-              <h3 className="text-gray-900 font-bold text-xl mb-2">Goal Completed!</h3>
-              <p className="text-gray-500 text-sm">You&apos;ve achieved what you set out to do.</p>
-            </div>
-          )}
+            )}
+          </div>
         </section>
-        </div>
-      </main>
 
-      {/* Contextual Action Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50">
-        <div className="flex justify-around items-center h-16 max-w-md mx-auto">
-          {/* Done - Back to Goals */}
+        </div>
+      </FullScreenLayout.Content>
+
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50 animate-in slide-in-from-bottom duration-500">
+        <div className="flex justify-around items-center h-20 max-w-md mx-auto px-4">
+          <button 
+            onClick={() => setShowAIInsights(true)}
+            className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors gap-1"
+          >
+            <Sparkles className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">AI Coach</span>
+          </button>
+
           <button
             onClick={() => router.push("/goals")}
-            className="flex flex-col items-center justify-center w-full h-full text-brand-primary transition-colors"
+            className="flex flex-col items-center justify-center w-full h-full text-brand-primary transition-colors gap-1"
           >
-            <Check className="w-6 h-6" />
-            <span className="text-xs mt-1 font-medium">Done</span>
+            <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-1 group-active:scale-95 transition-transform">
+              <X className="w-6 h-6 text-brand-primary" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest -mt-1">Close</span>
           </button>
-          
-          {/* Edit */}
-          <button
-            onClick={handleStartEditGoal}
-            className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors"
-          >
-            <Pencil className="w-6 h-6" />
-            <span className="text-xs mt-1">Edit</span>
-          </button>
-          
-          {/* Pause/Resume */}
-          {!isCompleted && (
-            <button
-              onClick={handlePauseResume}
-              className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors"
-            >
-              {goal.status === "paused" ? (
-                <>
-                  <PlayCircle className="w-6 h-6" />
-                  <span className="text-xs mt-1">Resume</span>
-                </>
-              ) : (
-                <>
-                  <PauseCircle className="w-6 h-6" />
-                  <span className="text-xs mt-1">Pause</span>
-                </>
-              )}
-            </button>
-          )}
-          
-          {/* Delete */}
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-red-500 transition-colors"
-          >
-            <Trash2 className="w-6 h-6" />
-            <span className="text-xs mt-1">Delete</span>
-          </button>
+
         </div>
       </nav>
-
-      {/* Goal Edit Modal Overlay */}
-      {isEditingGoal && (
-        <div className="fixed inset-0 z-50 bg-white animate-in slide-in-from-bottom-full flex flex-col">
-          
-          {/* Content - Static display with edit buttons */}
-          <div className="flex-1 overflow-y-auto pb-24">
-            <div className="max-w-sm lg:max-w-2xl mx-auto px-6 py-8 space-y-4">
-              
-              {/* Page Title */}
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Goal</h1>
-              
-              {/* Goal Title Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-5 relative group">
-                <div className="pr-10">
-                  <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1 mb-2">
-                    <Target className="w-3 h-3" /> What
-                  </p>
-                  {editingMilestoneId === "goal-title" ? (
-                    <input
-                      type="text"
-                      value={editGoalTitle}
-                      onChange={(e) => setEditGoalTitle(e.target.value)}
-                      onBlur={() => setEditingMilestoneId(null)}
-                      onKeyDown={(e) => e.key === "Enter" && setEditingMilestoneId(null)}
-                      autoFocus
-                      className="w-full text-lg font-medium text-gray-900 border-b-2 border-brand-primary focus:outline-none bg-transparent"
-                    />
-                  ) : (
-                    <p className="text-lg font-medium text-gray-900 leading-snug">
-                      {editGoalTitle || "Untitled Goal"}
-                    </p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setEditingMilestoneId(editingMilestoneId === "goal-title" ? null : "goal-title")}
-                  className="absolute top-5 right-5 p-2 rounded-lg text-brand-primary/50 hover:text-brand-primary hover:bg-brand-primary/5 transition-colors"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Why Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-5 relative group">
-                <div className="pr-10">
-                  <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1 mb-2">
-                    <Heart className="w-3 h-3" /> Why
-                  </p>
-                  {editingMilestoneId === "goal-why" ? (
-                    <textarea
-                      value={editGoalWhy}
-                      onChange={(e) => setEditGoalWhy(e.target.value)}
-                      onBlur={() => setEditingMilestoneId(null)}
-                      autoFocus
-                      rows={3}
-                      className="w-full text-base text-gray-700 border-b-2 border-brand-primary focus:outline-none bg-transparent resize-none leading-relaxed"
-                    />
-                  ) : (
-                    <p className="text-base text-gray-700 leading-relaxed">
-                      {editGoalWhy || "No motivation set"}
-                    </p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setEditingMilestoneId(editingMilestoneId === "goal-why" ? null : "goal-why")}
-                  className="absolute top-5 right-5 p-2 rounded-lg text-brand-primary/50 hover:text-brand-primary hover:bg-brand-primary/5 transition-colors"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* When Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-5 relative group">
-                <div className="pr-10">
-                  <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1 mb-2">
-                    <Calendar className="w-3 h-3" /> When
-                  </p>
-                  {editingMilestoneId === "goal-date" ? (
-                    <input
-                      type="date"
-                      value={editGoalDate}
-                      onChange={(e) => setEditGoalDate(e.target.value)}
-                      onBlur={() => setEditingMilestoneId(null)}
-                      autoFocus
-                      className="w-full text-lg font-medium text-gray-900 border-b-2 border-brand-primary focus:outline-none bg-transparent"
-                    />
-                  ) : (
-                    <p className="text-lg font-medium text-gray-900">
-                      {editGoalDate 
-                        ? new Date(editGoalDate).toLocaleDateString("en-AU", {
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                          })
-                        : "No date set"}
-                    </p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setEditingMilestoneId(editingMilestoneId === "goal-date" ? null : "goal-date")}
-                  className="absolute top-5 right-5 p-2 rounded-lg text-brand-primary/50 hover:text-brand-primary hover:bg-brand-primary/5 transition-colors"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Success Criteria Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-5 relative group">
-                <div className="pr-10">
-                  <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1 mb-2">
-                    <Target className="w-3 h-3" /> How I&apos;ll Know
-                  </p>
-                  {editingMilestoneId === "goal-success" ? (
-                    <textarea
-                      value={editGoalSuccess}
-                      onChange={(e) => setEditGoalSuccess(e.target.value)}
-                      onBlur={() => setEditingMilestoneId(null)}
-                      autoFocus
-                      rows={2}
-                      placeholder="How will you know when you've achieved this?"
-                      className="w-full text-base text-gray-700 border-b-2 border-brand-primary focus:outline-none bg-transparent resize-none leading-relaxed"
-                    />
-                  ) : (
-                    <p className="text-base text-gray-700 leading-relaxed">
-                      {editGoalSuccess || "Not set"}
-                    </p>
-                  )}
-                </div>
-                <button
-                  onClick={() => setEditingMilestoneId(editingMilestoneId === "goal-success" ? null : "goal-success")}
-                  className="absolute top-5 right-5 p-2 rounded-lg text-brand-primary/50 hover:text-brand-primary hover:bg-brand-primary/5 transition-colors"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Confidence Card */}
-              <div className="bg-white rounded-2xl border border-gray-100 p-5">
-                <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center gap-1 mb-4">
-                  <Heart className="w-3 h-3" /> Confidence Level
-                </p>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => setEditGoalConfidence(level)}
-                      className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all ${
-                        editGoalConfidence === level
-                          ? "bg-brand-primary text-white"
-                          : "bg-gray-50 text-gray-600 hover:bg-brand-primary/10"
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-400 text-center mt-3">
-                  1 = Not confident &nbsp;·&nbsp; 5 = Very confident
-                </p>
-              </div>
-              
+      {/* Modals */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+          <div className="relative bg-white rounded-[40px] p-10 max-w-sm w-full text-center animate-in zoom-in-95 duration-300">
+            <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-8">
+              <AlertCircle className="w-12 h-12 text-red-500" />
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">Delete Goal?</h2>
+            <p className="text-gray-500 mb-10 leading-relaxed text-sm">This will permanently remove this goal and all its progress. This cannot be undone.</p>
+            <div className="space-y-3">
+              <button 
+                onClick={handleDeleteGoal}
+                className="w-full bg-red-500 text-white py-5 rounded-full font-bold active:scale-95 transition-transform"
+              >
+                YES, DELETE GOAL
+              </button>
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                className="w-full py-5 rounded-full font-bold text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                CANCEL
+              </button>
             </div>
           </div>
-
-          {/* Contextual Action Bar */}
-          <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50">
-            <div className="flex justify-around items-center h-16 max-w-md mx-auto">
-              {/* Cancel */}
-              <button
-                onClick={() => setIsEditingGoal(false)}
-                className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <X className="w-6 h-6" />
-                <span className="text-xs mt-1">Cancel</span>
-              </button>
-              
-              {/* Save */}
-              <button
-                onClick={() => handleSaveGoalEdit()}
-                disabled={!editGoalTitle.trim() || !editGoalWhy.trim()}
-                className="flex flex-col items-center justify-center w-full h-full text-brand-primary disabled:text-gray-300 transition-colors"
-              >
-                <Check className="w-6 h-6" />
-                <span className="text-xs mt-1 font-medium">Save</span>
-              </button>
-            </div>
-          </nav>
         </div>
       )}
 
-      {/* AI Insights Coming Soon Modal */}
       {showAIInsights && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50 animate-in fade-in" onClick={() => setShowAIInsights(false)}>
-          <div 
-            className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-brand-gradient flex items-center justify-center">
-              <Sparkles className="w-10 h-10 text-white" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowAIInsights(false)} />
+          <div className="relative bg-white rounded-[40px] p-10 max-w-sm w-full text-center animate-in zoom-in-95 duration-300">
+            <div className="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Sparkles className="w-12 h-12 text-brand-primary" />
             </div>
-            
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              AI Insights
-            </h3>
-            <p className="text-brand-primary font-semibold text-sm uppercase tracking-widest mb-4">
-              Coming Soon
-            </p>
-            <p className="text-gray-500 mb-8 leading-relaxed">
-              We&apos;re building something special to help you achieve your goals faster with personalised AI-powered recommendations.
-            </p>
-            
-            <button
+            <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">AI Insights</h2>
+            <p className="text-gray-500 mb-10 leading-relaxed text-sm">Our AI coach is currently being trained to help you achieve your goals faster. Check back soon!</p>
+            <button 
               onClick={() => setShowAIInsights(false)}
-              className="w-full py-4 bg-brand-primary text-white font-semibold rounded-2xl hover:bg-brand-primary/90 transition-colors"
+              className="w-full bg-brand-primary text-white py-5 rounded-full font-bold active:scale-95 transition-transform"
             >
-              Got it!
+              GOT IT
             </button>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/50 animate-in fade-in" onClick={() => setShowDeleteConfirm(false)}>
-          <div 
-            className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95"
-            onClick={(e) => e.stopPropagation()}
+      {/* Why Editor Bottom Sheet */}
+      <BottomSheet
+        isOpen={showWhyEditor}
+        onClose={() => setShowWhyEditor(false)}
+        title="Edit Your Why"
+      >
+        <div className="space-y-6 pt-4">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-primary uppercase tracking-widest">
+              Goal Title
+            </label>
+            <input
+              type="text"
+              value={editWhyTitle}
+              onChange={(e) => setEditWhyTitle(e.target.value)}
+              className="w-full bg-gray-50 p-4 rounded-2xl border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-lg font-bold"
+              placeholder="What's your goal?"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-primary uppercase tracking-widest">
+              Why It Matters
+            </label>
+            <textarea
+              value={editWhyMatters}
+              onChange={(e) => setEditWhyMatters(e.target.value)}
+              className="w-full bg-gray-50 p-4 rounded-2xl border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-600 text-base leading-relaxed resize-none h-32"
+              placeholder="Why does this matter to you?"
+            />
+          </div>
+
+          <button
+            onClick={() => {
+              handleUpdateGoal({ title: editWhyTitle, whyMatters: editWhyMatters });
+              setShowWhyEditor(false);
+            }}
+            disabled={!editWhyTitle.trim()}
+            className="w-full bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-transform disabled:opacity-50"
           >
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center">
-              <Trash2 className="w-8 h-8 text-red-500" />
-            </div>
-            
-            <h3 className="text-xl font-bold text-gray-900 mb-3">
-              Delete Goal?
-            </h3>
-            <p className="text-gray-500 mb-8 leading-relaxed">
-              This will permanently delete this goal and all its milestones. This action cannot be undone.
-            </p>
-            
-            <div className="flex gap-3">
+            Save Changes
+          </button>
+        </div>
+      </BottomSheet>
+
+      {/* Category Editor Bottom Sheet */}
+      <BottomSheet
+        isOpen={showCategoryEditor}
+        onClose={() => {
+          setSelectedCategory(null);
+          setShowCategoryEditor(false);
+        }}
+        title="Edit Category"
+      >
+        <div className="space-y-6 pt-4">
+          <div className="grid grid-cols-2 gap-3">
+            {(["Health", "Wellbeing", "Career", "Personal", "Finance", "Growth", "Family"] as GoalCategory[]).map((cat) => {
+              const iconMap: Record<GoalCategory, LucideIcon> = {
+                Health: Activity,
+                Wellbeing: Heart,
+                Career: Briefcase,
+                Personal: Smile,
+                Finance: Coins,
+                Finances: Coins,
+                Growth: Sprout,
+                Family: Home,
+                other: Tag
+              };
+              const Icon = iconMap[cat] || Activity;
+              const isSelected = (selectedCategory || goal.category) === cat;
+              
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`flex flex-col items-center gap-3 p-5 rounded-2xl transition-all ${
+                    isSelected 
+                      ? "bg-brand-primary text-white" 
+                      : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Icon className="w-8 h-8" />
+                  <span className="text-sm font-bold capitalize">{cat}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => {
+              if (selectedCategory) {
+                handleUpdateGoal({ category: selectedCategory });
+              }
+              setSelectedCategory(null);
+              setShowCategoryEditor(false);
+            }}
+            className="w-full bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-transform"
+          >
+            Save Changes
+          </button>
+        </div>
+      </BottomSheet>
+
+      {/* Success Criteria Editor Bottom Sheet */}
+      <BottomSheet
+        isOpen={showSuccessEditor}
+        onClose={() => setShowSuccessEditor(false)}
+        title="Edit Success Measures"
+      >
+        <div className="space-y-6 pt-4">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-primary uppercase tracking-widest">
+              How You&apos;ll Know You&apos;ve Succeeded
+            </label>
+            <textarea
+              value={editSuccessCriteria}
+              onChange={(e) => setEditSuccessCriteria(e.target.value)}
+              className="w-full bg-gray-50 p-4 rounded-2xl border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-600 text-base leading-relaxed resize-none h-32"
+              placeholder="Define measurable success criteria..."
+            />
+          </div>
+
+          <button
+            onClick={() => {
+              handleUpdateGoal({ successCriteria: editSuccessCriteria });
+              setShowSuccessEditor(false);
+            }}
+            className="w-full bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-transform"
+          >
+            Save Changes
+          </button>
+        </div>
+      </BottomSheet>
+
+      {/* Readiness Editor Bottom Sheet */}
+      <BottomSheet
+        isOpen={showReadinessEditor}
+        onClose={() => {
+          setSelectedReadiness(null);
+          setShowReadinessEditor(false);
+        }}
+        title="Edit Readiness"
+      >
+        <div className="space-y-6 pt-4">
+          <p className="text-sm text-gray-500 text-center">How ready do you feel to achieve this goal?</p>
+          
+          <div className="flex items-center justify-between px-2">
+            {[1, 2, 3, 4, 5].map((level) => (
               <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-colors"
+                key={level}
+                onClick={() => setSelectedReadiness(level)}
+                className="group relative flex flex-col items-center gap-3"
               >
-                Cancel
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl transition-all duration-300 ${
+                  (selectedReadiness ?? goal.confidence ?? 0) >= level 
+                    ? "bg-brand-primary text-white" 
+                    : "bg-gray-100 text-gray-300 hover:bg-gray-200"
+                }`}>
+                  {level}
+                </div>
               </button>
-              <button
-                onClick={handleDelete}
-                className="flex-1 py-3 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-colors"
-              >
-                Delete
-              </button>
+            ))}
+          </div>
+          
+          <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] px-4">
+            <span>Building up</span>
+            <span>Fully ready</span>
+          </div>
+
+          <button
+            onClick={() => {
+              if (selectedReadiness) {
+                handleUpdateGoal({ confidence: selectedReadiness });
+              }
+              setSelectedReadiness(null);
+              setShowReadinessEditor(false);
+            }}
+            className="w-full bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-transform"
+          >
+            Save Changes
+          </button>
+        </div>
+      </BottomSheet>
+
+      {/* Timeline Editor Bottom Sheet */}
+      <BottomSheet
+        isOpen={showTimelineEditor}
+        onClose={() => setShowTimelineEditor(false)}
+        title="Edit Timeline"
+      >
+        <div className="space-y-6 pt-4">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-brand-primary uppercase tracking-widest">
+              Target Date
+            </label>
+            <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-2xl">
+              <Calendar className="w-5 h-5 text-brand-primary" />
+              <input
+                type="date"
+                value={editTargetDate}
+                onChange={(e) => setEditTargetDate(e.target.value)}
+                className="flex-1 bg-transparent border-none focus:ring-0 text-gray-900 font-bold text-lg"
+              />
             </div>
           </div>
+
+          <button
+            onClick={() => {
+              handleUpdateGoal({ targetDate: editTargetDate || undefined });
+              setShowTimelineEditor(false);
+            }}
+            className="w-full bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-transform"
+          >
+            Save Changes
+          </button>
         </div>
-      )}
+      </BottomSheet>
+
     </div>
   );
 }

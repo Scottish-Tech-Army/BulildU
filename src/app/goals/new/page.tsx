@@ -2,502 +2,426 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { FullScreenLayout, CelebrationScreen, TipBox } from "@/components";
-import DailyQuote from "@/components/ui/DailyQuote";
-import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
-import { TextAreaField } from "@/components/ui/TextAreaField";
-import { MilestoneInput } from "@/components/ui/MilestoneInput";
-import { MilestoneItem } from "@/components/ui/MilestoneItem";
-import { RatingScale } from "@/components/ui/RatingScale";
-import { StepHeader } from "@/components/ui/StepHeader";
+import { AppButton } from "@/components/ui/AppButton";
+import { Goal, createGoal, GoalCategory, Step } from "@/lib/storage";
+import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
 import { WizardHeader } from "@/components/ui/WizardHeader";
-import { GoalCategory, createGoal, generateId } from "@/lib/storage";
-import { Heart, Target, Ruler, BarChart3, Calendar, Pencil, Briefcase, PoundSterling, Home, Sprout, HeartPulse } from "lucide-react";
+import { StepInput } from "@/components/ui/StepInput";
+import { StepItem } from "@/components/ui/StepItem";
+import { 
+  Target, 
+  Sparkles, 
+  Calendar, 
+  Heart,
+  AlertCircle,
+  TrendingUp,
+  BarChart3,
+  ListTodo,
+  Ruler
+} from "lucide-react";
 
-type WizardStep =
-  | "why"         // Relevant
-  | "category"    // Category
-  | "title"       // Specific
-  | "measurable"  // Measurable
-  | "achievable"  // Achievable
-  | "targetDate"  // Time-bound
-  | "milestones"
-  | "confirm"
+type GoalCreationStep = 
+  | "why" 
+  | "title" 
+  | "measurable" 
+  | "achievable" 
+  | "date" 
+  | "steps" 
   | "done";
 
-interface MilestoneDraft {
+interface StepDraft {
   title: string;
   targetDate?: string;
 }
 
-interface GoalDraft {
-  whyMatters: string;
+interface FullGoalDraft {
   title: string;
+  category: GoalCategory;
+  whyMatters: string;
   successCriteria: string;
   confidence: number | null;
-  targetDate: string; // ISO date string
-  category: GoalCategory;
-  milestones: MilestoneDraft[];
+  targetDate: string;
+  steps: StepDraft[];
 }
 
 /**
- * Goal creation wizard - SMART Framework
+ * Goal Creation Wizard
  * 
- * Flow: Why (Relevant) → Title (Specific) → Measurable → Achievable → Target Date (Time-bound) → Milestones → Done
+ * Flow: Why (Relevant) → Title (Specific) → Measurable → Achievable → Target Date (Time-bound) → Steps → Done
  */
 export default function NewGoalPage() {
   const router = useRouter();
-  const [step, setStep] = useState<WizardStep>("category");
-  const [draft, setDraft] = useState<GoalDraft>({
-    whyMatters: "",
+  const [step, setStep] = useState<GoalCreationStep>("why");
+  const [draft, setDraft] = useState<FullGoalDraft>({
     title: "",
+    category: "Personal",
+    whyMatters: "",
     successCriteria: "",
     confidence: null,
     targetDate: "",
-    category: "Wellbeing",
-    milestones: [],
+    steps: [],
   });
 
-  const stepOrder: WizardStep[] = [
-    "category",
-    "title",
+  const STEPS_ORDER: GoalCreationStep[] = [
     "why",
+    "title",
     "measurable",
     "achievable",
-    "targetDate",
-    "milestones",
-    "confirm",
+    "date",
+    "steps",
+    "done"
   ];
 
-  const currentStepIndex = stepOrder.indexOf(step);
-  const totalSteps = stepOrder.length;
+  const currentIndex = STEPS_ORDER.indexOf(step);
+  const totalStepsCount = STEPS_ORDER.length - 1; // Exclude 'done'
 
   const handleNext = () => {
-    const nextStep = stepOrder[currentStepIndex + 1];
-    if (nextStep) {
-      setStep(nextStep);
-    } else if (step === "confirm") {
-      // Save goal
-      createGoal({
-        title: draft.title,
-        category: draft.category,
-        
-        // SMART Fields
-        whyMatters: draft.whyMatters,
-        successCriteria: draft.successCriteria,
-        confidence: draft.confidence || 3, // Default to middle if null (shouldn't happen due to validation)
-        targetDate: draft.targetDate,
-        
-        // Legacy fields (required by type but not used in SMART flow)
-        feelWhenDone: "",
-        holdingBack: undefined,
-        
-        milestones: draft.milestones.map((m) => ({
-          id: generateId(),
-          title: m.title,
-          targetDate: m.targetDate,
-          completed: false,
-        })),
-        actions: [],
-      });
-      setStep("done");
-    }
+    const nextStep = STEPS_ORDER[currentIndex + 1];
+    if (nextStep) setStep(nextStep);
   };
 
   const handleBack = () => {
-    const prevStep = stepOrder[currentStepIndex - 1];
-    if (prevStep) {
-      setStep(prevStep);
-    } else {
-      router.back();
-    }
+    const prevStep = STEPS_ORDER[currentIndex - 1];
+    if (prevStep) setStep(prevStep);
+    else router.back();
+  };
+
+  const handleSave = () => {
+    const newGoalData: Omit<Goal, "id" | "createdAt" | "status" | "steps"> & { steps: Step[] } = {
+      title: draft.title,
+      category: draft.category,
+      whyMatters: draft.whyMatters,
+      successCriteria: draft.successCriteria,
+      confidence: draft.confidence || 3,
+      targetDate: draft.targetDate,
+      steps: draft.steps.map(s => ({
+        ...s,
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        completed: false
+      })),
+      feelWhenDone: "", 
+      actions: []
+    };
+    
+    createGoal(newGoalData);
+    setStep("done");
+  };
+
+  const updateDraft = (key: keyof FullGoalDraft, value: string | number | StepDraft[] | null) => {
+    setDraft({ ...draft, [key]: value });
   };
 
   const canProceed = () => {
     switch (step) {
-      case "why": return draft.whyMatters.trim().length > 0;
-      case "category": return draft.category !== undefined;
-      case "title": return draft.title.trim().length > 0;
-      case "measurable": return draft.successCriteria.trim().length > 0;
+      case "why": return draft.whyMatters.trim().length >= 5;
+      case "title": return draft.title.trim().length >= 3;
+      case "measurable": return !!draft.successCriteria?.trim();
       case "achievable": return draft.confidence !== null;
-      case "targetDate": return draft.targetDate.length > 0;
-      case "milestones": return draft.milestones.length > 0;
-      case "confirm": return true;
-      default: return false;
+      case "date": return !!draft.targetDate;
+      case "steps": return draft.steps.length > 0;
+      default: return true;
     }
   };
 
-  const addMilestone = (milestone: MilestoneDraft) => {
-    setDraft({ ...draft, milestones: [...draft.milestones, milestone] });
+  const addStep = (s: StepDraft) => {
+    setDraft({ ...draft, steps: [...draft.steps, s] });
   };
 
-  const removeMilestone = (index: number) => {
+  const removeStep = (index: number) => {
     setDraft({
       ...draft,
-      milestones: draft.milestones.filter((_, i) => i !== index),
+      steps: draft.steps.filter((_, i) => i !== index),
     });
   };
 
   if (step === "done") {
     return (
-      <CelebrationScreen
-        progress={100}
-        title="Goal created!"
-        subtitle={`You've set a goal with ${draft.milestones.length} milestone${draft.milestones.length !== 1 ? "s" : ""}. Time to take action!`}
-        buttonText="Go to dashboard"
-        onButtonClick={() => router.push("/")}
-      />
+      <FullScreenLayout bgClass="bg-white">
+        <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
+          <div className="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mb-6 animate-bounce">
+            <Sparkles className="w-12 h-12 text-brand-primary" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Goal Locked In!</h1>
+          <p className="text-gray-500 mb-10 max-w-md text-lg leading-relaxed">
+            You&apos;ve set a goal with {draft.steps.length} step{draft.steps.length !== 1 ? "s" : ""}. Time to take action!
+          </p>
+          <AppButton onClick={() => router.push("/goals")}>
+            GO TO MY GOALS
+          </AppButton>
+        </div>
+      </FullScreenLayout>
     );
   }
 
   return (
     <FullScreenLayout bgClass="bg-white">
-      <div className="flex-1 overflow-y-auto">
-        <WizardHeader title="Create Goal" onCancel={() => router.back()} />
+      <div className="flex-1 flex flex-col overflow-y-auto">
+        <WizardHeader title="New Goal" onCancel={() => router.back()} />
         
-        <div className="max-w-sm lg:max-w-3xl mx-auto px-6 pb-6">
-
-          {/* Progress display */}
-          <ProgressDisplay 
-            progress={Math.round((currentStepIndex / totalSteps) * 100)}
-          />
-
-          <div className="flex-1">
-            {/* Step 1: Relevant (Why) */}
-            {step === "why" && (
-              <div className="space-y-6">
-              <StepHeader
-                title="Why does this goal matter to you?"
-              />
-                <TipBox>
-                  Think about what achieving this goal will bring you, what does it change, how does it make you feel – the more detail, the better.
-                </TipBox>
-                
-                <DailyQuote />
-                
-                <TextAreaField
-                  label=""
-                  placeholder="I want to achieve this because..."
-                  value={draft.whyMatters}
-                  onChange={(e) =>
-                    setDraft({ ...draft, whyMatters: e.target.value })
-                  }
-                  autoFocus
+        <div className="max-w-xl mx-auto px-6 pt-8 pb-32 w-full">
+          {/* Progress Indicator */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex gap-1.5 flex-1">
+              {STEPS_ORDER.slice(0, -1).map((s, idx) => (
+                <div 
+                  key={s}
+                  className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${
+                    idx <= currentIndex ? "bg-brand-primary" : "bg-gray-100"
+                  }`}
                 />
-              </div>
-            )}
+              ))}
+            </div>
+          </div>
 
-            {/* Step 2: Category */}
-            {step === "category" && (
-              <div className="space-y-6">
-              <StepHeader
-                title="What area of life is this goal for?"
-              />
-                <TipBox>
-                  Choose a category to help organise your goals.
-                </TipBox>
-                <div className="grid grid-cols-2 gap-3">
-                  {([
-                    { value: "Wellbeing" as GoalCategory, label: "Wellbeing", icon: HeartPulse },
-                    { value: "Career" as GoalCategory, label: "Career", icon: Briefcase },
-                    { value: "Finances" as GoalCategory, label: "Finances", icon: PoundSterling },
-                    { value: "Growth" as GoalCategory, label: "Growth", icon: Sprout },
-                    { value: "Family" as GoalCategory, label: "Family", icon: Home },
-                  ]).map(({ value, label, icon: Icon }) => (
-                    <button
-                      key={value}
-                      onClick={() => setDraft({ ...draft, category: value })}
-                      className={`p-4 rounded-2xl border text-left transition-all flex items-center gap-3 ${
-                        draft.category === value
-                          ? "border-[var(--color-magenta)] bg-[var(--color-magenta)]/5"
-                          : "border-gray-200 hover:border-[var(--color-magenta)]/50"
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        draft.category === value
-                          ? "bg-[var(--color-magenta)] text-white"
-                          : "bg-warm-ivory text-brand-primary"
-                      }`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <span className="text-[var(--color-charcoal)]">{label}</span>
-                    </button>
-                  ))}
+          <div className="space-y-8">
+            {/* Step 1: Why */}
+            {step === "why" && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-brand-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Why this goal?</h2>
+                    <p className="text-gray-500 text-sm">Connect with your motivation</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <label className="text-sm font-semibold text-gray-700 block px-1">
+                    What makes this goal important to you right now?
+                  </label>
+                  <textarea
+                    autoFocus
+                    value={draft.whyMatters}
+                    onChange={(e) => updateDraft("whyMatters", e.target.value)}
+                    placeholder="e.g. I want to feel more energised so I can spend better quality time with my family..."
+                    className="w-full min-h-[160px] p-5 rounded-3xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-lg leading-relaxed"
+                  />
+                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                      Tip: Exploring the deeper meaning behind your goals makes you 3x more likely to achieve them!
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Step 3: Specific (Title) */}
+            {/* Step 2: Title */}
             {step === "title" && (
-              <div className="space-y-6">
-              <StepHeader
-                title="What is your specific goal?"
-              />
-                <TipBox>
-                  Keep it clear and simple.
-                </TipBox>
-                <input
-                  type="text"
-                  placeholder="e.g., Run a 5K race"
-                  value={draft.title}
-                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                  autoFocus
-                  className="w-full px-4 py-3 text-base text-[var(--color-charcoal)] bg-white rounded-2xl border-2 border-gray-200 focus:border-[var(--color-magenta)] focus:outline-none placeholder:text-gray-400 transition-colors"
-                />
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+                    <Target className="w-6 h-6 text-brand-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">What is the goal?</h2>
+                    <p className="text-gray-500 text-sm">Keep it simple and actionable</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <label className="text-sm font-semibold text-gray-700 block px-1">
+                    Give your goal a clear, inspiring title
+                  </label>
+                  <input
+                    type="text"
+                    autoFocus
+                    value={draft.title}
+                    onChange={(e) => updateDraft("title", e.target.value)}
+                    placeholder="e.g. Run 5km without stopping"
+                    className="w-full p-5 rounded-full bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-lg"
+                  />
+                  
+                  <div className="grid grid-cols-2 gap-3 pt-4">
+                    {["Health", "Career", "Personal", "Finance", "Growth"].map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => updateDraft("category", cat as GoalCategory)}
+                        className={`py-3 px-4 rounded-2xl text-sm font-medium transition-all capitalize ${
+                          draft.category === cat
+                            ? "bg-brand-primary text-white"
+                            : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
             {/* Step 3: Measurable */}
             {step === "measurable" && (
-              <div className="space-y-6">
-              <StepHeader
-                title="Decide how progress will be tracked."
-              />
-                <TextAreaField
-                  label=""
-                  placeholder="examples: apply for 3 jobs, complete 1 online accredited course, secure 1 interview"
-                  value={draft.successCriteria}
-                  onChange={(e) =>
-                    setDraft({ ...draft, successCriteria: e.target.value })
-                  }
-                  autoFocus
-                />
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+                    <Ruler className="w-6 h-6 text-brand-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">How you&apos;ll know</h2>
+                    <p className="text-gray-500 text-sm">Make success undeniable</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Goal Title Display */}
+                  <div className="px-1">
+                    <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest block mb-1">GOAL</span>
+                    <h3 className="text-lg font-bold text-gray-900 leading-tight">{draft.title}</h3>
+                  </div>
+
+                  <label className="text-sm font-semibold text-gray-700 block px-1 pt-4">
+                    How will you measure your success?
+                  </label>
+                  <textarea
+                    autoFocus
+                    value={draft.successCriteria}
+                    onChange={(e) => updateDraft("successCriteria", e.target.value)}
+                    placeholder="e.g. When I can run the loop around the park in under 30 minutes without walking."
+                    className="w-full min-h-[120px] p-5 rounded-3xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-lg leading-relaxed"
+                  />
+                </div>
               </div>
             )}
 
             {/* Step 4: Achievable */}
             {step === "achievable" && (
-              <div className="space-y-6">
-              <StepHeader
-                title="Is this achievable for you right now?"
-              />
-                <TipBox>
-                  Rate your confidence level. If it&apos;s low, consider scaling back.
-                </TipBox>
-                
-                <div className="py-4">
-                  <RatingScale
-                    value={draft.confidence}
-                    onChange={(val) => setDraft({ ...draft, confidence: val })}
-                    question="How confident are you that you can achieve this goal?"
-                    lowLabel="Not confident"
-                    highLabel="Very confident"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: Time-bound */}
-            {step === "targetDate" && (
-              <div className="space-y-6">
-              <StepHeader
-                title="When would you like to achieve this by?"
-              />
-                <TipBox>
-                  A deadline helps you stay focused and track your progress.
-                </TipBox>
-
-                {/* Suggested timeframes */}
-                <div className="space-y-3">
-                  <p className="text-sm text-[var(--color-text-muted)]">Quick options:</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    {[
-                      { label: "1 month", months: 1 },
-                      { label: "3 months", months: 3 },
-                      { label: "6 months", months: 6 },
-                    ].map(({ label, months }) => {
-                      const date = new Date();
-                      date.setMonth(date.getMonth() + months);
-                      const isoDate = date.toISOString().split("T")[0];
-                      const isSelected = draft.targetDate === isoDate;
-
-                      return (
-                        <button
-                          key={label}
-                          onClick={() =>
-                            setDraft({ ...draft, targetDate: isoDate })
-                          }
-                          className={`px-4 py-3 rounded-xl text-sm font-normal transition-all ${
-                            isSelected
-                              ? "bg-[var(--color-magenta)] text-white"
-                              : "bg-white text-gray-700 border-2 border-gray-200 hover:border-[var(--color-magenta)]"
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      );
-                    })}
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+                    <BarChart3 className="w-6 h-6 text-brand-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Readiness Check</h2>
+                    <p className="text-gray-500 text-sm">Be honest with yourself</p>
                   </div>
                 </div>
 
-                {/* Custom date picker */}
-                <div className="space-y-2">
-                  <label className="block text-sm text-[var(--color-text-muted)]">
-                    Or pick a custom date:
+                <div className="space-y-8 pt-4">
+                  <label className="text-sm font-semibold text-gray-700 block text-center">
+                    On a scale of 1-5, how confident are you that you can achieve this?
                   </label>
-                  <input
-                    type="date"
-                    value={draft.targetDate}
-                    onChange={(e) =>
-                      setDraft({ ...draft, targetDate: e.target.value })
-                    }
-                    min={new Date().toISOString().split("T")[0]}
-                    className="w-full px-4 py-3 text-base text-[var(--color-charcoal)] bg-white rounded-2xl border-2 border-gray-200 focus:border-[var(--color-magenta)] focus:outline-none transition-colors"
-                  />
+                  
+                  <div className="flex items-center justify-between gap-2 max-w-sm mx-auto">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <button
+                        key={level}
+                        onClick={() => updateDraft("confidence", level)}
+                        className={`w-14 h-14 rounded-2xl font-bold text-xl transition-all ${
+                          draft.confidence === level
+                            ? "bg-brand-primary text-white scale-110"
+                            : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                  
+                  <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">
+                    <span>Not confident</span>
+                    <span>Very confident</span>
+                  </div>
+
+                  {draft.confidence && draft.confidence <= 2 && (
+                    <div className="p-4 bg-amber-50 border border-amber-100 rounded-2xl flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                      <p className="text-xs text-amber-800 leading-relaxed">
+                        It&apos;s okay to be nervous. In the next steps, we&apos;ll break this into smaller, more manageable pieces.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* Step 6: Milestones */}
-            {step === "milestones" && (
-              <div className="space-y-6">
-              <StepHeader
-                title="Let's break it down"
-              />
-                <TipBox>
-                  Create your first milestone to get started. Aim for something you can do in 1-2 weeks.
-                </TipBox>
-
-                <MilestoneInput onAdd={addMilestone} />
-
-                {draft.milestones.length > 0 && (
-                  <div className="space-y-3">
-                    <p className="text-sm text-[var(--color-charcoal)]">
-                      Your milestones ({draft.milestones.length}):
-                    </p>
-                    <div className="space-y-2">
-                      {draft.milestones.map((milestone, index) => (
-                        <MilestoneItem
-                          key={index}
-                          title={milestone.title}
-                          targetDate={milestone.targetDate}
-                          onRemove={() => removeMilestone(index)}
-                        />
-                      ))}
-                    </div>
+            {/* Step 5: Date */}
+            {step === "date" && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-brand-primary" />
                   </div>
-                )}
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Set a target</h2>
+                    <p className="text-gray-500 text-sm">When do you want to achieve this?</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4">
+                  <div className="relative">
+                    <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-brand-primary" />
+                    <input
+                      type="date"
+                      autoFocus
+                      value={draft.targetDate}
+                      onChange={(e) => updateDraft("targetDate", e.target.value)}
+                      className="w-full p-5 pl-14 rounded-full bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-lg appearance-none cursor-pointer"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 pt-4">
+                    {[
+                      { label: "2 Weeks", days: 14 },
+                      { label: "1 Month", days: 30 },
+                      { label: "3 Months", days: 90 },
+                      { label: "Custom", days: 0 },
+                    ].map((opt) => (
+                      <button
+                        key={opt.label}
+                        onClick={() => {
+                          if (opt.days > 0) {
+                            const d = new Date();
+                            d.setDate(d.getDate() + opt.days);
+                            updateDraft("targetDate", d.toISOString().split("T")[0]);
+                          }
+                        }}
+                        className="py-3 px-4 rounded-2xl bg-gray-50 text-gray-600 font-medium text-sm hover:bg-gray-100 transition-colors border border-transparent active:border-brand-primary/20"
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
-            {/* Step 7: Confirm */}
-            {step === "confirm" && (
-              <div className="space-y-6">
-                <div className="text-center">
-                  <h1 className="text-2xl text-[var(--color-charcoal)] mb-2">
-                    Review your Goal
-                  </h1>
-                  <p className="text-[var(--color-text-muted)]">
-                    Make sure your goals are clearly defined and achievable.
-                  </p>
+            {/* Step 6: Steps */}
+            {step === "steps" && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+                    <ListTodo className="w-6 h-6 text-brand-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">Take the first steps</h2>
+                    <p className="text-gray-500 text-sm">Break it down to get started</p>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                  {/* What (Goal Title) */}
-                  <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("title")}>
-                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
-                      <Target className="w-3 h-3" /> What
-                    </p>
-                    <div className="flex-1 flex items-center justify-center">
-                      <h2 className="text-lg text-[var(--color-charcoal)] font-medium break-words leading-tight line-clamp-4 text-center">
-                        {draft.title}
-                      </h2>
-                    </div>
-                    <div className="absolute bottom-3 right-3">
-                      <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
-                    </div>
-                  </div>
-
-                  {/* Why */}
-                  <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("why")}>
-                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
-                      <Heart className="w-3 h-3" /> Why
-                    </p>
-                    <div className="flex-1 flex items-center justify-center">
-                      <p className="text-sm text-[var(--color-charcoal)] break-words leading-snug line-clamp-5 text-center">
-                        {draft.whyMatters}
+                <div className="space-y-6">
+                  <StepInput onAdd={addStep} />
+                  
+                  {draft.steps.length > 0 && (
+                    <div className="space-y-4 pt-4">
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">
+                        Your steps ({draft.steps.length}):
                       </p>
-                    </div>
-                    <div className="absolute bottom-3 right-3">
-                      <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
-                    </div>
-                  </div>
-
-                  {/* How You'll Know */}
-                  <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("measurable")}>
-                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
-                      <Ruler className="w-3 h-3" /> How You&apos;ll Know
-                    </p>
-                    <div className="flex-1 flex items-center justify-center">
-                      <p className="text-sm text-[var(--color-charcoal)] break-words leading-snug line-clamp-5 text-center">
-                        {draft.successCriteria}
-                      </p>
-                    </div>
-                    <div className="absolute bottom-3 right-3">
-                      <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
-                    </div>
-                  </div>
-
-                  {/* Readiness */}
-                  <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("achievable")}>
-                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
-                      <BarChart3 className="w-3 h-3" /> Readiness
-                    </p>
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="text-center">
-                        <span className="block text-4xl font-semibold text-[var(--color-charcoal)] mb-1">
-                          {draft.confidence}
-                          <span className="text-lg text-[var(--color-text-muted)] font-normal">
-                            /5
-                          </span>
-                        </span>
-                        <span className="text-xs text-[var(--color-text-muted)]">
-                          confidence
-                        </span>
+                      <div className="space-y-2">
+                        {draft.steps.map((s, index) => (
+                          <StepItem 
+                            key={index} 
+                            title={s.title} 
+                            targetDate={s.targetDate}
+                            onRemove={() => removeStep(index)}
+                          />
+                        ))}
                       </div>
                     </div>
-                    <div className="absolute bottom-3 right-3">
-                      <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
-                    </div>
-                  </div>
-
-                  {/* When */}
-                  <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("targetDate")}>
-                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
-                      <Calendar className="w-3 h-3" /> When
-                    </p>
-                    <div className="flex-1 flex items-center justify-center">
-                      <p className="text-lg text-[var(--color-charcoal)] leading-tight text-center">
-                        {new Date(draft.targetDate).toLocaleDateString(
-                          "en-AU",
-                          { day: "numeric", month: "short", year: "numeric" }
-                        )}
-                      </p>
-                    </div>
-                    <div className="absolute bottom-3 right-3">
-                      <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
-                    </div>
-                  </div>
-
-                  {/* First Steps (Milestones count only) */}
-                  <div className="bg-white rounded-2xl border border-gray-100 p-4 aspect-square flex flex-col relative group cursor-pointer hover:border-[var(--color-magenta)]/30 transition-colors" onClick={() => setStep("milestones")}>
-                    <p className="text-sm text-brand-primary uppercase tracking-wide flex items-center justify-center gap-1 mb-2">
-                      <Target className="w-3 h-3" /> First Steps
-                    </p>
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="text-center">
-                        <span className="block text-4xl font-semibold text-[var(--color-charcoal)] mb-1">
-                          {draft.milestones.length}
-                        </span>
-                        <span className="text-xs text-[var(--color-text-muted)]">
-                          {draft.milestones.length === 1 ? "milestone" : "milestones"}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="absolute bottom-3 right-3">
-                      <Pencil className="w-4 h-4 text-[var(--color-magenta)]" />
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             )}
@@ -505,59 +429,32 @@ export default function NewGoalPage() {
         </div>
       </div>
 
-      {/* Contextual Action Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50">
-        <div className="flex justify-around items-center h-16 max-w-md mx-auto">
-          {/* Back */}
-          <button
+      {/* Sticky Bottom controls */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-100 p-6 z-20">
+        <div className="max-w-xl mx-auto flex items-center justify-between gap-4">
+          <button 
             onClick={handleBack}
-            disabled={currentStepIndex === 0}
-            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
-              currentStepIndex === 0 
-                ? "text-gray-300 cursor-not-allowed" 
-                : "text-gray-400 hover:text-brand-primary"
-            }`}
+            className="flex items-center gap-2 px-6 py-4 rounded-full text-brand-primary font-bold hover:bg-brand-primary/5 transition-colors"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-            </svg>
-            <span className="text-xs mt-1">Back</span>
+            <TrendingUp className="w-5 h-5 rotate-180" />
+            BACK
           </button>
           
-          {/* Progress indicator */}
-          <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
-            <span className="text-sm font-medium text-brand-primary">{currentStepIndex + 1}/{totalSteps}</span>
-            <span className="text-xs mt-0.5">Steps</span>
-          </div>
-          
-          {/* Next/Create */}
-          <button
-            onClick={handleNext}
+          <AppButton
             disabled={!canProceed()}
-            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
-              canProceed() 
-                ? "text-brand-primary" 
-                : "text-gray-300 cursor-not-allowed"
-            }`}
+            onClick={currentIndex === totalStepsCount - 1 ? handleSave : handleNext}
+            className="flex-1 group"
           >
-            {step === "confirm" ? (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-                <span className="text-xs mt-1 font-medium">Create</span>
-              </>
-            ) : (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                </svg>
-                <span className="text-xs mt-1">Next</span>
-              </>
-            )}
-          </button>
+            <span className="flex items-center justify-center gap-2">
+              {currentIndex === totalStepsCount - 1 ? (
+                <>LOCK IT IN <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" /></>
+              ) : (
+                <>CONTINUE <Sparkles className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>
+              )}
+            </span>
+          </AppButton>
         </div>
-      </nav>
+      </div>
     </FullScreenLayout>
   );
 }

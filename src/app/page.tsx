@@ -60,12 +60,12 @@ export default function DashboardPage() {
   }
 
   const activeGoals = goals.filter((g) => g.status === "active");
-  const totalMilestones = activeGoals.reduce(
-    (sum, g) => sum + g.milestones.length,
+  const totalSteps = goals.reduce(
+    (sum, g) => sum + g.steps.length,
     0
   );
-  const completedMilestones = activeGoals.reduce(
-    (sum, g) => sum + g.milestones.filter((m) => m.completed).length,
+  const completedSteps = goals.reduce(
+    (sum, g) => sum + g.steps.filter((s) => s.completed).length,
     0
   );
 
@@ -132,12 +132,12 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            {/* Milestones Progress */}
+            {/* Steps Progress */}
             <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-[var(--color-charcoal)]">
-                {totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0}%
+                {totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0}%
               </span>
-              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">milestones done</p>
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">steps done</p>
             </div>
           </div>
 
