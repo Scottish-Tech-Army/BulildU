@@ -102,7 +102,7 @@ export default function DashboardPage() {
                       <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">Weekly check-in</p>
                       <h2 className="text-2xl font-bold">How are you doing today?</h2>
                     </div>
-                    <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl">
+                    <div className="p-4 bg-white/20 backdrop-blur-md rounded-full">
                       <Bell className="w-8 h-8 animate-wiggle group-hover:animate-wiggle" />
                     </div>
                   </div>
@@ -214,7 +214,7 @@ export default function DashboardPage() {
               <section className="flex-1 flex flex-col mb-8">
                 <DottedEmptyState
                   href="/goals/new"
-                  title="Set Your First Goal"
+                  title="Set your first goal"
                   description="Start with something meaningful to you and track your journey to potential."
                   icon={Plus}
                   className="flex-1 h-full"
