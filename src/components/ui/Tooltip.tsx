@@ -47,7 +47,9 @@ export function Tooltip({ content, children, className = "" }: TooltipProps) {
         aria-label="More information"
       >
         {children || (
-          <Info className="w-5 h-5 text-[var(--color-magenta)]/60 hover:text-[var(--color-magenta)] transition-colors" />
+          <span className="flex items-center justify-center w-5 h-5 bg-[var(--color-purple)] rounded">
+            <Info className="w-3 h-3 text-white" />
+          </span>
         )}
       </button>
 

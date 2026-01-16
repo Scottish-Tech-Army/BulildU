@@ -199,7 +199,10 @@ export default function GoalsPage() {
 
         {/* Inspirational Quote */}
         <div className="mb-6">
-          <DailyQuote />
+          <DailyQuote 
+            quote="Whatever the mind can conceive and believe, it can achieve!"
+            author="Napoleon Hill"
+          />
         </div>
 
         {goals.length === 0 ? (

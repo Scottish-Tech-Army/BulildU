@@ -117,7 +117,7 @@ export default function DailyQuote({ className = "", quote: propQuote, author: p
     <section className={`flex flex-col h-full ${className}`}>
       <div className="bg-white p-10 rounded-3xl border border-slate-100 flex flex-col justify-between relative overflow-hidden h-full">
         <div className="relative z-10">
-           <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-6">Daily Inspiration</p>
+           <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-6">{propQuote ? "Inspiration" : "Daily Inspiration"}</p>
            <svg className="h-10 w-10 text-brand-primary/10 absolute -top-2 -left-4 -z-10" fill="currentColor" viewBox="0 0 24 24">
              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.570 9-10.609l.996 2.151c-2.433.917-4.001 3.638-4.001 5.849h4v10h-10z"/>
            </svg>
@@ -126,17 +126,19 @@ export default function DailyQuote({ className = "", quote: propQuote, author: p
            </blockquote>
            <cite className="text-text-muted not-italic font-medium">— {quote.a}</cite>
         </div>
-        <p className="text-[10px] text-text-subtle mt-8">
-          Powered by{" "}
-          <a
-            href="https://zenquotes.io/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-brand-primary transition-colors"
-          >
-            ZenQuotes API
-          </a>
-        </p>
+        {!propQuote && (
+          <p className="text-[10px] text-text-subtle mt-8">
+            Powered by{" "}
+            <a
+              href="https://zenquotes.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-brand-primary transition-colors"
+            >
+              ZenQuotes API
+            </a>
+          </p>
+        )}
       </div>
     </section>
   );

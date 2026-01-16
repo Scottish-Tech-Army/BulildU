@@ -109,8 +109,13 @@ export default function DashboardPage() {
             </section>
           )}
 
-          {/* Stats Column */}
-          <div className="md:col-span-4 grid grid-cols-3 md:grid-cols-1 gap-4">
+          {/* Daily Quote / Inspiration - Full Width */}
+          <div className="md:col-span-12">
+            <DailyQuote />
+          </div>
+
+          {/* Stats Row */}
+          <div className="md:col-span-12 grid grid-cols-3 gap-4">
             {/* Momentum */}
             <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-brand-primary flex items-center gap-2">
@@ -141,9 +146,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Daily Quote / Inspiration */}
-          <div className="md:col-span-8">
-            <DailyQuote className="h-full min-h-[300px]" />
+          {/* Divider */}
+          <div className="md:col-span-12">
+            <hr className="border-gray-100" />
           </div>
 
           {/* Goals Overview / Empty State */}
@@ -162,16 +167,16 @@ export default function DashboardPage() {
                   </Link>
                 </div>
                 <div className="grid grid-cols-1 gap-4">
-                  {activeGoals.slice(0, 2).map((goal) => (
+                  {activeGoals.slice(0, 5).map((goal) => (
                     <GoalCard key={goal.id} goal={goal} />
                   ))}
-                  {activeGoals.length > 2 && (
+                  {activeGoals.length > 5 && (
                     <Link
                       href="/goals"
                       className="block text-center text-sm text-text-muted py-2 hover:text-brand-primary transition-colors"
                     >
-                      +{activeGoals.length - 2} more goal
-                      {activeGoals.length - 2 !== 1 ? "s" : ""}
+                      +{activeGoals.length - 5} more goal
+                      {activeGoals.length - 5 !== 1 ? "s" : ""}
                     </Link>
                   )}
                 </div>
