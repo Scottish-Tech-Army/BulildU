@@ -21,11 +21,11 @@ import {
   Target,
   Zap,
   Trophy,
-  TrendingUp,
   BarChart3,
   X,
-  Activity,
-  ListTodo,
+  Sprout,
+  Smile,
+  Shield,
 } from "lucide-react";
 
 /**
@@ -77,52 +77,6 @@ export default function ProgressPage() {
   const latestEnergy = recentCheckIns.length > 0 ? recentCheckIns[0].energyLevel : null;
   const previousEnergy = recentCheckIns.length > 1 ? recentCheckIns[1].energyLevel : null;
 
-  // Baseline sections for comparison - using Lucide icon components
-  const impactMeasures = [
-    {
-      label: "Satisfaction",
-      baseline: baseline.situationSatisfaction,
-      icon: Flame,
-      category: "situation",
-    },
-    {
-      label: "Confidence",
-      baseline: baseline.confidence,
-      icon: TrendingUp,
-      category: "mindset",
-    },
-    {
-      label: "Future Clarity",
-      baseline: baseline.futureClarity,
-      icon: Target,
-      category: "vision",
-    },
-    {
-      label: "Future Positivity",
-      baseline: baseline.futureHope,
-      icon: Sparkles,
-      category: "vision",
-    },
-    {
-      label: "State of Calm",
-      baseline: baseline.stressLevel,
-      icon: Activity,
-      category: "wellbeing",
-    },
-    {
-      label: "Energy Level",
-      baseline: baseline.energyLevel,
-      icon: Zap,
-      category: "wellbeing",
-    },
-    {
-      label: "Balance",
-      baseline: baseline.lifeBalance,
-      icon: BarChart3,
-      category: "wellbeing",
-    },
-  ];
-
   const hasBaseline = baseline.completedAt;
   const hasData = checkIns.length > 0 || goals.length > 0;
 
@@ -147,6 +101,9 @@ export default function ProgressPage() {
             author="Robin Sharma"
           />
         </div>
+
+        {/* Divider */}
+        <hr className="border-gray-200 mb-6" />
 
         {!hasData && !hasBaseline ? (
           /* Empty State */
@@ -192,173 +149,323 @@ export default function ProgressPage() {
               </section>
             )}
 
-            {/* Your Achievements Section */}
+            {/* Your Achievements Section - Bento Row */}
             <section className="mb-6">
-              <div>
-                {/* Header with period tabs */}
-                <div className="flex items-start justify-between mb-4 mx-4">
-                  <div>
-                    <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
-                      Your Achievements
-                    </h2>
-                    <p className="text-sm text-text-muted">
-                      {period === "week" && "This week's progress"}
-                      {period === "month" && "This month's stats"}
-                      {period === "year" && "This year's stats"}
+              <div className="grid grid-cols-4 gap-3">
+                {/* Left Column - 25% Weekly Energy */}
+                <div className="col-span-1 bg-brand-primary rounded-2xl p-5 flex flex-col">
+                  {/* Header */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">Energy Level</h3>
+                      <p className="text-xs text-white/70">from weekly check-ins</p>
+                    </div>
+                  </div>
+                  {/* Content */}
+                  <div className="flex-1 flex flex-col items-center justify-center text-center">
+                    <p className="text-5xl font-bold text-white mb-1">
+                      {latestEnergy ?? baseline.energyLevel ?? 0}<span className="text-xl font-normal text-white/70">/5</span>
                     </p>
+                    {previousEnergy !== null && latestEnergy !== null && latestEnergy !== previousEnergy ? (
+                      <p className="text-xs text-white/80 uppercase tracking-wide">
+                        {latestEnergy > previousEnergy ? "↑" : "↓"} {Math.abs(latestEnergy - previousEnergy)} vs last week
+                      </p>
+                    ) : (
+                      <p className="text-xs text-white/80 uppercase tracking-wide">No Change</p>
+                    )}
                   </div>
-                  <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                    {(["week", "month", "year"] as const).map((p) => (
-                      <button
-                        key={p}
-                        onClick={() => setPeriod(p)}
-                        className={`px-3 py-1 text-xs rounded-md transition-colors ${
-                          period === p
-                            ? "bg-white text-[var(--color-charcoal)] shadow-sm"
-                            : "text-text-muted hover:text-[var(--color-charcoal)]"
-                        }`}
-                      >
-                        {p.charAt(0).toUpperCase() + p.slice(1)}
-                      </button>
-                    ))}
-                  </div>
+                  {/* Motivational Quote */}
+                  <p className="text-sm text-white/70 italic text-center mt-4">
+                    Energy flows where attention goes.
+                  </p>
                 </div>
 
-                {/* Stats Row */}
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  {/* Streak - First */}
-                  <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                      Check-in Streak
-                    </p>
-                    <p className="text-3xl font-bold text-brand-primary flex items-center gap-1">
-                      {momentum > 0 && <Flame className="w-6 h-6" />}
-                      {momentum}
-                    </p>
-                    <p className="text-xs text-text-subtle mt-2">
-                      {checkInDue ? "Check in to extend!" : "Keep it going!"}
-                    </p>
+                {/* Right Column - 75% Achievements */}
+                <div className="col-span-3 mt-5 mx-4 mb0">
+                  {/* Header with period tabs */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
+                        Your Achievements
+                      </h2>
+                      <p className="text-sm text-text-muted">
+                        {period === "week" && "This week's progress"}
+                        {period === "month" && "This month's stats"}
+                        {period === "year" && "This year's stats"}
+                      </p>
+                    </div>
+                    <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+                      {(["week", "month", "year"] as const).map((p) => (
+                        <button
+                          key={p}
+                          onClick={() => setPeriod(p)}
+                          className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                            period === p
+                              ? "bg-white text-[var(--color-charcoal)] shadow-sm"
+                              : "text-text-muted hover:text-[var(--color-charcoal)]"
+                          }`}
+                        >
+                          {p.charAt(0).toUpperCase() + p.slice(1)}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Goals Completed */}
-                  <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                      Goals Achieved
-                    </p>
-                    <p className="text-3xl font-bold text-[var(--color-charcoal)]">
-                      {completedGoals.length}
-                    </p>
-                    <p className="text-xs text-text-subtle mt-2">
-                      {goals.length > 0 ? `${goals.length} total` : "Set your first goal"}
-                    </p>
+                  {/* Stats Row */}
+                  <div className="grid grid-cols-3 gap-3 mb-0">
+                    {/* Streak - First */}
+                    <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                        Check-in Streak
+                      </p>
+                      <p className="text-3xl font-bold text-brand-primary flex items-center gap-1">
+                        {momentum > 0 && <Flame className="w-6 h-6" />}
+                        {momentum}
+                      </p>
+                      <p className="text-xs text-text-subtle mt-2 italic">
+                        {checkInDue ? "Check in to extend!" : "Keep it going!"}
+                      </p>
+                    </div>
+
+                    {/* Goals Completed */}
+                    <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                        Goals Achieved
+                      </p>
+                      <p className="text-3xl font-bold text-[var(--color-charcoal)]">
+                        {completedGoals.length}
+                      </p>
+                      <p className="text-xs text-text-subtle mt-2 italic">
+                        {completedGoals.length === 0 
+                          ? "Your journey begins now" 
+                          : completedGoals.length === 1 
+                          ? "Great start!" 
+                          : "You're making progress!"}
+                      </p>
+                    </div>
+
+                    {/* Steps Done */}
+                    <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                        Steps Done
+                      </p>
+                      <p className="text-3xl font-bold text-[var(--color-charcoal)]">
+                        {completedSteps}/{totalSteps}
+                      </p>
+                      <p className="text-xs text-text-subtle mt-2 italic">
+                        {totalSteps === 0 
+                          ? "Plan your first steps" 
+                          : completedSteps === 0 
+                          ? "Take that first step!" 
+                          : completedSteps >= totalSteps 
+                          ? "Amazing work!" 
+                          : "Keep moving forward!"}
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Steps Done */}
-                  <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                      Steps Done
-                    </p>
-                    <p className="text-3xl font-bold text-[var(--color-charcoal)]">
-                      {completedSteps}/{totalSteps}
-                    </p>
-                    <p className="text-xs text-text-subtle mt-2">
-                      {totalSteps > 0 
-                        ? `${Math.round((completedSteps / totalSteps) * 100)}% complete`
-                        : "Add steps to goals"}
-                    </p>
-                  </div>
+                  {/* Check-in prompt */}
+                  {checkInDue && (
+                    <button
+                      onClick={() => router.push("/checkin")}
+                      className="w-full mt-4 py-3 text-brand-primary font-medium text-sm hover:bg-brand-primary/5 rounded-lg transition-colors"
+                    >
+                      Complete your weekly check-in →
+                    </button>
+                  )}
                 </div>
-
-                {/* Check-in prompt */}
-                {checkInDue && (
-                  <button
-                    onClick={() => router.push("/checkin")}
-                    className="w-full mt-4 py-3 text-brand-primary font-medium text-sm hover:bg-brand-primary/5 rounded-lg transition-colors"
-                  >
-                    Complete your weekly check-in →
-                  </button>
-                )}
               </div>
             </section>
 
-            {/* Where You Stand Now */}
-            {hasBaseline && (
-              <section className="mb-6">
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                  <div className="mb-4">
-                    <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
-                      Where You Stand Now
-                    </h2>
-                    <p className="text-sm text-text-muted">vs where you started</p>
+            {/* Divider */}
+            <hr className="border-gray-200 my-6" />
+
+            {/* Bento Grid Section */}
+            <section className="mb-6">
+              {/* Section Header */}
+              <div className="mb-4 mx-4">
+                <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
+                  Where You Stand Now
+                </h2>
+                <p className="text-sm text-text-muted">vs where you started</p>
+              </div>
+
+              {/* Row 1: 2 columns + 1 column */}
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                {/* Wellbeing Card */}
+                <div className="col-span-2 bg-white rounded-2xl p-8 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[180px] relative overflow-hidden">
+                  {/* Decorative Icon */}
+                  <Sprout className="absolute right-8 bottom-4 w-48 h-48 text-brand-primary/5 transform rotate-12" />
+                  {/* Header */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-11 h-11 bg-brand-primary/10 rounded-xl flex items-center justify-center">
+                      <Sprout className="w-6 h-6 text-brand-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-[var(--color-charcoal)]">Wellbeing</h3>
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {impactMeasures
-                      .filter((m) => m.baseline !== undefined)
-                      .map((measure) => {
-                        const IconComponent = measure.icon;
-                        const displayValue = measure.baseline!;
-                        
+                  {/* Stats Row */}
+                  <div className="flex justify-between mb-5">
+                    <div>
+                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">State of Calm</p>
+                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
+                        {baseline.stressLevel === 5 ? "Very High" :
+                         baseline.stressLevel === 4 ? "High" :
+                         baseline.stressLevel === 3 ? "Moderate" :
+                         baseline.stressLevel === 2 ? "Low" : "Very Low"}
+                      </p>
+                      <p className="text-[10px] text-brand-primary uppercase tracking-wide mt-1">No Change</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Balance</p>
+                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
+                        {baseline.lifeBalance}<span className="text-base font-normal text-text-muted">/5</span>
+                      </p>
+                      <p className="text-[10px] text-brand-primary uppercase tracking-wide mt-1">No Change</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Energy</p>
+                      {(() => {
+                        const baselineEnergy = baseline.energyLevel ?? 0;
+                        const currentEnergy = latestEnergy ?? baselineEnergy;
+                        if (baselineEnergy === 0) return <p className="text-2xl font-bold text-brand-primary">+0%</p>;
+                        const percentChange = Math.round(((currentEnergy - baselineEnergy) / baselineEnergy) * 100);
+                        const arrow = percentChange > 0 ? "↑" : percentChange < 0 ? "↓" : "";
+                        const isNegative = percentChange < 0;
                         return (
-                          <div
-                            key={measure.label}
-                            className="bg-warm-ivory rounded-2xl p-4"
-                          >
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center">
-                                <IconComponent className="w-5 h-5 text-brand-primary" />
-                              </div>
-                            </div>
-                            <p className="text-sm text-text-muted mb-1">{measure.label}</p>
-                            <p className="text-3xl font-bold text-[var(--color-charcoal)]">
-                              {displayValue}
-                              <span className="text-base font-normal text-text-muted ml-1">/ 5</span>
-                            </p>
-                          </div>
+                          <p className={`text-2xl font-bold flex items-center gap-1 ${isNegative ? "text-[var(--color-charcoal)]" : "text-brand-primary"}`}>
+                            {arrow}
+                            {percentChange >= 0 ? `+${percentChange}%` : `${percentChange}%`}
+                          </p>
                         );
-                      })}
+                      })()}
+                    </div>
                   </div>
-                  <p className="text-xs text-text-subtle text-center mt-4">
-                    Baseline recorded{" "}
-                    {new Date(baseline.completedAt!).toLocaleDateString("en-AU", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                  {/* State-based message */}
+                  <p className="text-base text-text-muted italic">
+                    {(baseline.stressLevel ?? 0) >= 4 
+                      ? "Your energy is currently grounded and stable."
+                      : (baseline.stressLevel ?? 0) === 3
+                      ? "You're finding your balance. Keep nurturing yourself."
+                      : "Small steps forward still count. You've got this."}
                   </p>
                 </div>
-              </section>
-            )}
-
-            {/* Energy Level from Check-ins */}
-            {latestEnergy !== null && (
-              <section className="mb-6">
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                  <div className="mb-4">
-                    <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
-                      Energy Level
-                    </h2>
-                    <p className="text-sm text-text-muted">from your weekly check-ins</p>
-                  </div>
-                  <div className="bg-warm-ivory rounded-2xl p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center">
-                        <Zap className="w-5 h-5 text-brand-primary" />
-                      </div>
-                      {previousEnergy !== null && latestEnergy !== previousEnergy && (
-                        <span className="text-xs font-medium text-brand-primary">
-                          {latestEnergy > previousEnergy ? "↗" : "↘"} {latestEnergy > previousEnergy ? "+" : ""}{latestEnergy - previousEnergy} from last week
-                        </span>
-                      )}
+                {/* Satisfaction Card - Gradient */}
+                <div className="col-span-1 bg-brand-gradient rounded-2xl p-8 min-h-[180px] flex flex-col">
+                  {/* Header */}
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                      <Smile className="w-5 h-5 text-white" />
                     </div>
-                    <p className="text-sm text-text-muted mb-1">Current Energy</p>
-                    <p className="text-3xl font-bold text-[var(--color-charcoal)]">
-                      {latestEnergy}
-                      <span className="text-base font-normal text-text-muted ml-1">/ 5</span>
-                    </p>
+                    <h3 className="text-xl font-semibold text-white">Satisfaction</h3>
                   </div>
+                  {/* Content */}
+                  <div className="flex flex-col items-center justify-center text-center mb-4">
+                    <p className="text-7xl font-bold text-white mb-1">
+                      {baseline.situationSatisfaction ?? 0}<span className="text-2xl font-normal text-white/70">/5</span>
+                    </p>
+                    <p className="text-xs text-white/80 uppercase tracking-wide">No Change</p>
+                  </div>
+                  {/* Motivational tagline - pushed to bottom */}
+                  <p className="text-base text-white/80 italic text-center mt-auto">
+                    {(baseline.situationSatisfaction ?? 0) >= 4 
+                      ? "You're on a great path!"
+                      : (baseline.situationSatisfaction ?? 0) === 3
+                      ? "Room to grow, and that's exciting."
+                      : "Every step forward counts."}
+                  </p>
                 </div>
-              </section>
-            )}
+              </div>
+
+              {/* Row 2: 3 equal columns */}
+              <div className="grid grid-cols-3 gap-3">
+                {/* Confidence Card */}
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[160px] flex flex-col items-center justify-center text-center relative overflow-hidden">
+                  {/* Decorative Icon */}
+                  <Shield className="absolute -left-6 -top-6 w-28 h-28 text-brand-primary/5 transform -rotate-12" />
+                  <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-3">
+                    <Shield className="w-5 h-5 text-brand-primary" />
+                  </div>
+                  <p className="text-sm font-medium text-[var(--color-charcoal)] mb-1">Confidence</p>
+                  <p className="text-xl font-bold text-brand-primary mb-1">
+                    {baseline.confidence === 5 ? "Very Strong" :
+                     baseline.confidence === 4 ? "Strong" :
+                     baseline.confidence === 3 ? "Moderate" :
+                     baseline.confidence === 2 ? "Low" : "Very Low"}
+                  </p>
+                  <p className="text-[10px] text-brand-primary uppercase tracking-wide mb-2">No Change</p>
+                  <p className="text-sm text-text-muted italic">
+                    {(baseline.confidence ?? 0) >= 4 
+                      ? "You believe in yourself!"
+                      : (baseline.confidence ?? 0) === 3
+                      ? "Building momentum."
+                      : "One step at a time."}
+                  </p>
+                </div>
+
+                {/* Future Clarity Card */}
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[160px] flex flex-col items-center justify-center text-center relative overflow-hidden">
+                  {/* Decorative Icon */}
+                  <Target className="absolute -right-4 -bottom-4 w-24 h-24 text-brand-primary/5 transform rotate-6" />
+                  <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-3">
+                    <Target className="w-5 h-5 text-brand-primary" />
+                  </div>
+                  <p className="text-sm font-medium text-[var(--color-charcoal)] mb-1">Future Clarity</p>
+                  <p className="text-xl font-bold text-brand-primary mb-1">
+                    {baseline.futureClarity === 5 ? "Very Clear" :
+                     baseline.futureClarity === 4 ? "Clear" :
+                     baseline.futureClarity === 3 ? "Moderate" :
+                     baseline.futureClarity === 2 ? "Unclear" : "Very Unclear"}
+                  </p>
+                  <p className="text-[10px] text-brand-primary uppercase tracking-wide mb-2">No Change</p>
+                  <p className="text-sm text-text-muted italic">
+                    {(baseline.futureClarity ?? 0) >= 4 
+                      ? "Your path is clear."
+                      : (baseline.futureClarity ?? 0) === 3
+                      ? "Clarity comes with action."
+                      : "Explore your possibilities."}
+                  </p>
+                </div>
+
+                {/* Future Positivity Card */}
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[160px] flex flex-col items-center justify-center text-center relative overflow-hidden">
+                  {/* Decorative Icon */}
+                  <Sparkles className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-brand-primary/5 transform rotate-6" />
+                  <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-3">
+                    <Sparkles className="w-5 h-5 text-brand-primary" />
+                  </div>
+                  <p className="text-sm font-medium text-[var(--color-charcoal)] mb-1">Future Positivity</p>
+                  <p className="text-xl font-bold text-brand-primary mb-1">
+                    {baseline.futureHope === 5 ? "Very High" :
+                     baseline.futureHope === 4 ? "High" :
+                     baseline.futureHope === 3 ? "Moderate" :
+                     baseline.futureHope === 2 ? "Low" : "Very Low"}
+                  </p>
+                  <p className="text-[10px] text-brand-primary uppercase tracking-wide mb-2">No Change</p>
+                  <p className="text-sm text-text-muted italic">
+                    {(baseline.futureHope ?? 0) >= 4 
+                      ? "The future looks bright!"
+                      : (baseline.futureHope ?? 0) === 3
+                      ? "Hope is growing."
+                      : "Every day is a fresh start."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Baseline date */}
+              {baseline.completedAt && (
+                <p className="text-xs text-brand-primary text-center mt-8">
+                  Baseline recorded{" "}
+                  {new Date(baseline.completedAt).toLocaleDateString("en-AU", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+              )}
+            </section>
 
           </>
         )}

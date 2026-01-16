@@ -95,7 +95,7 @@ export default function DashboardPage() {
           {/* Weekly Check-in Prompt */}
           {showCheckInPrompt && (
             <section className="md:col-span-12">
-              <Link href="/checkin">
+              <Link href="/checkin" className="group">
                 <div className="bg-brand-gradient rounded-3xl p-8 text-white relative overflow-hidden hover:scale-[1.01] transition-transform">
                   <div className="relative z-10 flex justify-between items-center">
                     <div>
@@ -103,7 +103,7 @@ export default function DashboardPage() {
                       <h2 className="text-2xl font-bold">How are you doing today?</h2>
                     </div>
                     <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl">
-                      <Bell className="w-8 h-8" />
+                      <Bell className="w-8 h-8 animate-wiggle group-hover:animate-wiggle" />
                     </div>
                   </div>
                 </div>
@@ -116,8 +116,20 @@ export default function DashboardPage() {
             <DailyQuote />
           </div>
 
+          {/* Divider */}
+          <div className="md:col-span-12">
+            <hr className="border-gray-200 my-2" />
+          </div>
+
           {/* Stats Row */}
-          <div className="md:col-span-12 grid grid-cols-3 gap-3">
+          <div className="md:col-span-12">
+            <div className="mb-4 mx-4">
+              <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
+                Your Momentum
+              </h2>
+              <p className="text-sm text-text-muted">Keep the energy flowing</p>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
             {/* Momentum */}
             <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
               <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
@@ -160,17 +172,18 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
+          </div>
 
           {/* Divider */}
           <div className="md:col-span-12">
-            <hr className="border-gray-100" />
+            <hr className="border-gray-200 my-2" />
           </div>
 
           {/* Goals Overview / Empty State */}
           <div className="md:col-span-12">
             {activeGoals.length > 0 ? (
               <section className="mb-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 mx-4">
                   <h2 className="text-sm text-text-muted uppercase tracking-wider font-bold">
                     Your Goals
                   </h2>

@@ -229,7 +229,7 @@ export default function GoalDetailPage() {
         {/* Row 1: Primary Goal Card & Progress Card */}
         <div className="grid grid-cols-1 md:grid-cols-[repeat(20,minmax(0,1fr))] gap-6">
           {/* Goal Info Card (13/20 = 65%) */}
-          <div className="md:col-span-[13] bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 relative overflow-hidden group">
+          <div className="md:col-span-[13] bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] relative overflow-hidden group">
             <div className="relative z-10 flex flex-col h-full">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
@@ -266,7 +266,7 @@ export default function GoalDetailPage() {
           </div>
 
           {/* Progress Card (7/20 = 35%) */}
-          <div className="md:col-span-[7] bg-brand-primary rounded-[2.5rem] p-10 text-white flex flex-col justify-between relative overflow-hidden group">
+          <div className="md:col-span-[7] bg-brand-gradient rounded-2xl p-6 text-white flex flex-col justify-between relative overflow-hidden group shadow-[0_0_15px_rgba(0,0,0,0.08)]">
             <div className="relative z-10">
               <p className="text-white/60 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Overall progress</p>
               
@@ -297,7 +297,7 @@ export default function GoalDetailPage() {
         {/* Row 2: Category (5/20 = 25%) | How You'll Know (15/20 = 75%) */}
         <div className="grid grid-cols-1 md:grid-cols-[repeat(20,minmax(0,1fr))] gap-6">
           {/* Category Card (25%) */}
-          <div className="md:col-span-[5] bg-[var(--color-deep-violet)] rounded-[2.5rem] p-10 border border-white/10 flex flex-col relative overflow-hidden group">
+          <div className="md:col-span-[5] bg-[var(--color-deep-violet)] rounded-2xl p-6 border border-white/10 flex flex-col relative overflow-hidden group">
             <div className="relative z-10 flex flex-col h-full">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest leading-none">Category</h3>
@@ -353,7 +353,7 @@ export default function GoalDetailPage() {
           </div>
 
           {/* How You'll Know Card (75%) */}
-          <div className="md:col-span-[15] bg-brand-primary/5 rounded-[2.5rem] p-10 border border-brand-primary/20 flex flex-col relative overflow-hidden group">
+          <div className="md:col-span-[15] bg-brand-primary/5 rounded-2xl p-6 border border-brand-primary/20 flex flex-col relative overflow-hidden group">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-widest leading-none">How You&apos;ll Know</h3>
               <button
@@ -380,7 +380,7 @@ export default function GoalDetailPage() {
         {/* Row 3: Readiness (15/20 = 75%) | Timeline (5/20 = 25%) */}
         <div className="grid grid-cols-1 md:grid-cols-[repeat(20,minmax(0,1fr))] gap-6">
           {/* Readiness Card (75%) */}
-          <div className="md:col-span-[15] bg-warm-ivory rounded-[2.5rem] p-10 border border-brand-primary/10 flex flex-col">
+          <div className="md:col-span-[15] bg-warm-ivory rounded-2xl p-6 border border-brand-primary/10 flex flex-col shadow-[0_0_15px_rgba(0,0,0,0.08)]">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-[10px] font-bold text-brand-primary/60 uppercase tracking-widest leading-none">Readiness</h3>
               <button
@@ -405,13 +405,13 @@ export default function GoalDetailPage() {
               </div>
 
               {/* Desktop: Scale display */}
-              <div className="hidden md:flex items-center justify-between px-2">
+              <div className="hidden md:flex items-center justify-center gap-8">
                 {[1, 2, 3, 4, 5].map((level) => (
                   <div
                     key={level}
                     className="group relative flex flex-col items-center gap-3"
                   >
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl transition-all duration-300 ${
+                    <div className={`w-20 h-20 rounded-2xl flex items-center justify-center font-black text-2xl transition-all duration-300 ${
                       (goal.confidence || 0) >= level 
                         ? "bg-brand-primary text-white" 
                         : "bg-white text-gray-300 border border-gray-100"
@@ -430,33 +430,33 @@ export default function GoalDetailPage() {
           </div>
 
           {/* Timeline Card (25%) */}
-          <div className="md:col-span-[5] bg-white rounded-[2.5rem] p-10 border border-gray-100 flex flex-col relative overflow-hidden group">
+          <div className="md:col-span-[5] bg-[var(--color-magenta)] rounded-2xl p-6 border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col relative overflow-hidden group">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Timeline</h3>
+              <h3 className="text-[10px] font-bold text-white/60 uppercase tracking-widest leading-none">Timeline</h3>
               <button
                 onClick={() => {
                   setEditTargetDate(goal.targetDate || "");
                   setShowTimelineEditor(true);
                 }}
-                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10"
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-white/40 hover:text-white hover:bg-white/10"
                 aria-label="Edit timeline"
               >
                 <Pencil className="w-5 h-5" />
               </button>
             </div>
             <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <Calendar className="w-10 h-10 text-brand-primary mb-4" />
-              <span className="text-3xl font-black text-brand-primary leading-none">
+              <Calendar className="w-10 h-10 text-white mb-4" />
+              <span className="text-3xl font-black text-white leading-none">
                 {daysRemaining > 0 ? daysRemaining : 0} Days
               </span>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mt-2">REMAINING</p>
+              <p className="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mt-2">REMAINING</p>
             </div>
-            <Calendar className="absolute -right-6 -bottom-6 w-32 h-32 text-brand-primary/5 transform rotate-12 group-hover:scale-110 transition-transform duration-1000" />
+            <Calendar className="absolute -right-6 -bottom-6 w-32 h-32 text-white/10 transform rotate-12 group-hover:scale-110 transition-transform duration-1000" />
           </div>
         </div>
 
         {/* Row 3: Action Steps List (Full Width) */}
-        <section className="bg-white rounded-[2.5rem] p-6 md:p-10 border border-gray-100 relative overflow-hidden">
+        <section className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] relative overflow-hidden">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-4">

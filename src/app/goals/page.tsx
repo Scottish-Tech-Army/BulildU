@@ -211,6 +211,9 @@ export default function GoalsPage() {
           />
         </div>
 
+        {/* Divider */}
+        <hr className="border-gray-200 mb-6" />
+
         {goals.length === 0 ? (
           /* Initial Empty State (No goals created) */
           <section className="flex-1 flex flex-col pb-8 h-full">
@@ -238,12 +241,37 @@ export default function GoalsPage() {
           </section>
         ) : (
           <>
+            {/* Section Header */}
+            <div className="mb-4 mx-4">
+              <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
+                Your Goals
+              </h2>
+              <p className="text-sm text-text-muted">Track your journey to potential</p>
+            </div>
+
             {/* Active Goals */}
             {activeGoals.length > 0 && (
               <section className="mb-8">
-                <h2 className="text-sm text-text-muted uppercase tracking-wide mb-3">
-                  Active ({activeGoals.length})
-                </h2>
+                <div className="flex items-center justify-between mb-3 mx-4">
+                  <h3 className="text-sm text-text-muted uppercase tracking-wide">
+                    Active ({activeGoals.length})
+                  </h3>
+                  <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+                    {(["week", "month", "year"] as const).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPeriod(p)}
+                        className={`px-3 py-1 text-xs rounded-md transition-colors ${
+                          period === p
+                            ? "bg-white text-[var(--color-charcoal)] shadow-sm"
+                            : "text-text-muted hover:text-[var(--color-charcoal)]"
+                        }`}
+                      >
+                        {p.charAt(0).toUpperCase() + p.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="space-y-4">
                   {activeGoals.map((goal) => (
                     <GoalCard key={goal.id} goal={goal} />
