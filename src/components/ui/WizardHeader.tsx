@@ -2,31 +2,19 @@
 
 interface WizardHeaderProps {
   title: string;
-  onCancel?: () => void;
 }
 
 /**
  * Reusable header for wizard flows.
- * Cancel button left-aligned (optional), title centered.
+ * Title left-aligned to match other tab/wizard headings.
  */
-export function WizardHeader({ title, onCancel }: WizardHeaderProps) {
+export function WizardHeader({ title }: WizardHeaderProps) {
   return (
     <div className="pt-6 pb-4">
-      <div className="max-w-5xl mx-auto px-6 flex items-center">
-        {onCancel ? (
-          <button
-            onClick={onCancel}
-            className="text-brand-primary text-sm w-16 text-left leading-6"
-          >
-            Cancel
-          </button>
-        ) : (
-          <div className="w-16" />
-        )}
-        <p className="flex-1 text-center text-lg font-medium text-[var(--color-charcoal)] leading-6">
+      <div className="max-w-5xl mx-auto px-6 flex items-center justify-center">
+        <p className="text-2xl text-[var(--color-charcoal)]">
           {title}
         </p>
-        <div className="w-16" />
       </div>
     </div>
   );

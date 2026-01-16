@@ -7,6 +7,7 @@ import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
 import { StepInput } from "@/components/ui/StepInput";
 import { StepItem } from "@/components/ui/StepItem";
 import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
+import DailyQuote from "@/components/ui/DailyQuote";
 import { 
   Target, 
   Sparkles, 
@@ -31,6 +32,7 @@ import {
 } from "lucide-react";
 
 type GoalCreationStep = 
+  | "intro"
   | "category"
   | "why" 
   | "title" 
@@ -62,7 +64,7 @@ interface FullGoalDraft {
  */
 export default function NewGoalPage() {
   const router = useRouter();
-  const [step, setStep] = useState<GoalCreationStep>("category");
+  const [step, setStep] = useState<GoalCreationStep>("intro");
   const [draft, setDraft] = useState<FullGoalDraft>({
     title: "",
     category: "Career",
@@ -74,6 +76,7 @@ export default function NewGoalPage() {
   });
 
   const STEPS_ORDER: GoalCreationStep[] = [
+    "intro",
     "category",
     "title",
     "why",
@@ -125,6 +128,7 @@ export default function NewGoalPage() {
 
   const canProceed = () => {
     switch (step) {
+      case "intro": return true;
       case "category": return !!draft.category;
       case "why": return draft.whyMatters.trim().length >= 5;
       case "title": return draft.title.trim().length >= 3;
@@ -163,9 +167,9 @@ export default function NewGoalPage() {
   return (
     <FullScreenLayout bgClass="bg-bg-card">
       <div className="flex-1 flex flex-col overflow-y-auto">
-        {/* Header - aligned with content */}
+        {/* Header - centered */}
         <header className="bg-white sticky top-0 z-30 border-b border-gray-100">
-          <div className="max-w-xl w-full px-6 py-4 flex items-center gap-3">
+          <div className="max-w-xl mx-auto w-full px-6 py-4 flex items-center justify-center gap-3">
             <Target className="w-6 h-6 text-brand-primary" />
             <h1 className="text-2xl text-[var(--color-charcoal)]">New Goal</h1>
           </div>
@@ -187,6 +191,16 @@ export default function NewGoalPage() {
           </div>
 
           <div className="space-y-8">
+            {/* Step 0: Intro Quote */}
+            {step === "intro" && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <DailyQuote
+                  quote="When the why gets stronger, the how gets easier."
+                  author="Jim Rohn"
+                />
+              </div>
+            )}
+
             {/* Step 1: Category */}
             {step === "category" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -224,6 +238,12 @@ export default function NewGoalPage() {
                       </button>
                     ))}
                   </div>
+                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 mt-4">
+                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                      Tip: [PLACEHOLDER - Get tip from client]
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -255,7 +275,7 @@ export default function NewGoalPage() {
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                     <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      Tip: Exploring the deeper meaning behind your goals makes you 3x more likely to achieve them!
+                      Tip: Think about what achieving this goal will bring you, what does it change, how does it make you feel – the more detail, the better.
                     </p>
                   </div>
                 </div>
@@ -287,6 +307,12 @@ export default function NewGoalPage() {
                     placeholder="e.g. Run 5km without stopping"
                     className="w-full h-14 px-5 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base"
                   />
+                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                      Tip: [PLACEHOLDER - Get tip from client]
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -321,6 +347,12 @@ export default function NewGoalPage() {
                     placeholder="e.g. apply for 3 jobs, complete 1 online accredited course, secure 1 interview etc."
                     className="w-full min-h-[120px] p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-base leading-relaxed"
                   />
+                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                      Tip: [PLACEHOLDER - Get tip from client]
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -343,14 +375,14 @@ export default function NewGoalPage() {
                     On a scale of 1-5, how confident are you that you can achieve this?
                   </label>
                   
-                  <div className="flex items-center justify-between gap-2 max-w-sm mx-auto">
+                  <div className="flex items-center justify-center gap-2 sm:gap-3 max-w-sm mx-auto">
                     {[1, 2, 3, 4, 5].map((level) => (
                       <button
                         key={level}
                         onClick={() => updateDraft("confidence", level)}
-                        className={`w-14 h-14 rounded-2xl font-bold text-xl transition-all ${
+                        className={`w-14 h-14 rounded-lg font-bold text-xl transition-all ${
                           draft.confidence === level
-                            ? "bg-brand-primary text-white scale-110"
+                            ? "bg-brand-primary text-white scale-105 shadow-md"
                             : "bg-gray-50 text-gray-400 hover:bg-gray-100"
                         }`}
                       >
@@ -359,7 +391,7 @@ export default function NewGoalPage() {
                     ))}
                   </div>
                   
-                  <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">
+                  <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest max-w-sm mx-auto px-2">
                     <span>Not confident</span>
                     <span>Very confident</span>
                   </div>
@@ -372,6 +404,12 @@ export default function NewGoalPage() {
                       </p>
                     </div>
                   )}
+                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                      Tip: [PLACEHOLDER - Get tip from client]
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -426,6 +464,12 @@ export default function NewGoalPage() {
                       </button>
                     ))}
                   </div>
+                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                      Tip: [PLACEHOLDER - Get tip from client]
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
@@ -463,6 +507,12 @@ export default function NewGoalPage() {
                       </div>
                     </div>
                   )}
+                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                      Tip: [PLACEHOLDER - Get tip from client]
+                    </p>
+                  </div>
                 </div>
               </div>
             )}

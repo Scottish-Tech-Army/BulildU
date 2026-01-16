@@ -874,26 +874,24 @@ export default function GoalDetailPage() {
         <div className="space-y-6 pt-4">
           <p className="text-sm text-gray-500 text-center">How ready do you feel to achieve this goal?</p>
           
-          <div className="flex items-center justify-between px-2">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
             {[1, 2, 3, 4, 5].map((level) => (
               <button
                 key={level}
                 onClick={() => setSelectedReadiness(level)}
-                className="group relative flex flex-col items-center gap-3"
+                className={`w-14 h-14 rounded-lg flex items-center justify-center font-bold text-xl transition-all ${
+                  selectedReadiness === level
+                    ? "bg-brand-primary text-white scale-105 shadow-md"
+                    : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                }`}
               >
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl transition-all duration-300 ${
-                  (selectedReadiness ?? goal.confidence ?? 0) >= level 
-                    ? "bg-brand-primary text-white" 
-                    : "bg-gray-100 text-gray-300 hover:bg-gray-200"
-                }`}>
-                  {level}
-                </div>
+                {level}
               </button>
             ))}
           </div>
           
-          <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] px-4">
-            <span>Building up</span>
+          <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">
+            <span>Not ready</span>
             <span>Fully ready</span>
           </div>
 

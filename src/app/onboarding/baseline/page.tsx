@@ -160,7 +160,7 @@ export default function BaselinePage() {
     <FullScreenLayout bgClass="bg-bg-card">
       <div className="flex-1 overflow-y-auto">
         <div className="bg-white sticky top-0 z-30">
-          <WizardHeader title="About U" onCancel={handleCancel} />
+          <WizardHeader title="About U" />
         </div>
         <div className="max-w-5xl mx-auto px-6 pb-6 w-full pt-6">
 
@@ -377,11 +377,16 @@ export default function BaselinePage() {
             <span className="text-xs mt-1">Back</span>
           </button>
           
-          {/* Progress indicator */}
-          <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
-            <span className="text-sm font-medium text-brand-primary">{currentSection + 1}/{SECTIONS.length}</span>
-            <span className="text-xs mt-0.5">Steps</span>
-          </div>
+          {/* Cancel */}
+          <button
+            onClick={handleCancel}
+            className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+            <span className="text-xs mt-1">Cancel</span>
+          </button>
           
           {/* Next/Continue */}
           <button

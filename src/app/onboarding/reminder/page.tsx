@@ -60,7 +60,7 @@ export default function ReminderPage() {
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 overflow-y-auto">
-        <WizardHeader title="Reminder Setup" onCancel={() => router.push("/onboarding/welcome")} />
+        <WizardHeader title="Reminder Setup" />
         <div className="max-w-5xl mx-auto px-6 pb-6 w-full">
 
           {/* Large animated progress percentage - 5/6 complete */}

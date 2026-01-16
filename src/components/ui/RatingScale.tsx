@@ -44,9 +44,9 @@ export function RatingScale({
       aria-label={question || "Rating scale from 1 to 5"}
     >
       {/* Centered Rating Control Container */}
-      <div className="max-w-md mx-auto">
-        {/* Rating buttons - centered row with fixed gaps */}
-        <div className="flex justify-center gap-3 sm:gap-4 mb-4">
+      <div className="max-w-sm mx-auto">
+        {/* Rating buttons - centered row with consistent gaps */}
+        <div className="flex justify-center gap-2 sm:gap-3 mb-4">
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
@@ -55,13 +55,13 @@ export function RatingScale({
               aria-checked={value === num}
               aria-label={`${num} out of 5: ${RATING_LABELS[num - 1]}`}
               className={`
-                w-12 h-12 sm:w-14 sm:h-14 rounded-full font-semibold text-lg
+                w-14 h-14 rounded-lg font-semibold text-lg
                 transition-all duration-150
                 focus-ring
                 ${
                   value === num
-                    ? "bg-[var(--color-magenta)] text-white scale-110 shadow-lg"
-                    : "bg-[var(--color-warm-ivory)] text-[var(--color-charcoal)] hover:bg-[var(--color-magenta)]/20 hover:scale-105"
+                    ? "bg-brand-primary text-white scale-105 shadow-md"
+                    : "bg-gray-50 text-gray-400 hover:bg-gray-100"
                 }
               `}
             >
@@ -70,8 +70,8 @@ export function RatingScale({
           ))}
         </div>
 
-        {/* Scale labels aligned to buttons */}
-        <div className="flex justify-between text-sm text-[var(--color-charcoal)]/60 px-4">
+        {/* Scale labels - uppercase, consistent styling */}
+        <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">
           <span>{lowLabel}</span>
           <span>{highLabel}</span>
         </div>
