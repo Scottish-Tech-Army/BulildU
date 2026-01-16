@@ -151,7 +151,7 @@ export default function ProgressPage() {
 
             {/* Your Achievements Section - Bento Row */}
             <section className="mb-6">
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 {/* Left Column - 25% Weekly Energy */}
                 <div className="col-span-1 bg-brand-primary rounded-2xl p-5 flex flex-col">
                   {/* Header */}
@@ -184,7 +184,7 @@ export default function ProgressPage() {
                 </div>
 
                 {/* Right Column - 75% Achievements */}
-                <div className="col-span-3 mt-5 mx-4 mb0">
+                <div className="col-span-1 md:col-span-3 mt-5 mx-4 mb0">
                   {/* Header with period tabs */}
                   <div className="flex items-start justify-between mb-4">
                     <div>
@@ -215,7 +215,7 @@ export default function ProgressPage() {
                   </div>
 
                   {/* Stats Row */}
-                  <div className="grid grid-cols-3 gap-3 mb-0">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-0">
                     {/* Streak - First */}
                     <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                       <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
@@ -294,9 +294,9 @@ export default function ProgressPage() {
               </div>
 
               {/* Row 1: 2 columns + 1 column */}
-              <div className="grid grid-cols-3 gap-3 mb-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
                 {/* Wellbeing Card */}
-                <div className="col-span-2 bg-white rounded-2xl p-8 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[180px] relative overflow-hidden">
+                <div className="col-span-1 sm:col-span-2 bg-white rounded-2xl p-8 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[180px] relative overflow-hidden">
                   {/* Decorative Icon */}
                   <Sprout className="absolute right-8 bottom-4 w-48 h-48 text-brand-primary/5 transform rotate-12" />
                   {/* Header */}
@@ -380,7 +380,7 @@ export default function ProgressPage() {
               </div>
 
               {/* Row 2: 3 equal columns */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* Confidence Card */}
                 <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[160px] flex flex-col items-center justify-center text-center relative overflow-hidden">
                   {/* Decorative Icon */}

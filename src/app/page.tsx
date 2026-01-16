@@ -129,7 +129,7 @@ export default function DashboardPage() {
               </h2>
               <p className="text-sm text-text-muted">Keep the energy flowing</p>
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Momentum */}
             <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
               <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
