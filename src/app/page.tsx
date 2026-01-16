@@ -117,34 +117,47 @@ export default function DashboardPage() {
           </div>
 
           {/* Stats Row */}
-          <div className="md:col-span-12 grid grid-cols-3 gap-4">
+          <div className="md:col-span-12 grid grid-cols-3 gap-3">
             {/* Momentum */}
-            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
-              <span className="text-4xl font-black text-brand-primary flex items-center gap-2">
-                {momentum > 0 && <Flame className="w-8 h-8" />}
+            <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+              <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                Check-in Streak
+              </p>
+              <p className="text-3xl font-bold text-brand-primary flex items-center gap-1">
+                {momentum > 0 && <Flame className="w-6 h-6" />}
                 {momentum}
-              </span>
-              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">
-                {momentum === 1 ? "week streak" : "weeks streak"}
+              </p>
+              <p className="text-xs text-text-subtle mt-2">
+                Keep it going!
               </p>
             </div>
 
             {/* Active Goals */}
-            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
-              <span className="text-4xl font-black text-[var(--color-charcoal)]">
+            <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+              <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                Active Goals
+              </p>
+              <p className="text-3xl font-bold text-[var(--color-charcoal)]">
                 {activeGoals.length}
-              </span>
-              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">
-                active {activeGoals.length === 1 ? "goal" : "goals"}
+              </p>
+              <p className="text-xs text-text-subtle mt-2">
+                {activeGoals.length === 0 ? "Set your first goal" : "In progress"}
               </p>
             </div>
 
             {/* Steps Progress */}
-            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
-              <span className="text-4xl font-black text-[var(--color-charcoal)]">
-                {totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0}%
-              </span>
-              <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mt-1">steps done</p>
+            <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+              <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                Steps Done
+              </p>
+              <p className="text-3xl font-bold text-[var(--color-charcoal)]">
+                {completedSteps}/{totalSteps}
+              </p>
+              <p className="text-xs text-text-subtle mt-2">
+                {totalSteps > 0 
+                  ? `${Math.round((completedSteps / totalSteps) * 100)}% complete`
+                  : "Add steps to goals"}
+              </p>
             </div>
           </div>
 

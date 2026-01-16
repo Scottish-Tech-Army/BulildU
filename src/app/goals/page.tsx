@@ -50,6 +50,7 @@ export default function GoalsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [filters, setFilters] = useState<GoalFilterState>(DEFAULT_FILTERS);
+  const [period, setPeriod] = useState<"week" | "month" | "year">("week");
 
   // Apply filters and sort to goals
   const processedGoals = useMemo(() => {
@@ -153,9 +154,12 @@ export default function GoalsPage() {
       {/* Header */}
       <header className="pt-6 pb-4 bg-white sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Target className="w-8 h-8 text-brand-primary" />
-            <h1 className="text-2xl text-[var(--color-charcoal)]">Goals</h1>
+          <div>
+            <div className="flex items-center gap-3">
+              <Target className="w-8 h-8 text-brand-primary" />
+              <h1 className="text-2xl text-[var(--color-charcoal)]">Goals</h1>
+            </div>
+            <p className="text-text-muted mt-1">Move towards your potential</p>
           </div>
           <div className="flex items-center gap-3">
             <button

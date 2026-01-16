@@ -45,7 +45,7 @@ export default function GoalCard({ goal }: GoalCardProps) {
       href={`/goals/${goal.id}`}
       className={`block rounded-2xl p-4 group transition-all ${
         goal.status === "active" 
-          ? "bg-white border border-gray-100" 
+          ? "bg-white border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]" 
           : "bg-warm-ivory"
       } hover:bg-[var(--color-magenta)]/5`}
     >

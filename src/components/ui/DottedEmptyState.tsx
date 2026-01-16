@@ -21,7 +21,7 @@ export function DottedEmptyState({
   return (
     <Link href={href} className={`flex-1 flex flex-col outline-none group ${className}`}>
       <div className="flex-1 border-2 border-dashed border-warm-ivory rounded-[2.5rem] p-12 text-center hover:border-brand-primary hover:bg-brand-primary/5 transition-all duration-300 flex flex-col items-center justify-center h-full">
-        <div className="bg-brand-primary text-white p-4 rounded-2xl mb-6 shadow-brand-primary/20 group-hover:scale-110 transition-transform">
+        <div className="bg-brand-primary text-white p-4 rounded-full mb-6 shadow-brand-primary/20 group-hover:scale-110 transition-transform">
           <Icon className="w-8 h-8" />
         </div>
         <h2 className="text-xl font-bold text-[var(--color-charcoal)] mb-2 uppercase tracking-tight">

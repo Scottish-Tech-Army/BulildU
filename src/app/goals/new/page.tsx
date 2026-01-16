@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Goal, createGoal, GoalCategory, Step } from "@/lib/storage";
 import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
-import { WizardHeader } from "@/components/ui/WizardHeader";
 import { StepInput } from "@/components/ui/StepInput";
 import { StepItem } from "@/components/ui/StepItem";
 import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
@@ -27,6 +26,7 @@ import {
   Sprout,
   Home,
   Check,
+  Compass,
   type LucideIcon
 } from "lucide-react";
 
@@ -65,7 +65,7 @@ export default function NewGoalPage() {
   const [step, setStep] = useState<GoalCreationStep>("category");
   const [draft, setDraft] = useState<FullGoalDraft>({
     title: "",
-    category: "Personal",
+    category: "Health",
     whyMatters: "",
     successCriteria: "",
     confidence: null,
@@ -161,11 +161,17 @@ export default function NewGoalPage() {
   }
 
   return (
-    <FullScreenLayout bgClass="bg-white">
+    <FullScreenLayout bgClass="bg-bg-card">
       <div className="flex-1 flex flex-col overflow-y-auto">
-        <WizardHeader title="New Goal" />
+        {/* Header - aligned with content */}
+        <header className="bg-white sticky top-0 z-30 border-b border-gray-100">
+          <div className="max-w-xl w-full px-6 py-4 flex items-center gap-3">
+            <Target className="w-6 h-6 text-brand-primary" />
+            <h1 className="text-2xl text-[var(--color-charcoal)]">New Goal</h1>
+          </div>
+        </header>
         
-        <div className="max-w-xl mx-auto px-6 pt-8 pb-32 w-full">
+        <div className="max-w-xl mx-auto w-full px-6 pt-8 pb-32">
           {/* Progress Indicator */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex gap-1.5 flex-1">
@@ -186,7 +192,7 @@ export default function NewGoalPage() {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
-                    <Target className="w-6 h-6 text-brand-primary" />
+                    <Compass className="w-6 h-6 text-brand-primary" />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">What area of life?</h2>
@@ -467,7 +473,7 @@ export default function NewGoalPage() {
 
       {/* Contextual Sticky Nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50 animate-in slide-in-from-bottom duration-500">
-        <div className="flex justify-around items-center h-20 max-w-md mx-auto px-4">
+        <div className="flex justify-around items-center h-20 max-w-xl mx-auto px-6">
           <button
             onClick={handleBack}
             className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors gap-1"

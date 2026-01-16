@@ -1,12 +1,12 @@
 "use client";
 
-import { ReactNode, useEffect, useState, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { LucideIcon } from "lucide-react";
 import confetti from "canvas-confetti";
 import { PrimaryButton } from "./PrimaryButton";
 
 interface CelebrationScreenProps {
-  /** Optional progress percentage to display (e.g., 100) */
+  /** When true, fires confetti and enables icon bounce animation */
   progress?: number;
   /** Optional Lucide icon to display in the celebration badge */
   icon?: LucideIcon;
@@ -25,7 +25,7 @@ interface CelebrationScreenProps {
 /**
  * Full-screen celebration component for completion states.
  * Used for onboarding completion, check-in completion, etc.
- * Animates progress count-up and fires confetti on completion.
+ * Features bouncing icon and confetti animation.
  */
 export function CelebrationScreen({
   progress,
@@ -36,63 +36,44 @@ export function CelebrationScreen({
   buttonText,
   onButtonClick,
 }: CelebrationScreenProps) {
-  const [displayValue, setDisplayValue] = useState(0);
-  const animationRef = useRef<number | null>(null);
   const hasCompletedRef = useRef(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Animate count-up and fire confetti when complete
+  // Fire confetti on mount when progress is set
   useEffect(() => {
     if (progress === undefined) return;
+    if (hasCompletedRef.current) return;
+    
+    // Small delay to ensure canvas is ready
+    const timer = setTimeout(() => {
+      if (!canvasRef.current) return;
+      hasCompletedRef.current = true;
+      
+      const myConfetti = confetti.create(canvasRef.current, {
+        resize: true,
+        useWorker: true,
+      });
+      
+      // Fire from left
+      myConfetti({
+        particleCount: 30,
+        angle: 60,
+        spread: 70,
+        origin: { x: 0, y: 0.5 },
+        colors: ["#bc03b9", "#ffffff", "#efebee"],
+      });
+      // Fire from right
+      myConfetti({
+        particleCount: 30,
+        angle: 120,
+        spread: 70,
+        origin: { x: 1, y: 0.5 },
+        colors: ["#bc03b9", "#ffffff", "#efebee"],
+      });
+    }, 100);
 
-    const animationDuration = 800;
-    const startTime = performance.now();
-
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progressRatio = Math.min(elapsed / animationDuration, 1);
-      // Ease-out cubic for smooth deceleration
-      const eased = 1 - Math.pow(1 - progressRatio, 3);
-      setDisplayValue(Math.round(eased * progress));
-
-      if (progressRatio < 1) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else if (!hasCompletedRef.current && canvasRef.current) {
-        // Animation complete - fire confetti from canvas scoped to content!
-        hasCompletedRef.current = true;
-        
-        const myConfetti = confetti.create(canvasRef.current, {
-          resize: true,
-          useWorker: true,
-        });
-        
-        // Fire from left
-        myConfetti({
-          particleCount: 30,
-          angle: 60,
-          spread: 70,
-          origin: { x: 0, y: 0.5 },
-          colors: ["#bc03b9", "#ffffff", "#efebee"],
-        });
-        // Fire from right
-        myConfetti({
-          particleCount: 30,
-          angle: 120,
-          spread: 70,
-          origin: { x: 1, y: 0.5 },
-          colors: ["#bc03b9", "#ffffff", "#efebee"],
-        });
-      }
-    };
-
-    animationRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
+    return () => clearTimeout(timer);
   }, [progress]);
 
   return (
@@ -107,17 +88,10 @@ export function CelebrationScreen({
           ref={canvasRef}
           className="absolute inset-0 w-full h-full pointer-events-none"
         />
-        
-        {/* Animated progress percentage */}
-        {progress !== undefined && (
-          <div className="text-8xl font-light text-white mb-8 relative z-10">
-            {displayValue}%
-          </div>
-        )}
 
-        {/* Icon badge (optional) */}
+        {/* Icon badge with optional bounce animation */}
         {Icon && (
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-8 relative z-10">
+          <div className={`w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-8 relative z-10 ${progress !== undefined ? 'animate-bounce' : ''}`}>
             <Icon className="w-10 h-10 text-white" />
           </div>
         )}

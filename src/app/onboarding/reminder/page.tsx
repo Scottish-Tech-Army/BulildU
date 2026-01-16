@@ -7,7 +7,7 @@ import { ProgressDisplay } from "@/components/ui/ProgressDisplay";
 import { WizardHeader } from "@/components/ui/WizardHeader";
 import { TimeOption } from "@/components/ui/TimeOption";
 import { completeOnboarding, saveOnboardingState } from "@/lib/storage";
-import { Sunrise, Sunset } from "lucide-react";
+import { Sunrise, Sunset, Sparkles } from "lucide-react";
 
 type ReminderTime = "morning" | "evening";
 type Step = "reminder" | "celebration";
@@ -48,6 +48,7 @@ export default function ReminderPage() {
     return (
       <CelebrationScreen
         progress={100}
+        icon={Sparkles}
         title="You're all set!"
         subtitle="Welcome to empwrU. Let’s start moving towards your potential."
         buttonText="Go to dashboard"

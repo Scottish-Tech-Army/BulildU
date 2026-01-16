@@ -119,6 +119,7 @@ export default function CheckInPage() {
   if (step === 4) {
     return (
       <CelebrationScreen
+        progress={100}
         title="Check-in Complete!"
         subtitle="You're showing up for yourself and that's what counts."
         onButtonClick={() => router.push("/")}

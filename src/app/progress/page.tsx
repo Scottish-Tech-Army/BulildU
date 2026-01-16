@@ -130,9 +130,12 @@ export default function ProgressPage() {
     <div className="min-h-dvh bg-bg-card pb-32 overflow-y-auto">
       {/* Header */}
       <header className="pt-6 pb-4 bg-white sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-6 flex items-center gap-3">
-          <BarChart3 className="w-8 h-8 text-brand-primary" />
-          <h1 className="text-2xl text-[var(--color-charcoal)]">Progress</h1>
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="w-8 h-8 text-brand-primary" />
+            <h1 className="text-2xl text-[var(--color-charcoal)]">Progress</h1>
+          </div>
+          <p className="text-text-muted mt-1">Move towards your potential</p>
         </div>
       </header>
 
@@ -193,7 +196,7 @@ export default function ProgressPage() {
             <section className="mb-6">
               <div>
                 {/* Header with period tabs */}
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-4 mx-4">
                   <div>
                     <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
                       Your Achievements
@@ -226,7 +229,7 @@ export default function ProgressPage() {
                   {/* Streak - First */}
                   <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                     <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                      Weeks Streak
+                      Check-in Streak
                     </p>
                     <p className="text-3xl font-bold text-brand-primary flex items-center gap-1">
                       {momentum > 0 && <Flame className="w-6 h-6" />}

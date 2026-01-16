@@ -6,8 +6,6 @@ import {
   FullScreenLayout,
   RatingScale,
   ChoiceChips,
-  Tooltip,
-  ProgressDisplay,
   WizardHeader,
   TimeOption,
   CelebrationScreen,
@@ -20,7 +18,7 @@ import {
   type WorkStatus,
   type BaselineResponse,
 } from "@/lib/storage";
-import { Sunrise, Sunset } from "lucide-react";
+import { Sunrise, Sunset, Sparkles } from "lucide-react";
 
 // =============================================================================
 // Question Data
@@ -149,6 +147,7 @@ export default function BaselinePage() {
     return (
       <CelebrationScreen
         progress={100}
+        icon={Sparkles}
         title="You're All Set!"
         subtitle="You've completed your baseline assessment. Now let's start making progress together."
         buttonText="GO TO DASHBOARD"
@@ -158,38 +157,39 @@ export default function BaselinePage() {
   }
 
   return (
-    <FullScreenLayout bgClass="bg-white">
+    <FullScreenLayout bgClass="bg-bg-card">
       <div className="flex-1 overflow-y-auto">
-        <WizardHeader title="About U" onCancel={handleCancel} />
-        <div className="max-w-5xl mx-auto px-6 pb-6 w-full">
+        <div className="bg-white sticky top-0 z-30">
+          <WizardHeader title="About U" onCancel={handleCancel} />
+        </div>
+        <div className="max-w-5xl mx-auto px-6 pb-6 w-full pt-6">
 
-          {/* Large animated progress percentage */}
-          <ProgressDisplay 
-            progress={Math.round((currentSection / SECTIONS.length) * 100)}
-          />
+          {/* Progress Indicator */}
+          <div className="flex items-center justify-between mb-8 max-w-xl mx-auto">
+            <div className="flex gap-2 flex-1">
+              {SECTIONS.map((_, idx) => (
+                <div 
+                  key={idx}
+                  className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${
+                    idx <= currentSection ? "bg-brand-primary" : "bg-gray-100"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
 
           {/* Section title centered */}
           <div className="text-center mb-8">
             <p className="text-2xl font-semibold text-[var(--color-charcoal)]">
               {section.title}
             </p>
-            {section.id === "reminder" && (
-              <div className="flex items-center justify-center gap-2 mt-8">
-                <p className="text-[var(--color-charcoal)] text-[18px]">
-                  Pick a day
-                </p>
-                <Tooltip 
-                  content="Choose a day and time that is quiet and allows you to focus on you. Sundays can be a good day to reflect and plan."
-                />
-              </div>
-            )}
           </div>
 
           {/* Section content */}
-          <div className="space-y-12">
+          <div className="space-y-6 max-w-xl mx-auto">
             {section.id === "situation" && (
               <>
-                <div className="space-y-6 text-center">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-[18px]">
                     Which best describes where you&apos;re at right now?
                   </p>
@@ -202,7 +202,7 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.workStatus != null && (
-                  <div className="space-y-6 animate-fade-in text-center">
+                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
                     <p className="text-[var(--color-charcoal)] text-[18px] text-center">
                       How satisfied are you with your current situation?
                     </p>
@@ -219,7 +219,7 @@ export default function BaselinePage() {
 
             {section.id === "confidence" && (
               <>
-                <div className="space-y-6 text-center">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-[18px]">
                     How confident do you feel in yourself right now?
                   </p>
@@ -235,7 +235,7 @@ export default function BaselinePage() {
 
             {section.id === "aspirations" && (
               <>
-                <div className="space-y-6 text-center">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-[18px]">
                     How clear do you feel about what you want for your future?
                   </p>
@@ -248,7 +248,7 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.futureClarity != null && (
-                  <div className="space-y-6 animate-fade-in text-center">
+                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
                     <p className="text-[var(--color-charcoal)] text-[18px]">
                       How positive do you feel about your future?
                     </p>
@@ -265,7 +265,7 @@ export default function BaselinePage() {
 
             {section.id === "wellbeing" && (
               <>
-                <div className="space-y-6 text-center">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
                   <p className="text-[var(--color-charcoal)] text-[18px]">
                     How well do you manage stress?
                   </p>
@@ -278,7 +278,7 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.stressLevel != null && (
-                  <div className="space-y-6 animate-fade-in text-center">
+                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
                     <p className="text-[var(--color-charcoal)] text-[18px]">
                       How would you rate your energy most days?
                     </p>
@@ -292,7 +292,7 @@ export default function BaselinePage() {
                 )}
 
                 {responses.energyLevel != null && (
-                  <div className="space-y-6 animate-fade-in text-center">
+                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
                     <p className="text-[var(--color-charcoal)] text-[18px]">
                       How would you rate your life balance right now?
                     </p>
@@ -309,21 +309,30 @@ export default function BaselinePage() {
 
             {section.id === "reminder" && (
               <>
-                <div className="mt-6 text-center">
-                  <div className="max-w-xl mx-auto">
-                    <ChoiceChips
-                      className="justify-center flex-wrap"
-                      options={DAY_OPTIONS}
-                      value={reminderDay}
-                      onChange={(v) => setReminderDay(v as ReminderDay)}
-                    />
-                  </div>
+                {/* Tip Box */}
+                <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                  <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                  <p className="text-sm text-brand-primary/80 leading-relaxed italic text-left">
+                    Tip: Choose a day and time that is quiet and allows you to focus on you. Sundays can be a good day to reflect and plan.
+                  </p>
+                </div>
+
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 text-center space-y-4">
+                  <p className="text-[var(--color-charcoal)] text-[18px]">
+                    Pick a day
+                  </p>
+                  <ChoiceChips
+                    className="justify-center flex-wrap"
+                    options={DAY_OPTIONS}
+                    value={reminderDay}
+                    onChange={(v) => setReminderDay(v as ReminderDay)}
+                  />
                 </div>
 
                 {reminderDay != null && (
-                  <div className="space-y-3 mt-6 animate-fade-in text-center" role="radiogroup" aria-label="Weekly check-in time">
+                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-3 animate-fade-in text-center" role="radiogroup" aria-label="Weekly check-in time">
                     <p className="text-gray-900 font-medium">Pick a time</p>
-                    <div className="max-w-md mx-auto grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <TimeOption
                         time="8:00 AM"
                         label="Morning"
