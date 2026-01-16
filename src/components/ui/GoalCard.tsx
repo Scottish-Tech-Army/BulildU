@@ -28,7 +28,7 @@ export default function GoalCard({ goal }: GoalCardProps) {
 
   // Category icon map
   const iconMap: Record<GoalCategory, LucideIcon> = {
-    Health: Activity,
+
     Wellbeing: Heart,
     Career: Briefcase,
     Personal: Smile,

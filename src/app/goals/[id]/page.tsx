@@ -315,7 +315,6 @@ export default function GoalDetailPage() {
                   <div className="mb-4 flex justify-center">
                     {(() => {
                       const iconMap: Record<GoalCategory, LucideIcon> = {
-                        Health: Activity,
                         Wellbeing: Heart,
                         Career: Briefcase,
                         Personal: Smile,
@@ -337,7 +336,6 @@ export default function GoalDetailPage() {
             </div>
             {(() => {
               const iconMap: Record<GoalCategory, LucideIcon> = {
-                Health: Activity,
                 Wellbeing: Heart,
                 Career: Briefcase,
                 Personal: Smile,
@@ -787,9 +785,8 @@ export default function GoalDetailPage() {
       >
         <div className="space-y-6 pt-4">
           <div className="grid grid-cols-2 gap-3">
-            {(["Health", "Wellbeing", "Career", "Personal", "Finance", "Growth", "Family"] as GoalCategory[]).map((cat) => {
+            {(["Wellbeing", "Career", "Personal", "Finance", "Growth", "Family"] as GoalCategory[]).map((cat) => {
               const iconMap: Record<GoalCategory, LucideIcon> = {
-                Health: Activity,
                 Wellbeing: Heart,
                 Career: Briefcase,
                 Personal: Smile,

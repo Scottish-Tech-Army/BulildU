@@ -19,7 +19,7 @@ import {
   ListTodo,
   Ruler,
   X,
-  Activity,
+
   Briefcase,
   Smile,
   Coins,
@@ -65,7 +65,7 @@ export default function NewGoalPage() {
   const [step, setStep] = useState<GoalCreationStep>("category");
   const [draft, setDraft] = useState<FullGoalDraft>({
     title: "",
-    category: "Health",
+    category: "Career",
     whyMatters: "",
     successCriteria: "",
     confidence: null,
@@ -203,7 +203,6 @@ export default function NewGoalPage() {
                 <div className="p-5 bg-white rounded-3xl border border-gray-100">
                   <div className="grid grid-cols-2 gap-3">
                     {([
-                      { name: "Health", icon: Activity },
                       { name: "Career", icon: Briefcase },
                       { name: "Personal", icon: Smile },
                       { name: "Finance", icon: Coins },
@@ -301,7 +300,7 @@ export default function NewGoalPage() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">How you&apos;ll know</h2>
-                    <p className="text-gray-500 text-sm">Make success undeniable</p>
+                    <p className="text-gray-500 text-sm">Decide how progress will be tracked</p>
                   </div>
                 </div>
 
@@ -319,7 +318,7 @@ export default function NewGoalPage() {
                     autoFocus
                     value={draft.successCriteria}
                     onChange={(e) => updateDraft("successCriteria", e.target.value)}
-                    placeholder="e.g. When I can run the loop around the park in under 30 minutes without walking."
+                    placeholder="e.g. apply for 3 jobs, complete 1 online accredited course, secure 1 interview etc."
                     className="w-full min-h-[120px] p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-base leading-relaxed"
                   />
                 </div>

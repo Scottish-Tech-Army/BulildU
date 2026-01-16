@@ -36,7 +36,6 @@ export function GoalProgressCard({
 
   // Category icon map
   const iconMap: Record<GoalCategory, LucideIcon> = {
-    Health: Activity,
     Wellbeing: Heart,
     Career: Briefcase,
     Personal: Smile,

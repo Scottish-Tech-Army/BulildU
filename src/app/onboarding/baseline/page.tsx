@@ -149,7 +149,7 @@ export default function BaselinePage() {
         progress={100}
         icon={Sparkles}
         title="You're All Set!"
-        subtitle="You've completed your baseline assessment. Now let's start making progress together."
+        subtitle="You've completed your baseline assessment. Let's start moving towards your potential."
         buttonText="GO TO DASHBOARD"
         onButtonClick={handleFinish}
       />
