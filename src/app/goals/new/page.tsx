@@ -2,25 +2,36 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppButton } from "@/components/ui/AppButton";
 import { Goal, createGoal, GoalCategory, Step } from "@/lib/storage";
 import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
 import { WizardHeader } from "@/components/ui/WizardHeader";
 import { StepInput } from "@/components/ui/StepInput";
 import { StepItem } from "@/components/ui/StepItem";
+import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 import { 
   Target, 
   Sparkles, 
   Calendar, 
   Heart,
   AlertCircle,
-  TrendingUp,
+  ChevronLeft,
+  ChevronRight,
   BarChart3,
   ListTodo,
-  Ruler
+  Ruler,
+  X,
+  Activity,
+  Briefcase,
+  Smile,
+  Coins,
+  Sprout,
+  Home,
+  Check,
+  type LucideIcon
 } from "lucide-react";
 
 type GoalCreationStep = 
+  | "category"
   | "why" 
   | "title" 
   | "measurable" 
@@ -51,7 +62,7 @@ interface FullGoalDraft {
  */
 export default function NewGoalPage() {
   const router = useRouter();
-  const [step, setStep] = useState<GoalCreationStep>("why");
+  const [step, setStep] = useState<GoalCreationStep>("category");
   const [draft, setDraft] = useState<FullGoalDraft>({
     title: "",
     category: "Personal",
@@ -63,8 +74,9 @@ export default function NewGoalPage() {
   });
 
   const STEPS_ORDER: GoalCreationStep[] = [
-    "why",
+    "category",
     "title",
+    "why",
     "measurable",
     "achievable",
     "date",
@@ -113,6 +125,7 @@ export default function NewGoalPage() {
 
   const canProceed = () => {
     switch (step) {
+      case "category": return !!draft.category;
       case "why": return draft.whyMatters.trim().length >= 5;
       case "title": return draft.title.trim().length >= 3;
       case "measurable": return !!draft.successCriteria?.trim();
@@ -136,27 +149,21 @@ export default function NewGoalPage() {
 
   if (step === "done") {
     return (
-      <FullScreenLayout bgClass="bg-white">
-        <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
-          <div className="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mb-6 animate-bounce">
-            <Sparkles className="w-12 h-12 text-brand-primary" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Goal Locked In!</h1>
-          <p className="text-gray-500 mb-10 max-w-md text-lg leading-relaxed">
-            You&apos;ve set a goal with {draft.steps.length} step{draft.steps.length !== 1 ? "s" : ""}. Time to take action!
-          </p>
-          <AppButton onClick={() => router.push("/goals")}>
-            GO TO MY GOALS
-          </AppButton>
-        </div>
-      </FullScreenLayout>
+      <CelebrationScreen
+        progress={100}
+        icon={Sparkles}
+        title="Goal Locked In!"
+        subtitle={`You've set a goal with ${draft.steps.length} step${draft.steps.length !== 1 ? "s" : ""}. Time to take action!`}
+        buttonText="GO TO MY GOALS"
+        onButtonClick={() => router.push("/goals")}
+      />
     );
   }
 
   return (
     <FullScreenLayout bgClass="bg-white">
       <div className="flex-1 flex flex-col overflow-y-auto">
-        <WizardHeader title="New Goal" onCancel={() => router.back()} />
+        <WizardHeader title="New Goal" />
         
         <div className="max-w-xl mx-auto px-6 pt-8 pb-32 w-full">
           {/* Progress Indicator */}
@@ -174,7 +181,49 @@ export default function NewGoalPage() {
           </div>
 
           <div className="space-y-8">
-            {/* Step 1: Why */}
+            {/* Step 1: Category */}
+            {step === "category" && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-primary/10 flex items-center justify-center">
+                    <Target className="w-6 h-6 text-brand-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900">What area of life?</h2>
+                    <p className="text-gray-500 text-sm">Choose a category for your goal</p>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-white rounded-3xl border border-gray-100">
+                  <div className="grid grid-cols-2 gap-3">
+                    {([
+                      { name: "Health", icon: Activity },
+                      { name: "Career", icon: Briefcase },
+                      { name: "Personal", icon: Smile },
+                      { name: "Finance", icon: Coins },
+                      { name: "Growth", icon: Sprout },
+                      { name: "Wellbeing", icon: Heart },
+                      { name: "Family", icon: Home },
+                    ] as { name: GoalCategory; icon: LucideIcon }[]).map(({ name, icon: Icon }) => (
+                      <button
+                        key={name}
+                        onClick={() => updateDraft("category", name)}
+                        className={`flex items-center gap-3 py-4 px-5 rounded-2xl text-base font-medium transition-all capitalize ${
+                          draft.category === name
+                            ? "bg-brand-primary text-white"
+                            : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Why */}
             {step === "why" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center gap-3 mb-2">
@@ -187,8 +236,8 @@ export default function NewGoalPage() {
                   </div>
                 </div>
                 
-                <div className="space-y-4">
-                  <label className="text-sm font-semibold text-gray-700 block px-1">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-4">
+                  <label className="text-[10px] font-bold text-[var(--color-magenta)] uppercase tracking-widest px-1">
                     What makes this goal important to you right now?
                   </label>
                   <textarea
@@ -196,7 +245,7 @@ export default function NewGoalPage() {
                     value={draft.whyMatters}
                     onChange={(e) => updateDraft("whyMatters", e.target.value)}
                     placeholder="e.g. I want to feel more energised so I can spend better quality time with my family..."
-                    className="w-full min-h-[160px] p-5 rounded-3xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-lg leading-relaxed"
+                    className="w-full min-h-[160px] p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-base leading-relaxed"
                   />
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
@@ -208,7 +257,7 @@ export default function NewGoalPage() {
               </div>
             )}
 
-            {/* Step 2: Title */}
+            {/* Step 3: Title */}
             {step === "title" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="flex items-center gap-3 mb-2">
@@ -221,8 +270,8 @@ export default function NewGoalPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <label className="text-sm font-semibold text-gray-700 block px-1">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-4">
+                  <label className="text-[10px] font-bold text-[var(--color-magenta)] uppercase tracking-widest px-1">
                     Give your goal a clear, inspiring title
                   </label>
                   <input
@@ -231,24 +280,8 @@ export default function NewGoalPage() {
                     value={draft.title}
                     onChange={(e) => updateDraft("title", e.target.value)}
                     placeholder="e.g. Run 5km without stopping"
-                    className="w-full p-5 rounded-full bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-lg"
+                    className="w-full h-14 px-5 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base"
                   />
-                  
-                  <div className="grid grid-cols-2 gap-3 pt-4">
-                    {["Health", "Career", "Personal", "Finance", "Growth"].map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => updateDraft("category", cat as GoalCategory)}
-                        className={`py-3 px-4 rounded-2xl text-sm font-medium transition-all capitalize ${
-                          draft.category === cat
-                            ? "bg-brand-primary text-white"
-                            : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
             )}
@@ -266,14 +299,14 @@ export default function NewGoalPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-4">
                   {/* Goal Title Display */}
                   <div className="px-1">
                     <span className="text-[10px] font-bold text-brand-primary uppercase tracking-widest block mb-1">GOAL</span>
                     <h3 className="text-lg font-bold text-gray-900 leading-tight">{draft.title}</h3>
                   </div>
 
-                  <label className="text-sm font-semibold text-gray-700 block px-1 pt-4">
+                  <label className="text-[10px] font-bold text-[var(--color-magenta)] uppercase tracking-widest block px-1 pt-2">
                     How will you measure your success?
                   </label>
                   <textarea
@@ -281,7 +314,7 @@ export default function NewGoalPage() {
                     value={draft.successCriteria}
                     onChange={(e) => updateDraft("successCriteria", e.target.value)}
                     placeholder="e.g. When I can run the loop around the park in under 30 minutes without walking."
-                    className="w-full min-h-[120px] p-5 rounded-3xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-lg leading-relaxed"
+                    className="w-full min-h-[120px] p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-base leading-relaxed"
                   />
                 </div>
               </div>
@@ -300,8 +333,8 @@ export default function NewGoalPage() {
                   </div>
                 </div>
 
-                <div className="space-y-8 pt-4">
-                  <label className="text-sm font-semibold text-gray-700 block text-center">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6">
+                  <label className="text-[10px] font-bold text-[var(--color-magenta)] uppercase tracking-widest block text-center">
                     On a scale of 1-5, how confident are you that you can achieve this?
                   </label>
                   
@@ -351,24 +384,27 @@ export default function NewGoalPage() {
                   </div>
                 </div>
 
-                <div className="space-y-4 pt-4">
+                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-4">
+                  <label className="text-[10px] font-bold text-[var(--color-magenta)] uppercase tracking-widest px-1">
+                    Choose your target date
+                  </label>
                   <div className="relative">
-                    <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-brand-primary" />
+                    <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-primary" />
                     <input
                       type="date"
                       autoFocus
                       value={draft.targetDate}
                       onChange={(e) => updateDraft("targetDate", e.target.value)}
-                      className="w-full p-5 pl-14 rounded-full bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-lg appearance-none cursor-pointer"
+                      className="w-full h-14 px-5 pl-14 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base appearance-none cursor-pointer"
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-3 pt-4">
+                  <div className="grid grid-cols-2 gap-3 pt-2">
                     {[
+                      { label: "1 Week", days: 7 },
                       { label: "2 Weeks", days: 14 },
                       { label: "1 Month", days: 30 },
                       { label: "3 Months", days: 90 },
-                      { label: "Custom", days: 0 },
                     ].map((opt) => (
                       <button
                         key={opt.label}
@@ -379,7 +415,7 @@ export default function NewGoalPage() {
                             updateDraft("targetDate", d.toISOString().split("T")[0]);
                           }
                         }}
-                        className="py-3 px-4 rounded-2xl bg-gray-50 text-gray-600 font-medium text-sm hover:bg-gray-100 transition-colors border border-transparent active:border-brand-primary/20"
+                        className="h-14 px-4 rounded-2xl bg-gray-50 text-gray-600 font-medium text-sm hover:bg-gray-100 transition-colors border border-transparent active:border-brand-primary/20"
                       >
                         {opt.label}
                       </button>
@@ -429,32 +465,45 @@ export default function NewGoalPage() {
         </div>
       </div>
 
-      {/* Sticky Bottom controls */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-gray-100 p-6 z-20">
-        <div className="max-w-xl mx-auto flex items-center justify-between gap-4">
-          <button 
+      {/* Contextual Sticky Nav */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50 animate-in slide-in-from-bottom duration-500">
+        <div className="flex justify-around items-center h-20 max-w-md mx-auto px-4">
+          <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-6 py-4 rounded-full text-brand-primary font-bold hover:bg-brand-primary/5 transition-colors"
+            className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors gap-1"
           >
-            <TrendingUp className="w-5 h-5 rotate-180" />
-            BACK
+            <ChevronLeft className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Back</span>
           </button>
-          
-          <AppButton
-            disabled={!canProceed()}
-            onClick={currentIndex === totalStepsCount - 1 ? handleSave : handleNext}
-            className="flex-1 group"
+
+          <button
+            onClick={() => router.back()}
+            className="flex flex-col items-center justify-center w-full h-full text-brand-primary transition-colors gap-1"
           >
-            <span className="flex items-center justify-center gap-2">
-              {currentIndex === totalStepsCount - 1 ? (
-                <>LOCK IT IN <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" /></>
-              ) : (
-                <>CONTINUE <Sparkles className="w-5 h-5 group-hover:translate-x-1 transition-transform" /></>
-              )}
+            <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-1 group-active:scale-95 transition-transform">
+              <X className="w-6 h-6 text-brand-primary" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest -mt-1">Cancel</span>
+          </button>
+
+          <button
+            onClick={currentIndex === totalStepsCount - 1 ? handleSave : handleNext}
+            disabled={!canProceed()}
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors gap-1 ${
+              canProceed() ? "text-brand-primary" : "text-gray-300 pointer-events-none"
+            }`}
+          >
+            {currentIndex === totalStepsCount - 1 ? (
+              <Check className="w-6 h-6" />
+            ) : (
+              <ChevronRight className="w-6 h-6" />
+            )}
+            <span className="text-[10px] font-bold uppercase tracking-wider">
+              {currentIndex === totalStepsCount - 1 ? "Save" : "Next"}
             </span>
-          </AppButton>
+          </button>
         </div>
-      </div>
+      </nav>
     </FullScreenLayout>
   );
 }

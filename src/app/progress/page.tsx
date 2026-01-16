@@ -127,17 +127,22 @@ export default function ProgressPage() {
   const hasData = checkIns.length > 0 || goals.length > 0;
 
   return (
-    <div className="min-h-dvh bg-brand-surface pb-32 overflow-y-auto">
-      <div className="px-6 pt-8 pb-4 max-w-5xl mx-auto w-full">
-        {/* Header */}
-        <header className="mb-6 flex items-center gap-3">
+    <div className="min-h-dvh bg-bg-card pb-32 overflow-y-auto">
+      {/* Header */}
+      <header className="pt-6 pb-4 bg-white sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-6 flex items-center gap-3">
           <BarChart3 className="w-8 h-8 text-brand-primary" />
           <h1 className="text-2xl text-[var(--color-charcoal)]">Progress</h1>
-        </header>
+        </div>
+      </header>
 
+      <div className="px-6 pb-4 max-w-5xl mx-auto w-full pt-4">
         {/* Inspirational Quote */}
         <div className="mb-6">
-          <DailyQuote />
+          <DailyQuote 
+            quote="The smallest of actions is always better than the noblest of intentions."
+            author="Robin Sharma"
+          />
         </div>
 
         {!hasData && !hasBaseline ? (
@@ -157,18 +162,18 @@ export default function ProgressPage() {
             {/* Celebration - dismissible */}
             {!celebrationDismissed && (completedSteps > 0 || completedGoals.length > 0) && (
               <section className="mb-6">
-                <div className="bg-brand-primary/10 rounded-2xl p-4 text-center relative">
+                <div className="bg-brand-gradient rounded-2xl p-4 text-center relative shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                   <button
                     onClick={() => setCelebrationDismissed(true)}
-                    className="absolute top-2 right-2 p-1 text-text-muted hover:text-[var(--color-charcoal)] transition-colors"
+                    className="absolute top-2 right-2 p-1 text-white/70 hover:text-white transition-colors"
                     aria-label="Dismiss"
                   >
                     <X className="w-5 h-5" />
                   </button>
-                  <div className="w-12 h-12 bg-brand-primary/20 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <Trophy className="w-6 h-6 text-brand-primary" />
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Trophy className="w-6 h-6 text-white" />
                   </div>
-                  <p className="text-[var(--color-charcoal)] font-medium">
+                  <p className="text-white font-medium">
                     {completedGoals.length > 0
                       ? `You've achieved ${completedGoals.length} goal${
                           completedGoals.length !== 1 ? "s" : ""
@@ -177,7 +182,7 @@ export default function ProgressPage() {
                           completedSteps !== 1 ? "s" : ""
                         }!`}
                   </p>
-                  <p className="text-text-muted text-sm mt-1">
+                  <p className="text-white/80 text-sm mt-1">
                     Keep up the amazing work!
                   </p>
                 </div>
@@ -186,7 +191,7 @@ export default function ProgressPage() {
 
             {/* Your Achievements Section */}
             <section className="mb-6">
-              <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <div>
                 {/* Header with period tabs */}
                 <div className="flex items-start justify-between mb-4">
                   <div>
@@ -194,12 +199,12 @@ export default function ProgressPage() {
                       Your Achievements
                     </h2>
                     <p className="text-sm text-text-muted">
-                      {period === "week" && "This week's stats"}
+                      {period === "week" && "This week's progress"}
                       {period === "month" && "This month's stats"}
                       {period === "year" && "This year's stats"}
                     </p>
                   </div>
-                  <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                  <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                     {(["week", "month", "year"] as const).map((p) => (
                       <button
                         key={p}
@@ -218,8 +223,22 @@ export default function ProgressPage() {
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-3 gap-3 mb-4">
+                  {/* Streak - First */}
+                  <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
+                      Weeks Streak
+                    </p>
+                    <p className="text-3xl font-bold text-brand-primary flex items-center gap-1">
+                      {momentum > 0 && <Flame className="w-6 h-6" />}
+                      {momentum}
+                    </p>
+                    <p className="text-xs text-text-subtle mt-2">
+                      {checkInDue ? "Check in to extend!" : "Keep it going!"}
+                    </p>
+                  </div>
+
                   {/* Goals Completed */}
-                  <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
+                  <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                     <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
                       Goals Achieved
                     </p>
@@ -232,7 +251,7 @@ export default function ProgressPage() {
                   </div>
 
                   {/* Steps Done */}
-                  <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
+                  <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                     <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
                       Steps Done
                     </p>
@@ -243,23 +262,6 @@ export default function ProgressPage() {
                       {totalSteps > 0 
                         ? `${Math.round((completedSteps / totalSteps) * 100)}% complete`
                         : "Add steps to goals"}
-                    </p>
-                  </div>
-
-                  {/* Streak */}
-                  <div className="bg-warm-ivory rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center">
-                    <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                      Streak
-                    </p>
-                    <p className="text-3xl font-bold text-[var(--color-charcoal)] flex items-center gap-1">
-                      {momentum > 0 && <Flame className="w-6 h-6 text-brand-primary" />}
-                      {momentum}
-                      <span className="text-sm font-normal text-text-muted">
-                        {momentum === 1 ? "week" : "weeks"}
-                      </span>
-                    </p>
-                    <p className="text-xs text-text-subtle mt-2">
-                      {checkInDue ? "Check in to extend!" : "Keep it going!"}
                     </p>
                   </div>
                 </div>
@@ -279,7 +281,7 @@ export default function ProgressPage() {
             {/* Where You Stand Now */}
             {hasBaseline && (
               <section className="mb-6">
-                <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                   <div className="mb-4">
                     <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
                       Where You Stand Now
@@ -327,7 +329,7 @@ export default function ProgressPage() {
             {/* Energy Level from Check-ins */}
             {latestEnergy !== null && (
               <section className="mb-6">
-                <div className="bg-white rounded-2xl p-5 border border-gray-100">
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
                   <div className="mb-4">
                     <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
                       Energy Level

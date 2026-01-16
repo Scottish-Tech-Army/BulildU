@@ -33,10 +33,16 @@ import {
   Coins,
   Sprout,
   Home,
+  Trophy,
+  Pause,
+  Play,
+  ListTodo,
+  Target,
   type LucideIcon
 } from "lucide-react";
 import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
 import BottomSheet from "@/components/ui/BottomSheet";
+import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 
 export default function GoalDetailPage() {
   const router = useRouter();
@@ -68,6 +74,9 @@ export default function GoalDetailPage() {
   const [editingTitle, setEditingTitle] = useState("");
   const [editingDate, setEditingDate] = useState("");
 
+  // Celebration state
+  const [showCelebration, setShowCelebration] = useState(false);
+
   const refreshGoal = useCallback(() => {
     if (id) {
       const data = getGoalById(id);
@@ -82,8 +91,22 @@ export default function GoalDetailPage() {
 
   const handleStepToggle = (stepId: string) => {
     if (!goal) return;
+    
+    // Check if this toggle will complete the goal
+    const step = goal.steps.find(s => s.id === stepId);
+    if (!step) return;
+    
+    const willComplete = !step.completed; // Step is about to be toggled to complete
+    const otherStepsComplete = goal.steps.filter(s => s.id !== stepId).every(s => s.completed);
+    const willBeFullyComplete = willComplete && otherStepsComplete && goal.steps.length > 0;
+    
     toggleStep(goal.id, stepId);
     refreshGoal();
+    
+    // Show celebration if goal just became 100% complete
+    if (willBeFullyComplete) {
+      setShowCelebration(true);
+    }
   };
 
   const handleAddStep = () => {
@@ -138,6 +161,20 @@ export default function GoalDetailPage() {
 
   if (!goal) return null;
 
+  // Show celebration when goal is completed
+  if (showCelebration) {
+    return (
+      <CelebrationScreen
+        progress={100}
+        icon={Trophy}
+        title="Goal Achieved!"
+        subtitle={`Congratulations! You've completed your goal. Time to celebrate!`}
+        buttonText="BACK TO GOAL"
+        onButtonClick={() => setShowCelebration(false)}
+      />
+    );
+  }
+
   const isCompleted = goal.status === "completed";
   const progress = goal.steps.length > 0 
     ? Math.round((goal.steps.filter(s => s.completed).length / goal.steps.length) * 100) 
@@ -153,10 +190,37 @@ export default function GoalDetailPage() {
   return (
     <div className="min-h-dvh bg-bg-card pb-32">
       <header className="pt-6 pb-4 bg-white/80 backdrop-blur-md sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-6 flex items-center justify-center">
-          <p className="text-lg font-medium text-[var(--color-charcoal)]">
-            Your Goal
-          </p>
+        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Target className="w-8 h-8 text-brand-primary" />
+            <h1 className="text-2xl text-[var(--color-charcoal)]">Your Goal</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
+              aria-label="Delete goal"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => {
+                if (goal) {
+                  const newStatus = goal.status === "paused" ? "active" : "paused";
+                  updateGoal(goal.id, { status: newStatus });
+                  refreshGoal();
+                }
+              }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-400 hover:text-amber-500 hover:bg-amber-50 transition-all"
+              aria-label={goal.status === "paused" ? "Resume goal" : "Pause goal"}
+            >
+              {goal.status === "paused" ? (
+                <Play className="w-5 h-5" />
+              ) : (
+                <Pause className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -289,7 +353,7 @@ export default function GoalDetailPage() {
           </div>
 
           {/* How You'll Know Card (75%) */}
-          <div className="md:col-span-[15] bg-white rounded-[2.5rem] p-10 border border-gray-100 flex flex-col relative overflow-hidden group">
+          <div className="md:col-span-[15] bg-brand-primary/5 rounded-[2.5rem] p-10 border border-brand-primary/20 flex flex-col relative overflow-hidden group">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-[10px] font-bold text-brand-primary uppercase tracking-widest leading-none">How You&apos;ll Know</h3>
               <button
@@ -297,7 +361,7 @@ export default function GoalDetailPage() {
                   setEditSuccessCriteria(goal.successCriteria || "");
                   setShowSuccessEditor(true);
                 }}
-                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-gray-400 hover:text-brand-primary hover:bg-brand-primary/10"
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all text-brand-primary/40 hover:text-brand-primary hover:bg-brand-primary/10"
                 aria-label="Edit success criteria"
               >
                 <Pencil className="w-5 h-5" />
@@ -309,7 +373,7 @@ export default function GoalDetailPage() {
                 {goal.successCriteria || "Define your win criteria."}
               </p>
             </div>
-            <Ruler className="absolute -right-6 -bottom-6 w-40 h-40 text-brand-primary/5 transform rotate-12 group-hover:scale-110 transition-transform duration-1000" />
+            <Ruler className="absolute -right-6 -bottom-6 w-40 h-40 text-white transform rotate-12 group-hover:scale-110 transition-transform duration-1000" />
           </div>
         </div>
 
@@ -359,8 +423,8 @@ export default function GoalDetailPage() {
               </div>
               
               <div className="hidden md:flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-[0.1em] px-4">
-                <span>Building up</span>
-                <span>Fully ready</span>
+                <span>Not confident</span>
+                <span>Very confident</span>
               </div>
             </div>
           </div>
@@ -396,6 +460,7 @@ export default function GoalDetailPage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-4">
+                <ListTodo className="w-8 h-8 text-brand-primary" />
                 Action Plan
                 <div className="bg-gray-100 text-brand-primary text-xs py-1.5 px-4 rounded-full font-black tracking-widest">
                   {goal.steps.filter(s => s.completed).length} / {goal.steps.length}
@@ -611,12 +676,10 @@ export default function GoalDetailPage() {
 
           <button
             onClick={() => router.push("/goals")}
-            className="flex flex-col items-center justify-center w-full h-full text-brand-primary transition-colors gap-1"
+            className="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors gap-1"
           >
-            <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-1 group-active:scale-95 transition-transform">
-              <X className="w-6 h-6 text-brand-primary" />
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-widest -mt-1">Close</span>
+            <X className="w-6 h-6" />
+            <span className="text-[10px] font-bold uppercase tracking-wider">Close</span>
           </button>
 
         </div>
@@ -653,8 +716,8 @@ export default function GoalDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowAIInsights(false)} />
           <div className="relative bg-white rounded-[40px] p-10 max-w-sm w-full text-center animate-in zoom-in-95 duration-300">
-            <div className="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
-              <Sparkles className="w-12 h-12 text-brand-primary" />
+            <div className="w-24 h-24 bg-brand-gradient rounded-full flex items-center justify-center mx-auto mb-8">
+              <Sparkles className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">AI Insights</h2>
             <p className="text-gray-500 mb-10 leading-relaxed text-sm">Our AI coach is currently being trained to help you achieve your goals faster. Check back soon!</p>

@@ -149,10 +149,10 @@ export default function GoalsPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-brand-surface flex flex-col">
-      <div className="px-6 pt-8 flex-1 flex flex-col max-w-5xl mx-auto w-full">
-        {/* Header */}
-        <header className="flex items-center justify-between mb-8">
+    <div className="min-h-dvh bg-bg-card flex flex-col">
+      {/* Header */}
+      <header className="pt-6 pb-4 bg-white sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Target className="w-8 h-8 text-brand-primary" />
             <h1 className="text-2xl text-[var(--color-charcoal)]">Goals</h1>
@@ -195,8 +195,10 @@ export default function GoalsPage() {
               <Plus className="w-5 h-5" />
             </Link>
           </div>
-        </header>
+        </div>
+      </header>
 
+      <div className="px-6 flex-1 flex flex-col max-w-5xl mx-auto w-full pt-4">
         {/* Inspirational Quote */}
         <div className="mb-6">
           <DailyQuote 

@@ -1,7 +1,19 @@
 "use client";
 
-import { Goal } from "@/lib/storage";
-import { Check, Calendar } from "lucide-react";
+import { Goal, GoalCategory } from "@/lib/storage";
+import { 
+  Check, 
+  Calendar,
+  Activity, 
+  Heart, 
+  Briefcase, 
+  Smile, 
+  Coins, 
+  Sprout, 
+  Home,
+  Tag,
+  type LucideIcon 
+} from "lucide-react";
 
 interface GoalProgressCardProps {
   goal: Goal;
@@ -22,16 +34,30 @@ export function GoalProgressCard({
   const totalSteps = goal.steps.length;
   const progress = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
 
+  // Category icon map
+  const iconMap: Record<GoalCategory, LucideIcon> = {
+    Health: Activity,
+    Wellbeing: Heart,
+    Career: Briefcase,
+    Personal: Smile,
+    Finance: Coins,
+    Finances: Coins,
+    Growth: Sprout,
+    Family: Home,
+    other: Tag
+  };
+  const CategoryIcon = iconMap[goal.category] || Activity;
+
   return (
     <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden transition-shadow">
       {/* Goal Header */}
-      <div className="p-6 border-b border-gray-50 flex items-center justify-between gap-4">
+      <div className="p-5 border-b border-gray-50 flex items-center gap-4">
+        {/* Category Icon */}
+        <div className="w-14 h-14 rounded-xl bg-[var(--color-deep-violet)] flex items-center justify-center shrink-0">
+          <CategoryIcon className="w-7 h-7 text-white" />
+        </div>
+        
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-primary/10 text-brand-primary uppercase tracking-wider">
-              {goal.category}
-            </span>
-          </div>
           <h3 className="text-lg font-bold text-gray-900 truncate">
             {goal.title}
           </h3>

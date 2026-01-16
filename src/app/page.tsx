@@ -78,17 +78,19 @@ export default function DashboardPage() {
 
 
   return (
-    <div className="min-h-dvh bg-brand-surface flex flex-col">
-      <div className="px-6 pt-8 max-w-5xl mx-auto w-full flex-1 flex flex-col">
-        {/* Header */}
-        <header className="mb-8 md:col-span-12">
+    <div className="min-h-dvh bg-bg-card flex flex-col">
+      {/* Header */}
+      <header className="pt-6 pb-4 bg-white sticky top-0 z-30">
+        <div className="max-w-5xl mx-auto px-6">
           <h1 className="text-2xl text-[var(--color-charcoal)] mb-1 flex items-center gap-3">
             <GreetingIcon className="w-8 h-8 text-brand-primary" />
             {greeting}
           </h1>
           <p className="text-text-muted mt-1">Move towards your potential</p>
-        </header>
+        </div>
+      </header>
 
+      <div className="px-6 max-w-5xl mx-auto w-full flex-1 flex flex-col pt-4">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
           {/* Weekly Check-in Prompt */}
           {showCheckInPrompt && (
@@ -117,7 +119,7 @@ export default function DashboardPage() {
           {/* Stats Row */}
           <div className="md:col-span-12 grid grid-cols-3 gap-4">
             {/* Momentum */}
-            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
+            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-brand-primary flex items-center gap-2">
                 {momentum > 0 && <Flame className="w-8 h-8" />}
                 {momentum}
@@ -128,7 +130,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Active Goals */}
-            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
+            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-[var(--color-charcoal)]">
                 {activeGoals.length}
               </span>
@@ -138,7 +140,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Steps Progress */}
-            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
+            <div className="bg-white rounded-3xl p-6 text-center border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col items-center justify-center hover:bg-slate-50 transition-colors">
               <span className="text-4xl font-black text-[var(--color-charcoal)]">
                 {totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0}%
               </span>

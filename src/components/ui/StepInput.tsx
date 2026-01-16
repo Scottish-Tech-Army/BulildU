@@ -49,27 +49,27 @@ export function StepInput({
       <div className="flex items-center justify-between gap-4 pt-2">
         <div className="flex-1">
           {showDate ? (
-            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-xl animate-in slide-in-from-left-2">
-              <Calendar className="w-4 h-4 text-[var(--color-magenta)]" />
+            <div className="flex items-center gap-2 px-4 h-14 bg-gray-50 rounded-2xl animate-in slide-in-from-left-2">
+              <Calendar className="w-5 h-5 text-[var(--color-magenta)]" />
               <input
                 type="date"
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
-                className="flex-1 text-xs border-none focus:ring-0 p-0 text-gray-700 bg-transparent cursor-pointer"
+                className="flex-1 text-base border-none focus:ring-0 p-0 text-gray-700 bg-transparent cursor-pointer"
               />
               <button 
                 onClick={() => { setShowDate(false); setTargetDate(""); }}
-                className="p-1 hover:bg-gray-200 rounded-lg transition-colors"
+                className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
               >
-                <X className="w-3 h-3 text-gray-400" />
+                <X className="w-4 h-4 text-gray-400" />
               </button>
             </div>
           ) : (
             <button
               onClick={() => setShowDate(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-400 hover:text-[var(--color-magenta)] hover:bg-[var(--color-magenta)]/5 transition-all text-sm font-medium"
+              className="flex items-center gap-2 px-4 h-14 rounded-2xl text-gray-400 hover:text-[var(--color-magenta)] hover:bg-[var(--color-magenta)]/5 transition-all text-base font-medium"
             >
-              <Clock className="w-4 h-4" />
+              <Clock className="w-5 h-5" />
               <span>Add deadline</span>
             </button>
           )}

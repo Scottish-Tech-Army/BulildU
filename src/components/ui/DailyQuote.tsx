@@ -115,7 +115,7 @@ export default function DailyQuote({ className = "", quote: propQuote, author: p
 
   return (
     <section className={`flex flex-col h-full ${className}`}>
-      <div className="bg-white p-10 rounded-3xl border border-slate-100 flex flex-col justify-between relative overflow-hidden h-full">
+      <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col justify-between relative overflow-hidden h-full">
         <div className="relative z-10">
            <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-6">{propQuote ? "Inspiration" : "Daily Inspiration"}</p>
            <svg className="h-10 w-10 text-brand-primary/10 absolute -top-2 -left-4 -z-10" fill="currentColor" viewBox="0 0 24 24">
