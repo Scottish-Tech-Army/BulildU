@@ -16,6 +16,7 @@ export const STORAGE_KEYS = {
   CHECKINS: `${STORAGE_PREFIX}checkins`,
   PREFERENCES: `${STORAGE_PREFIX}preferences`,
   DAILY_QUOTE: "empwru_daily_quote", // Standardized name
+  DISCOVERY: `${STORAGE_PREFIX}discovery`,
 } as const;
 
 // Onboarding state
@@ -692,4 +693,80 @@ export function getWeeklyMomentumData(weeksCount: number = 8): WeeklyMomentumDat
   }
   
   return weeks;
+}
+
+// =============================================================================
+// Discovery (Self-Awareness Pillars)
+// =============================================================================
+
+export type DiscoveryPillar = "skills" | "qualities" | "values" | "interests";
+
+export interface DiscoveryData {
+  skills: string[];
+  qualities: string[];
+  values: string[];
+  interests: string[];
+  updatedAt?: string; // ISO date string
+}
+
+const DEFAULT_DISCOVERY: DiscoveryData = {
+  skills: [],
+  qualities: [],
+  values: [],
+  interests: [],
+};
+
+/**
+ * Get discovery data from localStorage
+ */
+export function getDiscoveryData(): DiscoveryData {
+  if (!isBrowser()) return DEFAULT_DISCOVERY;
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.DISCOVERY);
+    if (!stored) return DEFAULT_DISCOVERY;
+    return JSON.parse(stored) as DiscoveryData;
+  } catch {
+    return DEFAULT_DISCOVERY;
+  }
+}
+
+/**
+ * Save discovery data to localStorage
+ */
+export function saveDiscoveryData(data: Partial<DiscoveryData>): void {
+  if (!isBrowser()) return;
+
+  const current = getDiscoveryData();
+  const updated = { 
+    ...current, 
+    ...data,
+    updatedAt: new Date().toISOString()
+  };
+  localStorage.setItem(STORAGE_KEYS.DISCOVERY, JSON.stringify(updated));
+}
+
+/**
+ * Add an item to a discovery pillar
+ */
+export function addDiscoveryItem(pillar: DiscoveryPillar, item: string): void {
+  const data = getDiscoveryData();
+  const trimmed = item.trim();
+  
+  // Avoid duplicates (case-insensitive)
+  if (data[pillar].some(i => i.toLowerCase() === trimmed.toLowerCase())) {
+    return;
+  }
+  
+  data[pillar] = [...data[pillar], trimmed];
+  saveDiscoveryData(data);
+}
+
+/**
+ * Remove an item from a discovery pillar
+ */
+export function removeDiscoveryItem(pillar: DiscoveryPillar, item: string): void {
+  const data = getDiscoveryData();
+  data[pillar] = data[pillar].filter(i => i !== item);
+  saveDiscoveryData(data);
 }

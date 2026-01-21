@@ -24,3 +24,4 @@ export { TextAreaField } from "./ui/TextAreaField";
 export { StepHeader } from "./ui/StepHeader";
 export { StepInput } from "./ui/StepInput";
 export { StepItem } from "./ui/StepItem";
+export { QuoteCard } from "./ui/QuoteCard";

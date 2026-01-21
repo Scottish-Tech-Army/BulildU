@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-import { Home, Target, BarChart3, RotateCcw } from "lucide-react";
+import { Home, Target, BarChart3, Lightbulb, RotateCcw } from "lucide-react";
 
 interface NavItem {
   href: string;
@@ -16,6 +16,11 @@ const navItems: NavItem[] = [
     href: "/",
     label: "Home",
     icon: <Home className="w-6 h-6" />,
+  },
+  {
+    href: "/discovery",
+    label: "Discovery",
+    icon: <Lightbulb className="w-6 h-6" />,
   },
   {
     href: "/goals",
