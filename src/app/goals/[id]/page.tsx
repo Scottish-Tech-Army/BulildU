@@ -29,7 +29,6 @@ import {
   X,
   Activity,
   Briefcase,
-  Smile,
   Coins,
   Sprout,
   Home,
@@ -317,7 +316,6 @@ export default function GoalDetailPage() {
                       const iconMap: Record<GoalCategory, LucideIcon> = {
                         Wellbeing: Heart,
                         Career: Briefcase,
-                        Personal: Smile,
                         Finance: Coins,
                         Finances: Coins,
                         Growth: Sprout,
@@ -338,7 +336,6 @@ export default function GoalDetailPage() {
               const iconMap: Record<GoalCategory, LucideIcon> = {
                 Wellbeing: Heart,
                 Career: Briefcase,
-                Personal: Smile,
                 Finance: Coins,
                 Finances: Coins,
                 Growth: Sprout,
@@ -784,12 +781,11 @@ export default function GoalDetailPage() {
         title="Edit Category"
       >
         <div className="space-y-6 pt-4">
-          <div className="grid grid-cols-2 gap-3">
-            {(["Wellbeing", "Career", "Personal", "Finance", "Growth", "Family"] as GoalCategory[]).map((cat) => {
+          <div className="grid grid-cols-1 gap-3">
+            {(["Wellbeing", "Career", "Finance", "Growth", "Family"] as GoalCategory[]).map((cat) => {
               const iconMap: Record<GoalCategory, LucideIcon> = {
                 Wellbeing: Heart,
                 Career: Briefcase,
-                Personal: Smile,
                 Finance: Coins,
                 Finances: Coins,
                 Growth: Sprout,
@@ -803,7 +799,7 @@ export default function GoalDetailPage() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`flex flex-col items-center gap-3 p-5 rounded-2xl transition-all ${
+                  className={`flex items-center gap-4 p-5 rounded-2xl transition-all ${
                     isSelected 
                       ? "bg-brand-primary text-white" 
                       : "bg-gray-50 text-gray-600 hover:bg-gray-100"

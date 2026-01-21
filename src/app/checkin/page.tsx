@@ -1,16 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { saveCheckIn } from "@/lib/storage";
 import { 
-  getGoals, 
-  saveCheckIn, 
-  Goal, 
-  toggleStep,
-  getGoalProgress
-} from "@/lib/storage";
-import { 
-  TrendingUp, 
   MessageSquare, 
   Sparkles,
   Heart,
@@ -21,7 +14,6 @@ import {
   Trophy
 } from "lucide-react";
 import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
-import { GoalProgressCard } from "@/components/ui/GoalProgressCard";
 import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 
 /**
@@ -36,82 +28,27 @@ import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 
 interface CheckInDraft {
   energyLevel: number;
+  achievements: string;
   reflection: string;
-  stepsCompleted: string[];
 }
 
 export default function CheckInPage() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [goals, setGoals] = useState<Goal[]>([]);
   const [draft, setDraft] = useState<CheckInDraft>({
     energyLevel: 3,
+    achievements: "",
     reflection: "",
-    stepsCompleted: [],
   });
 
-  // Store the original goal IDs to keep showing them during check-in
-  const [originalGoalIds, setOriginalGoalIds] = useState<string[]>([]);
-  
-  // Celebration state for completed goals
-  const [celebratingGoal, setCelebratingGoal] = useState<Goal | null>(null);
 
-  // Load goals once on mount
-  useEffect(() => {
-    const activeGoals = getGoals().filter((g) => g.status === "active");
-    setGoals(activeGoals);
-    setOriginalGoalIds(activeGoals.map(g => g.id));
-  }, []);
-
-  const handleStepToggle = (goalId: string, stepId: string) => {
-    // Get current progress before toggle
-    const goalBefore = goals.find(g => g.id === goalId);
-    const progressBefore = goalBefore ? getGoalProgress(goalBefore) : 0;
-    
-    // Toggle in storage
-    toggleStep(goalId, stepId);
-
-    // Refresh local goals state - keep showing original goals even if they become completed
-    const allGoals = getGoals();
-    const updatedGoals = allGoals.filter((g) => originalGoalIds.includes(g.id));
-    setGoals(updatedGoals);
-    
-    // Check if this toggle completed the goal (went from <100% to 100%)
-    const updatedGoal = updatedGoals.find(g => g.id === goalId);
-    const progressAfter = updatedGoal ? getGoalProgress(updatedGoal) : 0;
-    
-    if (progressBefore < 100 && progressAfter === 100 && updatedGoal) {
-      setCelebratingGoal(updatedGoal);
-    }
-
-    // Track completed steps for the check-in record
-    setDraft((prev) => {
-      const selectedGoal = updatedGoals.find((g) => g.id === goalId);
-      const targetStep = selectedGoal?.steps.find((s) => s.id === stepId);
-      const isCompleting = targetStep?.completed ?? false;
-
-      if (isCompleting) {
-        return {
-          ...prev,
-          stepsCompleted: [...prev.stepsCompleted, stepId],
-        };
-      } else {
-        return {
-          ...prev,
-          stepsCompleted: prev.stepsCompleted.filter(
-            (id) => id !== stepId
-          ),
-        };
-      }
-    });
-  };
 
   const handleFinish = () => {
     saveCheckIn({
       date: new Date().toISOString().split("T")[0],
       energyLevel: draft.energyLevel,
+      achievements: draft.achievements,
       reflection: draft.reflection,
-      stepsCompleted: draft.stepsCompleted,
     });
     setStep(4);
   };
@@ -129,19 +66,6 @@ export default function CheckInPage() {
     );
   }
 
-  // Show goal completion celebration
-  if (celebratingGoal) {
-    return (
-      <CelebrationScreen
-        title="Goal Complete!"
-        subtitle={celebratingGoal.title}
-        onButtonClick={() => setCelebratingGoal(null)}
-        buttonText="CONTINUE CHECK-IN"
-        icon={Trophy}
-        progress={100}
-      />
-    );
-  }
 
   return (
     <FullScreenLayout bgClass="bg-bg-card">
@@ -208,33 +132,27 @@ export default function CheckInPage() {
               </div>
             )}
 
-            {/* Step 2: Progress */}
+            {/* Step 2: Achievements */}
             {step === 2 && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-xl mx-auto">
                 {/* Icon Header - Outside Card */}
-                <div className="text-center mb-6 max-w-xl mx-auto">
+                <div className="text-center mb-6">
                   <div className="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <TrendingUp className="w-8 h-8 text-brand-primary" strokeWidth={1.5} />
+                    <Trophy className="w-8 h-8 text-brand-primary" strokeWidth={1.5} />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">What did you achieve?</h2>
-                  <p className="text-gray-500 mt-2 text-sm">Celebrate the steps you took this week, no matter how small.</p>
+                  <h2 className="text-2xl font-bold text-gray-900">What do you feel proud of this week?</h2>
+                  <p className="text-gray-500 mt-2 text-sm">Celebrate your wins this week, no matter how small.</p>
                 </div>
 
-                {/* Goal Cards */}
-                <div className="max-w-xl mx-auto w-full space-y-4">
-                  {goals.map((goal) => (
-                    <GoalProgressCard
-                      key={goal.id}
-                      goal={goal}
-                      onStepToggle={(stepId) => handleStepToggle(goal.id, stepId)}
-                    />
-                  ))}
-                  
-                  {goals.length === 0 && (
-                    <div className="py-12 text-center bg-white rounded-3xl border border-gray-100">
-                      <p className="text-gray-400">No active goals to check in on.</p>
-                    </div>
-                  )}
+                {/* Card - Input Only */}
+                <div className="p-5 bg-white rounded-3xl border border-gray-100">
+                  <textarea
+                    autoFocus
+                    value={draft.achievements}
+                    onChange={(e) => setDraft({ ...draft, achievements: e.target.value })}
+                    placeholder="I completed my first workout... or, I had a difficult conversation I'd been putting off..."
+                    className="w-full min-h-[180px] p-5 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base resize-none"
+                  />
                 </div>
               </div>
             )}

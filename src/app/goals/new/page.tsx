@@ -22,7 +22,6 @@ import {
   X,
 
   Briefcase,
-  Smile,
   Coins,
   Sprout,
   Home,
@@ -215,10 +214,9 @@ export default function NewGoalPage() {
                 </div>
 
                 <div className="p-5 bg-white rounded-3xl border border-gray-100">
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {([
                       { name: "Career", icon: Briefcase },
-                      { name: "Personal", icon: Smile },
                       { name: "Finance", icon: Coins },
                       { name: "Growth", icon: Sprout },
                       { name: "Wellbeing", icon: Heart },

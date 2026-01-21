@@ -6,7 +6,6 @@ import {
   Activity, 
   Heart, 
   Briefcase, 
-  Smile, 
   Coins, 
   Sprout, 
   Home,
@@ -28,10 +27,8 @@ export default function GoalCard({ goal }: GoalCardProps) {
 
   // Category icon map
   const iconMap: Record<GoalCategory, LucideIcon> = {
-
     Wellbeing: Heart,
     Career: Briefcase,
-    Personal: Smile,
     Finance: Coins,
     Finances: Coins,
     Growth: Sprout,

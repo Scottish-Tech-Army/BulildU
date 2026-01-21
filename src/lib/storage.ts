@@ -166,7 +166,7 @@ export function completeBaseline(): void {
 // Goals
 // =============================================================================
 
-export type GoalCategory = "Wellbeing" | "Career" | "Personal" | "Finance" | "Finances" | "Growth" | "Family" | "other";
+export type GoalCategory = "Wellbeing" | "Career" | "Finance" | "Finances" | "Growth" | "Family" | "other";
 
 export interface Action {
   id: string;
@@ -500,8 +500,9 @@ export interface CheckIn {
   id: string;
   date: string; // ISO date (YYYY-MM-DD)
   energyLevel: number; // 1-5 scale
+  achievements?: string; // User's self-reported achievements
   reflection?: string; // Optional weekly reflection
-  stepsCompleted: string[]; // IDs of steps marked complete this session
+  stepsCompleted: string[]; // IDs of steps marked complete this session (legacy)
   milestonesCompleted?: string[]; // Legacy
   createdAt: string; // ISO datetime
 }
@@ -554,7 +555,7 @@ export function saveCheckIn(
     stepsCompleted: checkIn.stepsCompleted || checkIn.milestonesCompleted || [],
     id: generateId(),
     createdAt: new Date().toISOString(),
-  } as CheckIn;
+  };
 
   const checkIns = getCheckIns();
   checkIns.push(newCheckIn);
