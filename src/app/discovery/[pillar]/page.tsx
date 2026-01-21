@@ -124,7 +124,9 @@ export default function PillarDetailPage() {
 
   // Handle hydration flag separately to avoid SSR mismatches
   useEffect(() => {
-    setIsHydrated(true);
+    requestAnimationFrame(() => {
+      setIsHydrated(true);
+    });
   }, []);
 
   if (!config) {

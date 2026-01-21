@@ -42,14 +42,16 @@ const PILLARS: PillarCard[] = [
 ];
 
 export default function DiscoveryPage() {
-  const [pillarData, setPillarData] = useState<Record<DiscoveryPillar, string[]>>(() => {
+  const [pillarData] = useState<Record<DiscoveryPillar, string[]>>(() => {
     if (typeof window === "undefined") return { skills: [], qualities: [], values: [], interests: [] };
     return getDiscoveryData();
   });
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setIsHydrated(true);
+    requestAnimationFrame(() => {
+      setIsHydrated(true);
+    });
   }, []);
 
   return (

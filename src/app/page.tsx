@@ -9,6 +9,7 @@ import {
   isOnboardingCompleted,
   hasCheckedInThisWeek,
   getMomentumDays,
+  isDiscoveryPopulated,
 } from "@/lib/storage";
 
 import BottomNav from "@/components/ui/BottomNav";
@@ -23,6 +24,7 @@ import {
 import GoalCard from "@/components/ui/GoalCard";
 import DailyQuote from "@/components/ui/DailyQuote";
 import { DottedEmptyState } from "@/components";
+import { Lightbulb } from "lucide-react";
 
 
 
@@ -42,6 +44,7 @@ export default function DashboardPage() {
   const [goals] = useState<Goal[]>(() => onboardingComplete ? getGoals() : []);
   const [showCheckInPrompt] = useState(() => onboardingComplete ? !hasCheckedInThisWeek() : false);
   const [momentum] = useState(() => onboardingComplete ? getMomentumDays() : 0);
+  const [isDiscoveryEmpty] = useState(() => onboardingComplete ? !isDiscoveryPopulated() : false);
 
   // Redirect to onboarding if not completed
   useEffect(() => {
@@ -174,13 +177,24 @@ export default function DashboardPage() {
           </div>
           </div>
 
-          {/* Divider */}
-          <div className="md:col-span-12">
-            <hr className="border-gray-200 my-2" />
-          </div>
+          {/* Main Content Area: Prompt / Goals */}
+          <div className={`md:col-span-12 ${isDiscoveryEmpty && activeGoals.length === 0 ? "grid md:grid-cols-2 gap-4" : ""}`}>
+            
+            {/* Discovery Prompt - Show if empty */}
+            {isDiscoveryEmpty && (
+              <div className="mb-4 md:mb-0">
+                <DottedEmptyState
+                  href="/discovery"
+                  title="Start your discovery journey"
+                  description="Explore your skills, values, and interests to build a clearer path forward."
+                  icon={Lightbulb}
+                  className="h-full"
+                />
+              </div>
+            )}
 
-          {/* Goals Overview / Empty State */}
-          <div className="md:col-span-12">
+            {/* Goals Overview / Empty State */}
+            <div className={activeGoals.length === 0 ? "h-full" : ""}>
             {activeGoals.length > 0 ? (
               <section className="mb-6">
                 <div className="flex items-center justify-between mb-4 mx-4">
@@ -235,6 +249,7 @@ export default function DashboardPage() {
                 </Link>
               </section>
             )}
+            </div>
           </div>
         </div>
       </div>

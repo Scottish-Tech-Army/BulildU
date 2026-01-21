@@ -770,3 +770,15 @@ export function removeDiscoveryItem(pillar: DiscoveryPillar, item: string): void
   data[pillar] = data[pillar].filter(i => i !== item);
   saveDiscoveryData(data);
 }
+/**
+ * Check if the discovery hub has been populated with any items
+ */
+export function isDiscoveryPopulated(): boolean {
+  const data = getDiscoveryData();
+  return (
+    data.skills.length > 0 ||
+    data.qualities.length > 0 ||
+    data.values.length > 0 ||
+    data.interests.length > 0
+  );
+}
