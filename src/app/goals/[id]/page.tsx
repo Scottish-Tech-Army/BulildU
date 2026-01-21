@@ -375,7 +375,7 @@ export default function GoalDetailPage() {
         {/* Row 3: Readiness (15/20 = 75%) | Timeline (5/20 = 25%) */}
         <div className="grid grid-cols-1 md:grid-cols-[repeat(20,minmax(0,1fr))] gap-6">
           {/* Readiness Card (75%) */}
-          <div className="md:col-span-[15] bg-warm-ivory rounded-2xl p-6 border border-brand-primary/10 flex flex-col shadow-[0_0_15px_rgba(0,0,0,0.08)]">
+          <div className="md:col-span-[15] bg-white rounded-2xl p-6 border border-gray-100 flex flex-col shadow-[0_0_15px_rgba(0,0,0,0.08)]">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-[10px] font-bold text-brand-primary/60 uppercase tracking-widest leading-none">Readiness</h3>
               <button
@@ -406,10 +406,10 @@ export default function GoalDetailPage() {
                     key={level}
                     className="group relative flex flex-col items-center gap-3"
                   >
-                    <div className={`w-20 h-20 rounded-2xl flex items-center justify-center font-black text-2xl transition-all duration-300 ${
+                    <div className={`w-20 h-20 rounded-2xl flex items-center justify-center font-black text-2xl transition-all duration-300 border ${
                       (goal.confidence || 0) >= level 
-                        ? "bg-brand-primary text-white" 
-                        : "bg-white text-gray-300 border border-gray-100"
+                        ? "bg-brand-primary text-white border-brand-primary" 
+                        : "bg-white text-gray-300 border-brand-primary/30"
                     }`}>
                       {level}
                     </div>

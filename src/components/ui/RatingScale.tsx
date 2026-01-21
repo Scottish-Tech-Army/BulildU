@@ -23,9 +23,10 @@ const RATING_LABELS = [
 ];
 
 /**
- * 5-point rating scale with large touch targets.
+ * 5-point rating scale with responsive touch targets.
+ * Compact on mobile, full size on iPad+.
  * Improved for accessibility:
- * - 48px+ touch targets (exceeds WCAG minimum)
+ * - 40px+ touch targets on mobile, 56px+ on tablet
  * - Descriptive aria-labels for screen readers
  * - Single row layout for easier scanning
  * - Clear visual selection state
@@ -39,14 +40,14 @@ export function RatingScale({
 }: RatingScaleProps) {
   return (
     <div 
-      className="space-y-4"
+      className="space-y-2 md:space-y-4"
       role="radiogroup"
       aria-label={question || "Rating scale from 1 to 5"}
     >
       {/* Centered Rating Control Container */}
       <div className="max-w-sm mx-auto">
-        {/* Rating buttons - centered row with consistent gaps */}
-        <div className="flex justify-center gap-2 sm:gap-3 mb-4">
+        {/* Rating buttons - responsive sizing */}
+        <div className="flex justify-center gap-1.5 md:gap-3 mb-2 md:mb-4">
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
@@ -55,7 +56,7 @@ export function RatingScale({
               aria-checked={value === num}
               aria-label={`${num} out of 5: ${RATING_LABELS[num - 1]}`}
               className={`
-                w-14 h-14 rounded-lg font-semibold text-lg
+                w-10 h-10 md:w-14 md:h-14 rounded-lg font-semibold text-base md:text-lg
                 transition-all duration-150
                 focus-ring
                 ${

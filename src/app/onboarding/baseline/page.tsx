@@ -162,10 +162,10 @@ export default function BaselinePage() {
         <div className="bg-white sticky top-0 z-30">
           <WizardHeader title="About U" />
         </div>
-        <div className="max-w-5xl mx-auto px-6 pb-6 w-full pt-6">
+        <div className="max-w-5xl mx-auto px-4 pb-4 w-full pt-4">
 
           {/* Progress Indicator */}
-          <div className="flex items-center justify-between mb-8 max-w-xl mx-auto">
+          <div className="flex items-center justify-between mb-4 max-w-xl mx-auto">
             <div className="flex gap-2 flex-1">
               {SECTIONS.map((_, idx) => (
                 <div 
@@ -179,18 +179,18 @@ export default function BaselinePage() {
           </div>
 
           {/* Section title centered */}
-          <div className="text-center mb-8">
-            <p className="text-2xl font-semibold text-[var(--color-charcoal)]">
+          <div className="text-center mb-4">
+            <p className="text-xl font-semibold text-[var(--color-charcoal)]">
               {section.title}
             </p>
           </div>
 
           {/* Section content */}
-          <div className="space-y-6 max-w-xl mx-auto">
+          <div className="space-y-4 max-w-xl mx-auto">
             {section.id === "situation" && (
               <>
-                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-[18px]">
+                <div className="text-center space-y-3">
+                  <p className="text-[var(--color-charcoal)] text-base">
                     Which best describes where you&apos;re at right now?
                   </p>
                   <ChoiceChips
@@ -202,8 +202,8 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.workStatus != null && (
-                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-[18px] text-center">
+                  <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 md:space-y-6 animate-fade-in text-center">
+                    <p className="text-[var(--color-charcoal)] text-sm md:text-lg text-center">
                       How satisfied are you with your current situation?
                     </p>
                     <RatingScale
@@ -219,8 +219,8 @@ export default function BaselinePage() {
 
             {section.id === "confidence" && (
               <>
-                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-[18px]">
+                <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 md:space-y-6 text-center">
+                  <p className="text-[var(--color-charcoal)] text-sm md:text-lg">
                     How confident do you feel in yourself right now?
                   </p>
                   <RatingScale
@@ -235,8 +235,8 @@ export default function BaselinePage() {
 
             {section.id === "aspirations" && (
               <>
-                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-[18px]">
+                <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 md:space-y-6 text-center">
+                  <p className="text-[var(--color-charcoal)] text-sm md:text-lg">
                     How clear do you feel about what you want for your future?
                   </p>
                   <RatingScale
@@ -248,8 +248,8 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.futureClarity != null && (
-                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-[18px]">
+                  <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 md:space-y-6 animate-fade-in text-center">
+                    <p className="text-[var(--color-charcoal)] text-sm md:text-lg">
                       How positive do you feel about your future?
                     </p>
                     <RatingScale
@@ -265,8 +265,8 @@ export default function BaselinePage() {
 
             {section.id === "wellbeing" && (
               <>
-                <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-[18px]">
+                <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 md:space-y-6 text-center">
+                  <p className="text-[var(--color-charcoal)] text-sm md:text-lg">
                     How well do you manage stress?
                   </p>
                   <RatingScale
@@ -278,8 +278,8 @@ export default function BaselinePage() {
                 </div>
 
                 {responses.stressLevel != null && (
-                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-[18px]">
+                  <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 md:space-y-6 animate-fade-in text-center">
+                    <p className="text-[var(--color-charcoal)] text-sm md:text-lg">
                       How would you rate your energy most days?
                     </p>
                     <RatingScale
@@ -292,8 +292,8 @@ export default function BaselinePage() {
                 )}
 
                 {responses.energyLevel != null && (
-                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-[18px]">
+                  <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 md:space-y-6 animate-fade-in text-center">
+                    <p className="text-[var(--color-charcoal)] text-sm md:text-lg">
                       How would you rate your life balance right now?
                     </p>
                     <RatingScale
@@ -317,22 +317,40 @@ export default function BaselinePage() {
                   </p>
                 </div>
 
-                <div className="p-5 bg-white rounded-3xl border border-gray-100 text-center space-y-4">
-                  <p className="text-[var(--color-charcoal)] text-[18px]">
-                    Pick a day
-                  </p>
-                  <ChoiceChips
-                    className="justify-center flex-wrap"
-                    options={DAY_OPTIONS}
-                    value={reminderDay}
-                    onChange={(v) => setReminderDay(v as ReminderDay)}
-                  />
-                </div>
+                {/* Show Pick a day card only when no day selected yet */}
+                {reminderDay == null && (
+                  <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 text-center space-y-3 md:space-y-4">
+                    <p className="text-[var(--color-charcoal)] text-sm md:text-lg">
+                      Pick a day
+                    </p>
+                    <ChoiceChips
+                      className="justify-center flex-wrap"
+                      options={DAY_OPTIONS}
+                      value={reminderDay}
+                      onChange={(v) => setReminderDay(v as ReminderDay)}
+                    />
+                  </div>
+                )}
 
+                {/* Once day is selected, show combined card with edit option */}
                 {reminderDay != null && (
-                  <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-3 animate-fade-in text-center" role="radiogroup" aria-label="Weekly check-in time">
-                    <p className="text-gray-900 font-medium">Pick a time</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="p-3 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-3 animate-fade-in text-center" role="radiogroup" aria-label="Weekly check-in time">
+                    {/* Selected day with edit option */}
+                    <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                      <span>Every</span>
+                      <button
+                        onClick={() => setReminderDay(null)}
+                        className="px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-full font-medium hover:bg-brand-primary/20 transition-colors flex items-center gap-1"
+                      >
+                        {DAY_OPTIONS.find(d => d.value === reminderDay)?.label}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-3 h-3">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                        </svg>
+                      </button>
+                    </div>
+                    
+                    <p className="text-gray-900 font-medium text-sm md:text-base">Pick a time</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                       <TimeOption
                         time="8:00 AM"
                         label="Morning"

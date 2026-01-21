@@ -18,17 +18,17 @@ interface ChoiceChipsProps {
 
 /**
  * Horizontal chip selection for Yes/No/Unsure or status options.
- * Full-width button style for easy tapping.
+ * Responsive: compact on mobile, full size on iPad+.
  */
 export function ChoiceChips({ options, value, onChange, className }: ChoiceChipsProps) {
   return (
-    <div className={`flex flex-wrap gap-3 justify-center ${className ?? ""}`}>
+    <div className={`flex flex-wrap gap-2 md:gap-3 justify-center ${className ?? ""}`}>
       {options.map((option) => (
         <button
           key={option.value}
           onClick={() => onChange(option.value)}
           className={`
-            px-6 py-3 rounded-full font-medium
+            px-3 py-1.5 md:px-6 md:py-3 text-xs md:text-base rounded-full font-medium
             transition-all duration-150
             focus-ring
             ${

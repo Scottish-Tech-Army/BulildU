@@ -39,8 +39,8 @@ export function TimeOption({
       role="radio"
       aria-checked={selected}
       className={`
-        w-full aspect-[3/1] md:aspect-square p-4 md:p-6 rounded-2xl border transition-all duration-150
-        flex flex-row md:flex-col items-center justify-start md:justify-center gap-4 md:gap-3 relative
+        w-full aspect-[3/1] md:aspect-square p-3 md:p-6 rounded-2xl border transition-all duration-150
+        flex flex-row md:flex-col items-center justify-start md:justify-center gap-3 md:gap-3 relative
         ${
           selected
             ? "border-brand-primary bg-brand-primary/5"
