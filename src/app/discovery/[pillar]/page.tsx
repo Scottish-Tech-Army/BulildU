@@ -35,7 +35,7 @@ interface PillarConfig {
 
 const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
   skills: {
-    title: "Skills",
+    title: "Add Skills",
     singular: "skill",
     icon: Wrench,
     purpose: "These help you recognise what you can already do.",
@@ -55,7 +55,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
     celebrationSubtitle: "You've recognised what you're capable of. These skills are the building blocks of your potential.",
   },
   qualities: {
-    title: "Qualities",
+    title: "Add Qualities",
     singular: "quality",
     icon: Star,
     purpose: "Build your confidence by identifying personal strengths and character traits.",
@@ -75,7 +75,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
     celebrationSubtitle: "Your qualities define your character. Acknowledging them is a powerful step toward self-belief.",
   },
   values: {
-    title: "Values",
+    title: "Add Values",
     singular: "value",
     icon: Compass,
     purpose: "These help you understand what truly matters to you.",
@@ -95,7 +95,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
     celebrationSubtitle: "Knowing your values helps you make choices that align with your true self.",
   },
   interests: {
-    title: "Interests",
+    title: "Add Interests",
     singular: "interest",
     icon: Heart,
     purpose: "These help you reignite your curiosity, motivation, and enjoyment.",
