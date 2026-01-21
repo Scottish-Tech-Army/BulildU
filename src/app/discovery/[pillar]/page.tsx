@@ -5,8 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { FullScreenLayout } from "@/components/layouts/FullScreenLayout";
 import {
   getDiscoveryData,
-  addDiscoveryItem,
-  removeDiscoveryItem,
+  saveDiscoveryData,
   type DiscoveryPillar,
 } from "@/lib/storage";
 import {
@@ -15,11 +14,12 @@ import {
   Sparkles,
   Heart,
   Compass,
-  ChevronLeft,
   X,
   Plus,
+  Check,
   type LucideIcon,
 } from "lucide-react";
+import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 
 // Pillar configuration
 interface PillarConfig {
@@ -29,6 +29,8 @@ interface PillarConfig {
   purpose: string;
   questions: string[];
   suggestions: string[];
+  celebrationTitle: string;
+  celebrationSubtitle: string;
 }
 
 const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
@@ -36,7 +38,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
     title: "Skills",
     singular: "skill",
     icon: Wrench,
-    purpose: "Help you recognise what you can already do.",
+    purpose: "These help you recognise what you can already do.",
     questions: [
       "What are you good at – at home, work, or in everyday life?",
       "What do people often come to you for?",
@@ -49,12 +51,14 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
       "Creativity",
       "Leadership",
     ],
+    celebrationTitle: "Skills Unlocked!",
+    celebrationSubtitle: "You've recognised what you're capable of. These skills are the building blocks of your potential.",
   },
   qualities: {
     title: "Qualities",
     singular: "quality",
     icon: Star,
-    purpose: "Build confidence by identifying personal strengths and character traits.",
+    purpose: "Build your confidence by identifying personal strengths and character traits.",
     questions: [
       "What personal qualities describe you?",
       "When have you shown resilience, kindness, leadership, or creativity?",
@@ -67,12 +71,14 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
       "Patient",
       "Honest",
     ],
+    celebrationTitle: "Strengths Recognised!",
+    celebrationSubtitle: "Your qualities define your character. Acknowledging them is a powerful step toward self-belief.",
   },
   values: {
     title: "Values",
     singular: "value",
     icon: Compass,
-    purpose: "Help you understand what truly matters to you.",
+    purpose: "These help you understand what truly matters to you.",
     questions: [
       "What matters most to you in life right now?",
       "What do you want more of in your future?",
@@ -85,12 +91,14 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
       "Security",
       "Freedom",
     ],
+    celebrationTitle: "Compass Set!",
+    celebrationSubtitle: "Knowing your values helps you make choices that align with your true self.",
   },
   interests: {
     title: "Interests",
     singular: "interest",
     icon: Heart,
-    purpose: "Reignite curiosity, motivation, and enjoyment.",
+    purpose: "These help you reignite your curiosity, motivation, and enjoyment.",
     questions: [
       "What do you enjoy doing?",
       "What topics or activities interest you?",
@@ -103,6 +111,8 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
       "Reading",
       "Cooking",
     ],
+    celebrationTitle: "Passions Ignited!",
+    celebrationSubtitle: "Exploring your interests brings energy and joy to your journey forward.",
   },
 };
 
@@ -111,23 +121,28 @@ export default function PillarDetailPage() {
   const params = useParams();
   const pillarKey = params.pillar as DiscoveryPillar;
 
-  const [items, setItems] = useState<string[]>(() => {
-    // Note: pillarKey is available since it's from useParams
-    if (typeof window === "undefined") return [];
-    const data = getDiscoveryData();
-    return (pillarKey && data[pillarKey]) ? data[pillarKey] : [];
-  });
+  const [items, setItems] = useState<string[]>([]);
+  const [initialItems, setInitialItems] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isHydrated, setIsHydrated] = useState(false);
+  const [isDone, setIsDone] = useState(false);
 
   const config = PILLAR_CONFIG[pillarKey];
 
-  // Handle hydration flag separately to avoid SSR mismatches
+  // Handle hydration and initial state
   useEffect(() => {
-    requestAnimationFrame(() => {
-      setIsHydrated(true);
-    });
-  }, []);
+    if (typeof window !== "undefined") {
+      const data = getDiscoveryData();
+      const currentItems = (pillarKey && data[pillarKey]) ? [...data[pillarKey]] : [];
+      
+      // Update state in next frame to avoid cascading render warning
+      requestAnimationFrame(() => {
+        setItems(currentItems);
+        setInitialItems(currentItems);
+        setIsHydrated(true);
+      });
+    }
+  }, [pillarKey]);
 
   if (!config) {
     router.push("/discovery");
@@ -145,15 +160,21 @@ export default function PillarDetailPage() {
       return;
     }
 
-    addDiscoveryItem(pillarKey, trimmed);
     setItems([...items, trimmed]);
     setInputValue("");
   };
 
   const handleRemoveItem = (item: string) => {
-    removeDiscoveryItem(pillarKey, item);
     setItems(items.filter(i => i !== item));
   };
+
+  const handleSave = () => {
+    if (!pillarKey) return;
+    saveDiscoveryData({ [pillarKey]: items });
+    setIsDone(true);
+  };
+
+  const isDirty = JSON.stringify([...items].sort()) !== JSON.stringify([...initialItems].sort());
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,6 +188,19 @@ export default function PillarDetailPage() {
 
   if (!isHydrated) {
     return null;
+  }
+
+  if (isDone) {
+    return (
+      <CelebrationScreen
+        progress={100}
+        icon={config.icon}
+        title={config.celebrationTitle}
+        subtitle={config.celebrationSubtitle}
+        buttonText="Back to Discovery"
+        onButtonClick={() => router.push("/discovery")}
+      />
+    );
   }
 
   return (
@@ -190,11 +224,11 @@ export default function PillarDetailPage() {
           </div>
 
           {/* Questions - Consolidated Card */}
-          <div className="space-y-4 mb-8">
+          <div className="space-y-4 mb-8 mx-4">
             <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">
               Reflect on these questions
             </h2>
-            <div className="bg-white rounded-3xl border border-gray-100 p-6 space-y-4 shadow-sm">
+            <div className="px-1 space-y-4">
               <ul className="space-y-4">
                 {config.questions.map((question, idx) => (
                   <li key={idx} className="flex gap-4">
@@ -275,14 +309,29 @@ export default function PillarDetailPage() {
       </div>
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50">
-        <div className="flex justify-center items-center h-16 max-w-xl mx-auto px-6">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe z-50 animate-in slide-in-from-bottom duration-500">
+        <div className="flex justify-between items-center h-20 max-w-xl mx-auto px-12">
           <button
             onClick={() => router.push("/discovery")}
-            className="flex items-center gap-2 text-brand-primary font-medium"
+            className="flex flex-col items-center justify-center text-brand-primary transition-colors gap-1 group"
           >
-            <ChevronLeft className="w-5 h-5" />
-            Back to Discovery
+            <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-1 group-active:scale-95 transition-transform">
+              <X className="w-6 h-6 text-brand-primary" />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-widest -mt-1">Cancel</span>
+          </button>
+
+          <button
+            onClick={handleSave}
+            disabled={!isDirty}
+            className={`flex flex-col items-center justify-center text-brand-primary transition-colors gap-1 group ${
+              !isDirty ? "opacity-30 pointer-events-none" : ""
+            }`}
+          >
+            <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-1 group-active:scale-95 transition-transform">
+              <Check className="w-6 h-6 text-brand-primary" />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider">Save</span>
           </button>
         </div>
       </nav>

@@ -44,7 +44,8 @@ export default function DashboardPage() {
   const [goals] = useState<Goal[]>(() => onboardingComplete ? getGoals() : []);
   const [showCheckInPrompt] = useState(() => onboardingComplete ? !hasCheckedInThisWeek() : false);
   const [momentum] = useState(() => onboardingComplete ? getMomentumDays() : 0);
-  const [isDiscoveryEmpty] = useState(() => onboardingComplete ? !isDiscoveryPopulated() : false);
+  // Reactive calculation for Discovery status (re-checks on navigation/render)
+  const isDiscoveryEmpty = onboardingComplete ? !isDiscoveryPopulated() : false;
 
   // Redirect to onboarding if not completed
   useEffect(() => {

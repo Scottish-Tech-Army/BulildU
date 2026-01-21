@@ -226,7 +226,7 @@ export function getGoals(): Goal[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.GOALS);
     if (!stored) return [];
-    const rawGoals = JSON.parse(stored) as any[];
+    const rawGoals = JSON.parse(stored) as Goal[];
     
     // Data Migration: Ensure 'steps' property exists
     return rawGoals.map(g => {
@@ -516,7 +516,7 @@ export function getCheckIns(): CheckIn[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEYS.CHECKINS);
     if (!stored) return [];
-    const rawCheckIns = JSON.parse(stored) as any[];
+    const rawCheckIns = JSON.parse(stored) as CheckIn[];
     
     // Data Migration: Ensure 'stepsCompleted' exists
     return rawCheckIns.map(c => {
