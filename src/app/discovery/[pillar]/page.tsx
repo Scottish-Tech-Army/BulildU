@@ -25,6 +25,7 @@ import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 interface PillarConfig {
   title: string;
   singular: string;
+  plural: string;
   icon: LucideIcon;
   purpose: string;
   questions: string[];
@@ -37,6 +38,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
   skills: {
     title: "Add Skills",
     singular: "skill",
+    plural: "skills",
     icon: Wrench,
     purpose: "These help you recognise what you can already do.",
     questions: [
@@ -57,6 +59,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
   qualities: {
     title: "Add Qualities",
     singular: "quality",
+    plural: "qualities",
     icon: Star,
     purpose: "Build your confidence by identifying personal strengths and character traits.",
     questions: [
@@ -77,6 +80,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
   values: {
     title: "Add Values",
     singular: "value",
+    plural: "values",
     icon: Compass,
     purpose: "These help you understand what truly matters to you.",
     questions: [
@@ -97,6 +101,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
   interests: {
     title: "Add Interests",
     singular: "interest",
+    plural: "interests",
     icon: Heart,
     purpose: "These help you reignite your curiosity, motivation, and enjoyment.",
     questions: [
@@ -285,7 +290,7 @@ export default function PillarDetailPage() {
           {items.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">
-                Your {config.title.toLowerCase()} ({items.length})
+                Your {config.plural} ({items.length})
               </h2>
               <div className="space-y-2">
                 {items.map((item) => (
