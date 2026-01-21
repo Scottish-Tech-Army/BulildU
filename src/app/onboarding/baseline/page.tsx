@@ -35,7 +35,7 @@ const WORK_STATUS_OPTIONS = [
 // Section definitions
 const SECTIONS = [
   { id: "situation", title: "Current Situation" },
-  { id: "confidence", title: "Confidence & Self-Esteem" },
+  { id: "confidence", title: "Confidence" },
   { id: "aspirations", title: "Aspirations for the Future" },
   { id: "wellbeing", title: "Wellbeing & Balance" },
   { id: "reminder", title: "Weekly Check-in" },

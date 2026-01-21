@@ -106,9 +106,8 @@ export interface BaselineResponse {
   workStatus?: WorkStatus;
   situationSatisfaction?: number; // 1-5
   
-  // Section 2: Confidence & Self-Esteem
+  // Section 2: Confidence
   confidence?: number; // 1-5
-  selfEsteem?: number; // 1-5
 
   // Section 3: Aspirations
   futureClarity?: number; // 1-5
