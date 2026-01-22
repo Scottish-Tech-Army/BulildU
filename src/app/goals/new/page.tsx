@@ -218,9 +218,9 @@ export default function NewGoalPage() {
                     {([
                       { name: "Career", icon: Briefcase },
                       { name: "Finance", icon: Coins },
-                      { name: "Growth", icon: Sprout },
+                      { name: "Personal Growth", icon: Sprout },
                       { name: "Wellbeing", icon: Heart },
-                      { name: "Family", icon: Home },
+                      { name: "Relationships", icon: Home },
                     ] as { name: GoalCategory; icon: LucideIcon }[]).map(({ name, icon: Icon }) => (
                       <button
                         key={name}
