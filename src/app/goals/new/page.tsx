@@ -433,7 +433,6 @@ export default function NewGoalPage() {
                     <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-brand-primary" />
                     <input
                       type="date"
-                      autoFocus
                       value={draft.targetDate}
                       onChange={(e) => updateDraft("targetDate", e.target.value)}
                       className="w-full h-14 px-5 pl-14 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base appearance-none cursor-pointer"
