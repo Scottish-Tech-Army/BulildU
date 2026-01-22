@@ -48,6 +48,9 @@
 }
 
 @theme inline {
+  /* Custom breakpoint for larger phones (400px+) */
+  --breakpoint-xs: 400px;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 

@@ -28,7 +28,8 @@ export function ChoiceChips({ options, value, onChange, className }: ChoiceChips
           key={option.value}
           onClick={() => onChange(option.value)}
           className={`
-            px-3 py-1.5 md:px-6 md:py-3 text-xs md:text-base rounded-full font-medium
+            px-4 py-2.5 xs:px-5 md:px-6 md:py-3 text-xs xs:text-sm md:text-base rounded-full font-medium
+            min-h-[44px] flex items-center justify-center
             transition-all duration-150
             focus-ring
             ${

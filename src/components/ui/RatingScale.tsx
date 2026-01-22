@@ -46,8 +46,8 @@ export function RatingScale({
     >
       {/* Centered Rating Control Container */}
       <div className="max-w-sm mx-auto">
-        {/* Rating buttons - responsive sizing */}
-        <div className="flex justify-center gap-1.5 md:gap-3 mb-2 md:mb-4">
+        {/* Rating buttons - responsive sizing with 44px minimum touch targets */}
+        <div className="flex justify-center gap-1.5 xs:gap-2 md:gap-3 mb-2 md:mb-4">
           {[1, 2, 3, 4, 5].map((num) => (
             <button
               key={num}
@@ -56,7 +56,7 @@ export function RatingScale({
               aria-checked={value === num}
               aria-label={`${num} out of 5: ${RATING_LABELS[num - 1]}`}
               className={`
-                w-10 h-10 md:w-14 md:h-14 rounded-lg font-semibold text-base md:text-lg
+                w-11 h-11 xs:w-12 xs:h-12 md:w-14 md:h-14 rounded-lg font-semibold text-base md:text-lg
                 transition-all duration-150
                 focus-ring
                 ${
