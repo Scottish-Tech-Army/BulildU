@@ -940,41 +940,38 @@ export default function GoalDetailPage() {
         </div>
       </BottomSheet>
 
-      {/* Goal Completion Confirmation Bottom Sheet */}
-      <BottomSheet
-        isOpen={showCompletionConfirm}
-        onClose={() => setShowCompletionConfirm(false)}
-        title="Goal Complete!"
-      >
-        <div className="space-y-6 pt-4 text-center">
-          <div className="w-20 h-20 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
-            <Trophy className="w-10 h-10 text-brand-primary" />
-          </div>
+      {/* Goal Completion Confirmation Modal */}
+      {showCompletionConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => setShowCompletionConfirm(false)} />
+          <div className="relative bg-white rounded-[40px] p-10 max-w-sm w-full text-center animate-in zoom-in-95 duration-300">
+            <div className="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
+              <Trophy className="w-12 h-12 text-brand-primary" />
+            </div>
 
-          <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-gray-900">Amazing work!</h3>
-            <p className="text-gray-500">
+            <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">Amazing work!</h2>
+            <p className="text-gray-500 mb-10 leading-relaxed text-sm">
               You&apos;ve completed all the steps for &quot;{goal?.title}&quot;.
               Would you like to mark this goal as officially complete?
             </p>
-          </div>
 
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={handleConfirmCompletion}
-              className="w-full bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-transform"
-            >
-              Yes, Mark as Complete
-            </button>
-            <button
-              onClick={() => setShowCompletionConfirm(false)}
-              className="w-full py-3 text-gray-400 font-bold text-xs hover:text-gray-600"
-            >
-              NOT YET, KEEP IT ACTIVE
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={handleConfirmCompletion}
+                className="w-full bg-brand-primary text-white py-5 rounded-full font-bold active:scale-95 transition-transform"
+              >
+                YES, MARK AS COMPLETE
+              </button>
+              <button
+                onClick={() => setShowCompletionConfirm(false)}
+                className="w-full py-5 rounded-full font-bold text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                NOT YET, KEEP IT ACTIVE
+              </button>
+            </div>
           </div>
         </div>
-      </BottomSheet>
+      )}
 
     </div>
   );
