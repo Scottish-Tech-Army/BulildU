@@ -15,7 +15,7 @@ export default function WelcomePage() {
 
   const handleGetStarted = () => {
     // Will navigate to baseline quiz in Chunk 3
-    router.push("/onboarding/baseline");
+    router.push("/onboarding/carousel");
   };
 
   return (
