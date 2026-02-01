@@ -321,9 +321,11 @@ function syncGoalStatus(goal: Goal): Goal {
 
   const allCompleted = goal.steps.every((s) => s.completed);
 
-  if (allCompleted && goal.status !== "completed") {
-    goal.status = "completed";
-  } else if (!allCompleted && goal.status === "completed") {
+  // If all steps are completed, we used to automatically mark the goal as complete.
+  // We've modified this to wait for explicit user confirmation.
+  // HOWEVER, we still automatically revert from 'completed' to 'active'
+  // if a step is UNCHECKED, to ensure the status remains accurate.
+  if (!allCompleted && goal.status === "completed") {
     goal.status = "active";
   }
 

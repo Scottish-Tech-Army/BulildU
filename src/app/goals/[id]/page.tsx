@@ -75,6 +75,7 @@ export default function GoalDetailPage() {
 
   // Celebration state
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showCompletionConfirm, setShowCompletionConfirm] = useState(false);
 
   const refreshGoal = useCallback(() => {
     if (id) {
@@ -102,10 +103,18 @@ export default function GoalDetailPage() {
     toggleStep(goal.id, stepId);
     refreshGoal();
 
-    // Show celebration if goal just became 100% complete
+    // Show confirmation modal if goal just became 100% complete
     if (willBeFullyComplete) {
-      setShowCelebration(true);
+      setShowCompletionConfirm(true);
     }
+  };
+
+  const handleConfirmCompletion = () => {
+    if (!goal) return;
+    updateGoal(goal.id, { status: "completed" });
+    refreshGoal();
+    setShowCompletionConfirm(false);
+    setShowCelebration(true);
   };
 
   const handleAddStep = () => {
@@ -928,6 +937,42 @@ export default function GoalDetailPage() {
           >
             Save Changes
           </button>
+        </div>
+      </BottomSheet>
+
+      {/* Goal Completion Confirmation Bottom Sheet */}
+      <BottomSheet
+        isOpen={showCompletionConfirm}
+        onClose={() => setShowCompletionConfirm(false)}
+        title="Goal Complete!"
+      >
+        <div className="space-y-6 pt-4 text-center">
+          <div className="w-20 h-20 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
+            <Trophy className="w-10 h-10 text-brand-primary" />
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold text-gray-900">Amazing work!</h3>
+            <p className="text-gray-500">
+              You&apos;ve completed all the steps for &quot;{goal?.title}&quot;.
+              Would you like to mark this goal as officially complete?
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleConfirmCompletion}
+              className="w-full bg-brand-primary text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest active:scale-95 transition-transform"
+            >
+              Yes, Mark as Complete
+            </button>
+            <button
+              onClick={() => setShowCompletionConfirm(false)}
+              className="w-full py-3 text-gray-400 font-bold text-xs hover:text-gray-600"
+            >
+              NOT YET, KEEP IT ACTIVE
+            </button>
+          </div>
         </div>
       </BottomSheet>
 
