@@ -72,7 +72,7 @@ export default function BaselinePage() {
 
   // Form state - all questions
   const [responses, setResponses] = useState<Partial<BaselineResponse>>({});
-  
+
   // Reminder state
   const [reminderDay, setReminderDay] = useState<ReminderDay | null>(null);
   const [reminderTime, setReminderTime] = useState<ReminderTime | null>(null);
@@ -96,11 +96,11 @@ export default function BaselinePage() {
     // Final section - save and go to dashboard
     saveBaselineResponse(responses);
     completeBaseline();
-    
+
     // Calculate reminder date as one week from now
     const nextWeek = new Date();
     nextWeek.setDate(nextWeek.getDate() + 7);
-    
+
     // Save reminder preferences and mark complete
     saveOnboardingState({
       currentStep: 7,
@@ -149,7 +149,7 @@ export default function BaselinePage() {
         progress={100}
         icon={Sparkles}
         title="You're All Set!"
-        subtitle="You've completed your baseline assessment. Let's start moving towards your potential."
+        subtitle="Let's start moving towards your potential."
         buttonText="GO TO DASHBOARD"
         onButtonClick={handleFinish}
       />
@@ -168,11 +168,10 @@ export default function BaselinePage() {
           <div className="flex items-center justify-between mb-4 max-w-xl mx-auto">
             <div className="flex gap-2 flex-1">
               {SECTIONS.map((_, idx) => (
-                <div 
+                <div
                   key={idx}
-                  className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${
-                    idx <= currentSection ? "bg-brand-primary" : "bg-gray-100"
-                  }`}
+                  className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${idx <= currentSection ? "bg-brand-primary" : "bg-gray-100"
+                    }`}
                 />
               ))}
             </div>
@@ -348,7 +347,7 @@ export default function BaselinePage() {
                         </svg>
                       </button>
                     </div>
-                    
+
                     <p className="text-gray-900 font-medium text-sm md:text-base">Pick a time</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                       <TimeOption
@@ -383,18 +382,17 @@ export default function BaselinePage() {
           <button
             onClick={handleBack}
             disabled={currentSection === 0}
-            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
-              currentSection === 0 
-                ? "text-gray-300 cursor-not-allowed" 
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${currentSection === 0
+                ? "text-gray-300 cursor-not-allowed"
                 : "text-gray-400 hover:text-brand-primary"
-            }`}
+              }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
             <span className="text-xs mt-1">Back</span>
           </button>
-          
+
           {/* Cancel */}
           <button
             onClick={handleCancel}
@@ -405,16 +403,15 @@ export default function BaselinePage() {
             </svg>
             <span className="text-xs mt-1">Cancel</span>
           </button>
-          
+
           {/* Next/Continue */}
           <button
             onClick={handleNext}
             disabled={!isSectionComplete()}
-            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
-              isSectionComplete() 
-                ? "text-brand-primary" 
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isSectionComplete()
+                ? "text-brand-primary"
                 : "text-gray-300 cursor-not-allowed"
-            }`}
+              }`}
           >
             {isLastSection ? (
               <>

@@ -105,7 +105,7 @@ export interface BaselineResponse {
   // Section 1: Current Situation
   workStatus?: WorkStatus;
   situationSatisfaction?: number; // 1-5
-  
+
   // Section 2: Confidence
   confidence?: number; // 1-5
 
@@ -166,7 +166,7 @@ export function completeBaseline(): void {
 // Goals
 // =============================================================================
 
-export type GoalCategory = "Wellbeing" | "Career" | "Finance" | "Finances" | "Growth" | "Family" | "other";
+export type GoalCategory = "Wellbeing" | "Career" | "Finance" | "Personal Growth" | "Relationships" | "other";
 
 export interface Action {
   id: string;
@@ -226,7 +226,7 @@ export function getGoals(): Goal[] {
     const stored = localStorage.getItem(STORAGE_KEYS.GOALS);
     if (!stored) return [];
     const rawGoals = JSON.parse(stored) as Goal[];
-    
+
     // Data Migration: Ensure 'steps' property exists
     return rawGoals.map(g => {
       if (!g.steps && g.milestones) {
@@ -320,7 +320,7 @@ function syncGoalStatus(goal: Goal): Goal {
   }
 
   const allCompleted = goal.steps.every((s) => s.completed);
-  
+
   if (allCompleted && goal.status !== "completed") {
     goal.status = "completed";
   } else if (!allCompleted && goal.status === "completed") {
@@ -348,10 +348,10 @@ export function addMilestone(
 
   goal.steps.push(newStep);
   syncGoalStatus(goal);
-  
-  updateGoal(goalId, { 
+
+  updateGoal(goalId, {
     steps: goal.steps,
-    status: goal.status 
+    status: goal.status
   });
 
   return newStep;
@@ -375,10 +375,10 @@ export function toggleMilestone(
 
   step.completed = !step.completed;
   syncGoalStatus(goal);
-  
-  updateGoal(goalId, { 
+
+  updateGoal(goalId, {
     steps: goal.steps,
-    status: goal.status 
+    status: goal.status
   });
 
   return true;
@@ -401,9 +401,9 @@ export function deleteMilestone(goalId: string, stepId: string): boolean {
 
   syncGoalStatus(goal);
 
-  updateGoal(goalId, { 
+  updateGoal(goalId, {
     steps: goal.steps,
-    status: goal.status 
+    status: goal.status
   });
   return true;
 }
@@ -428,9 +428,9 @@ export function updateMilestone(
   Object.assign(step, updates);
   syncGoalStatus(goal);
 
-  updateGoal(goalId, { 
+  updateGoal(goalId, {
     steps: goal.steps,
-    status: goal.status 
+    status: goal.status
   });
   return true;
 }
@@ -517,7 +517,7 @@ export function getCheckIns(): CheckIn[] {
     const stored = localStorage.getItem(STORAGE_KEYS.CHECKINS);
     if (!stored) return [];
     const rawCheckIns = JSON.parse(stored) as CheckIn[];
-    
+
     // Data Migration: Ensure 'stepsCompleted' exists
     return rawCheckIns.map(c => {
       if (!c.stepsCompleted && c.milestonesCompleted) {
@@ -538,8 +538,8 @@ export function getCheckIns(): CheckIn[] {
 export function getLastCheckIn(): CheckIn | null {
   const checkIns = getCheckIns();
   if (checkIns.length === 0) return null;
-  
-  return checkIns.sort((a, b) => 
+
+  return checkIns.sort((a, b) =>
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )[0];
 }
@@ -559,7 +559,7 @@ export function saveCheckIn(
 
   const checkIns = getCheckIns();
   checkIns.push(newCheckIn);
-  
+
   if (!isBrowser()) return newCheckIn;
   localStorage.setItem(STORAGE_KEYS.CHECKINS, JSON.stringify(checkIns));
 
@@ -599,7 +599,7 @@ export function getMomentumDays(): number {
   const checkIns = getCheckIns();
   if (checkIns.length === 0) return 0;
 
-  const sorted = checkIns.sort((a, b) => 
+  const sorted = checkIns.sort((a, b) =>
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
@@ -642,46 +642,46 @@ export function getWeeklyMomentumData(weeksCount: number = 8): WeeklyMomentumDat
   const checkIns = getCheckIns();
   const goals = getGoals();
   const totalSteps = goals.reduce((sum, g) => sum + g.steps.length, 0);
-  
+
   const weeks: WeeklyMomentumData[] = [];
   const now = new Date();
-  
+
   for (let i = weeksCount - 1; i >= 0; i--) {
     const weekStart = getWeekStart(new Date(now));
     weekStart.setDate(weekStart.getDate() - (i * 7));
-    
+
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 7);
-    
+
     const weekCheckIns = checkIns.filter(c => {
       const checkInDate = new Date(c.createdAt);
       return checkInDate >= weekStart && checkInDate < weekEnd;
     });
-    
+
     const hasCheckIn = weekCheckIns.length > 0;
     const avgEnergy = hasCheckIn
       ? weekCheckIns.reduce((sum, c) => sum + c.energyLevel, 0) / weekCheckIns.length
       : null;
-    
+
     const stepsCompleted = weekCheckIns.reduce(
       (sum, c) => sum + c.stepsCompleted.length,
       0
     );
-    
+
     let score = 0;
     if (hasCheckIn) {
-      score += 40; 
+      score += 40;
       score += avgEnergy ? ((avgEnergy - 1) / 4) * 30 : 0;
-      score += totalSteps > 0 
+      score += totalSteps > 0
         ? Math.min(30, (stepsCompleted / totalSteps) * 100 * 0.3)
         : 0;
     }
-    
+
     const weekLabel = weekStart.toLocaleDateString("en-US", {
       month: "short",
       day: "2-digit",
     });
-    
+
     weeks.push({
       weekStart,
       weekLabel,
@@ -691,7 +691,7 @@ export function getWeeklyMomentumData(weeksCount: number = 8): WeeklyMomentumDat
       score: Math.round(score),
     });
   }
-  
+
   return weeks;
 }
 
@@ -738,8 +738,8 @@ export function saveDiscoveryData(data: Partial<DiscoveryData>): void {
   if (!isBrowser()) return;
 
   const current = getDiscoveryData();
-  const updated = { 
-    ...current, 
+  const updated = {
+    ...current,
     ...data,
     updatedAt: new Date().toISOString()
   };
@@ -752,12 +752,12 @@ export function saveDiscoveryData(data: Partial<DiscoveryData>): void {
 export function addDiscoveryItem(pillar: DiscoveryPillar, item: string): void {
   const data = getDiscoveryData();
   const trimmed = item.trim();
-  
+
   // Avoid duplicates (case-insensitive)
   if (data[pillar].some(i => i.toLowerCase() === trimmed.toLowerCase())) {
     return;
   }
-  
+
   data[pillar] = [...data[pillar], trimmed];
   saveDiscoveryData(data);
 }

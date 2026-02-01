@@ -8,10 +8,10 @@ import { StepInput } from "@/components/ui/StepInput";
 import { StepItem } from "@/components/ui/StepItem";
 import { CelebrationScreen } from "@/components/ui/CelebrationScreen";
 import DailyQuote from "@/components/ui/DailyQuote";
-import { 
-  Target, 
-  Sparkles, 
-  Calendar, 
+import {
+  Target,
+  Sparkles,
+  Calendar,
   Heart,
   AlertCircle,
   ChevronLeft,
@@ -30,15 +30,15 @@ import {
   type LucideIcon
 } from "lucide-react";
 
-type GoalCreationStep = 
+type GoalCreationStep =
   | "intro"
   | "category"
-  | "why" 
-  | "title" 
-  | "measurable" 
-  | "achievable" 
-  | "date" 
-  | "steps" 
+  | "why"
+  | "title"
+  | "measurable"
+  | "achievable"
+  | "date"
+  | "steps"
   | "done";
 
 interface StepDraft {
@@ -55,6 +55,57 @@ interface FullGoalDraft {
   targetDate: string;
   steps: StepDraft[];
 }
+
+const CATEGORY_CONTENT: Record<GoalCategory, {
+  tip: string;
+  titlePlaceholder: string;
+  whyPlaceholder: string;
+  measurablePlaceholder: string;
+  stepPlaceholder: string;
+}> = {
+  "Career": {
+    tip: "Career goals help you shape your professional future - whether that's aiming for a promotion, exploring a new role, or taking steps toward self-employment. This is your space to set goals that move you toward the career path you truly want, at a pace that works for you.",
+    titlePlaceholder: "e.g. Apply for 3 new job opportunities in my field",
+    whyPlaceholder: "e.g. I want to feel more confident in my professional skills and open up new opportunities for growth...",
+    measurablePlaceholder: "e.g. Apply for 3 jobs, update my CV, complete 2 networking conversations, secure 1 interview...",
+    stepPlaceholder: "e.g. Update CV and LinkedIn profile"
+  },
+  "Wellbeing": {
+    tip: "Wellbeing goals help you care for yourself so you can thrive in all areas of life. You might set a goal to take part in activities that re-energise you, such as a weekly nature walk, or to prioritise rest and recovery through intentional downtime or a calming evening routine.",
+    titlePlaceholder: "e.g. Go for a 30-minute walk 3 times a week",
+    whyPlaceholder: "e.g. I want to feel more energised so I can spend better quality time with my family...",
+    measurablePlaceholder: "e.g. Complete 3 walks per week, feel more rested, notice improved energy levels...",
+    stepPlaceholder: "e.g. Schedule 3 walks in my calendar"
+  },
+  "Personal Growth": {
+    tip: "Personal growth is your opportunity to expand your knowledge and skills through lifelong learning. You might set a goal to enrol in a short, accredited qualification, take an online course to build a new skill, or pursue learning that supports both personal and professional development.",
+    titlePlaceholder: "e.g. Complete an online course in digital marketing",
+    whyPlaceholder: "e.g. I want to build new skills that will help me feel more capable and confident in different areas of my life...",
+    measurablePlaceholder: "e.g. Complete 1 online course, practice new skill 3 times per week, earn a certificate...",
+    stepPlaceholder: "e.g. Research and enroll in a course"
+  },
+  "Relationships": {
+    tip: "Relationships are key to a fulfilling life. You might set a goal to spend quality time with family or friends, strengthen important connections, or build professional relationships and networks that support your future opportunities.",
+    titlePlaceholder: "e.g. Have a weekly coffee date with a close friend",
+    whyPlaceholder: "e.g. I want to strengthen my connections with people who matter to me and feel less isolated...",
+    measurablePlaceholder: "e.g. Have 1 meaningful conversation per week, arrange 2 social activities, reconnect with 3 friends...",
+    stepPlaceholder: "e.g. Text a friend to arrange coffee"
+  },
+  "Finance": {
+    tip: "Financial goals help you create stability, security, and a more comfortable way of living. This might include easing financial pressure, enjoying more time and experiences with your family, or having more flexibility and control over your future.",
+    titlePlaceholder: "e.g. Save £500 towards an emergency fund",
+    whyPlaceholder: "e.g. I want to feel more secure and have less stress about unexpected expenses...",
+    measurablePlaceholder: "e.g. Save £50 per week, reduce spending by £100 per month, build £500 emergency fund...",
+    stepPlaceholder: "e.g. Set up automatic savings transfer"
+  },
+  "other": {
+    tip: "",
+    titlePlaceholder: "",
+    whyPlaceholder: "",
+    measurablePlaceholder: "",
+    stepPlaceholder: ""
+  }
+};
 
 /**
  * Goal Creation Wizard
@@ -113,10 +164,10 @@ export default function NewGoalPage() {
         id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         completed: false
       })),
-      feelWhenDone: "", 
+      feelWhenDone: "",
       actions: []
     };
-    
+
     createGoal(newGoalData);
     setStep("done");
   };
@@ -173,17 +224,16 @@ export default function NewGoalPage() {
             <h1 className="text-2xl text-[var(--color-charcoal)]">New Goal</h1>
           </div>
         </header>
-        
+
         <div className="max-w-xl mx-auto w-full px-6 pt-8 pb-32">
           {/* Progress Indicator */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex gap-1.5 flex-1">
               {STEPS_ORDER.slice(0, -1).map((s, idx) => (
-                <div 
+                <div
                   key={s}
-                  className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${
-                    idx <= currentIndex ? "bg-brand-primary" : "bg-gray-100"
-                  }`}
+                  className={`h-1.5 rounded-full flex-1 transition-all duration-500 ${idx <= currentIndex ? "bg-brand-primary" : "bg-gray-100"
+                    }`}
                 />
               ))}
             </div>
@@ -225,11 +275,10 @@ export default function NewGoalPage() {
                       <button
                         key={name}
                         onClick={() => updateDraft("category", name)}
-                        className={`flex items-center gap-3 py-4 px-5 rounded-2xl text-base font-medium transition-all capitalize ${
-                          draft.category === name
-                            ? "bg-brand-primary text-white"
-                            : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                        }`}
+                        className={`flex items-center gap-3 py-4 px-5 rounded-2xl text-base font-medium transition-all capitalize ${draft.category === name
+                          ? "bg-brand-primary text-white"
+                          : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                          }`}
                       >
                         <Icon className="w-5 h-5" />
                         {name}
@@ -239,7 +288,7 @@ export default function NewGoalPage() {
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 mt-4">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                     <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      Tip: [PLACEHOLDER - Get tip from client]
+                      {CATEGORY_CONTENT[draft.category].tip}
                     </p>
                   </div>
                 </div>
@@ -258,7 +307,7 @@ export default function NewGoalPage() {
                     <p className="text-gray-500 text-sm">Connect with your motivation</p>
                   </div>
                 </div>
-                
+
                 <div className="p-5 bg-white rounded-3xl border border-gray-100 space-y-4">
                   <label className="text-[10px] font-bold text-[var(--color-magenta)] uppercase tracking-widest px-1">
                     What makes this goal important to you right now?
@@ -267,8 +316,8 @@ export default function NewGoalPage() {
                     autoFocus
                     value={draft.whyMatters}
                     onChange={(e) => updateDraft("whyMatters", e.target.value)}
-                    placeholder="e.g. I want to feel more energised so I can spend better quality time with my family..."
-                    className="w-full min-h-[160px] p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-base leading-relaxed"
+                    placeholder={CATEGORY_CONTENT[draft.category].whyPlaceholder}
+                    className="w-full min-h-[160px] p-4 rounded-2xl bg-gray-50 border-none focus:outline-none focus:ring-2 focus:ring-brand-primary/40 text-gray-900 resize-none text-base leading-relaxed"
                   />
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
@@ -302,13 +351,14 @@ export default function NewGoalPage() {
                     autoFocus
                     value={draft.title}
                     onChange={(e) => updateDraft("title", e.target.value)}
-                    placeholder="e.g. Run 5km without stopping"
-                    className="w-full h-14 px-5 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base"
+                    placeholder={CATEGORY_CONTENT[draft.category].titlePlaceholder}
+                    className="w-full h-14 px-5 rounded-2xl bg-gray-50 border-none focus:outline-none focus:ring-2 focus:ring-brand-primary/40 text-gray-900 text-base"
                   />
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                     <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      Tip: [PLACEHOLDER - Get tip from client]
+                      Empowering you to take action,
+                      Moving forward with intention
                     </p>
                   </div>
                 </div>
@@ -342,13 +392,14 @@ export default function NewGoalPage() {
                     autoFocus
                     value={draft.successCriteria}
                     onChange={(e) => updateDraft("successCriteria", e.target.value)}
-                    placeholder="e.g. apply for 3 jobs, complete 1 online accredited course, secure 1 interview etc."
-                    className="w-full min-h-[120px] p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 resize-none text-base leading-relaxed"
+                    placeholder={CATEGORY_CONTENT[draft.category].measurablePlaceholder}
+                    className="w-full min-h-[120px] p-4 rounded-2xl bg-gray-50 border-none focus:outline-none focus:ring-2 focus:ring-brand-primary/40 text-gray-900 resize-none text-base leading-relaxed"
                   />
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                     <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      Tip: [PLACEHOLDER - Get tip from client]
+                      Tip: This doesn’t need to be measured in numbers. It might be a change in how you feel, what
+                      you’re doing more of, or what feels easier over time.
                     </p>
                   </div>
                 </div>
@@ -372,23 +423,22 @@ export default function NewGoalPage() {
                   <label className="text-[10px] font-bold text-[var(--color-magenta)] uppercase tracking-widest block text-center">
                     On a scale of 1-5, how confident are you that you can achieve this?
                   </label>
-                  
+
                   <div className="flex items-center justify-center gap-2 sm:gap-3 max-w-sm mx-auto">
                     {[1, 2, 3, 4, 5].map((level) => (
                       <button
                         key={level}
                         onClick={() => updateDraft("confidence", level)}
-                        className={`w-14 h-14 rounded-lg font-bold text-xl transition-all ${
-                          draft.confidence === level
-                            ? "bg-brand-primary text-white scale-105 shadow-md"
-                            : "bg-gray-50 text-gray-400 hover:bg-gray-100"
-                        }`}
+                        className={`w-14 h-14 rounded-lg font-bold text-xl transition-all ${draft.confidence === level
+                          ? "bg-brand-primary text-white scale-105 shadow-md"
+                          : "bg-gray-50 text-gray-400 hover:bg-gray-100"
+                          }`}
                       >
                         {level}
                       </button>
                     ))}
                   </div>
-                  
+
                   <div className="flex justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest max-w-sm mx-auto px-2">
                     <span>Not confident</span>
                     <span>Very confident</span>
@@ -405,7 +455,7 @@ export default function NewGoalPage() {
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                     <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      Tip: [PLACEHOLDER - Get tip from client]
+                      Tip: Your answer helps you decide whether this goal feels realistic and achievable right now.
                     </p>
                   </div>
                 </div>
@@ -435,10 +485,10 @@ export default function NewGoalPage() {
                       type="date"
                       value={draft.targetDate}
                       onChange={(e) => updateDraft("targetDate", e.target.value)}
-                      className="w-full h-14 px-5 pl-14 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base appearance-none cursor-pointer"
+                      className="w-full h-14 px-5 pl-14 rounded-2xl bg-gray-50 border-none focus:outline-none focus:ring-2 focus:ring-brand-primary/40 text-gray-900 text-base appearance-none cursor-pointer"
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     {[
                       { label: "1 Week", days: 7 },
@@ -464,7 +514,8 @@ export default function NewGoalPage() {
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                     <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      Tip: [PLACEHOLDER - Get tip from client]
+                      Tip: Choose a timeframe that feels realistic and achievable for your life right now - it’s okay to
+                      start small and adjust later.
                     </p>
                   </div>
                 </div>
@@ -485,8 +536,8 @@ export default function NewGoalPage() {
                 </div>
 
                 <div className="space-y-6">
-                  <StepInput onAdd={addStep} />
-                  
+                  <StepInput onAdd={addStep} placeholder={CATEGORY_CONTENT[draft.category].stepPlaceholder} />
+
                   {draft.steps.length > 0 && (
                     <div className="space-y-4 pt-4">
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">
@@ -494,9 +545,9 @@ export default function NewGoalPage() {
                       </p>
                       <div className="space-y-2">
                         {draft.steps.map((s, index) => (
-                          <StepItem 
-                            key={index} 
-                            title={s.title} 
+                          <StepItem
+                            key={index}
+                            title={s.title}
                             targetDate={s.targetDate}
                             onRemove={() => removeStep(index)}
                           />
@@ -507,7 +558,7 @@ export default function NewGoalPage() {
                   <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
                     <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
                     <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      Tip: [PLACEHOLDER - Get tip from client]
+                      Tip: Start with one small, clear action - something you could realistically do this week.
                     </p>
                   </div>
                 </div>
@@ -541,9 +592,8 @@ export default function NewGoalPage() {
           <button
             onClick={currentIndex === totalStepsCount - 1 ? handleSave : handleNext}
             disabled={!canProceed()}
-            className={`flex flex-col items-center justify-center w-full h-full transition-colors gap-1 ${
-              canProceed() ? "text-brand-primary" : "text-gray-300 pointer-events-none"
-            }`}
+            className={`flex flex-col items-center justify-center w-full h-full transition-colors gap-1 ${canProceed() ? "text-brand-primary" : "text-gray-300 pointer-events-none"
+              }`}
           >
             {currentIndex === totalStepsCount - 1 ? (
               <Check className="w-6 h-6" />

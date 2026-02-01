@@ -37,7 +37,7 @@ const PILLARS: PillarCard[] = [
     key: "interests",
     title: "Interests",
     icon: <Heart className="w-6 h-6" />,
-    description: "What excites you",
+    description: "What you enjoy",
   },
 ];
 
@@ -70,7 +70,7 @@ export default function DiscoveryPage() {
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 pt-4">
         <div className="py-6">
           <QuoteCard label="Reflection" variant="ripple">
-            Before setting goals, take time to reconnect with who you are. 
+            Before setting goals, take time to reconnect with who you are.
             Explore each area to build self-awareness and clarity.
           </QuoteCard>
         </div>
@@ -104,7 +104,7 @@ export default function DiscoveryPage() {
                   {items.length > 0 && (
                     <div className="flex flex-wrap gap-2 pt-1">
                       {displayItems.map((item, idx) => (
-                        <span 
+                        <span
                           key={idx}
                           className="px-3 py-1 bg-deep-violet/5 text-deep-violet text-xs font-medium rounded-full border border-deep-violet/10"
                         >

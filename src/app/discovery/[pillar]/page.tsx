@@ -64,7 +64,7 @@ const PILLAR_CONFIG: Record<DiscoveryPillar, PillarConfig> = {
     purpose: "Build your confidence by identifying personal strengths and character traits.",
     questions: [
       "What personal qualities describe you?",
-      "When have you shown resilience, kindness, leadership, or creativity?",
+      "What do people appreciate about you?",
       "What qualities help you get through challenges?",
     ],
     suggestions: [
@@ -139,7 +139,7 @@ export default function PillarDetailPage() {
     if (typeof window !== "undefined") {
       const data = getDiscoveryData();
       const currentItems = (pillarKey && data[pillarKey]) ? [...data[pillarKey]] : [];
-      
+
       // Update state in next frame to avoid cascading render warning
       requestAnimationFrame(() => {
         setItems(currentItems);
@@ -159,7 +159,7 @@ export default function PillarDetailPage() {
   const handleAddItem = (item: string) => {
     const trimmed = item.trim();
     if (!trimmed) return;
-    
+
     // Check for duplicates
     if (items.some(i => i.toLowerCase() === trimmed.toLowerCase())) {
       return;
@@ -253,16 +253,15 @@ export default function PillarDetailPage() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={`Add a ${config.singular}...`}
-                className="flex-1 h-12 px-4 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary text-gray-900"
+                className="flex-1 h-12 px-4 rounded-xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-primary/40 focus:border-brand-primary text-gray-900"
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim()}
-                className={`h-12 w-12 rounded-xl flex items-center justify-center transition-colors ${
-                  inputValue.trim()
-                    ? "bg-brand-primary text-white"
-                    : "bg-gray-100 text-gray-400"
-                }`}
+                className={`h-12 w-12 rounded-xl flex items-center justify-center transition-colors ${inputValue.trim()
+                  ? "bg-brand-primary text-white"
+                  : "bg-gray-100 text-gray-400"
+                  }`}
               >
                 <Plus className="w-5 h-5" />
               </button>
@@ -329,9 +328,8 @@ export default function PillarDetailPage() {
           <button
             onClick={handleSave}
             disabled={!isDirty}
-            className={`flex flex-col items-center justify-center text-brand-primary transition-colors gap-1 group ${
-              !isDirty ? "opacity-30 pointer-events-none" : ""
-            }`}
+            className={`flex flex-col items-center justify-center text-brand-primary transition-colors gap-1 group ${!isDirty ? "opacity-30 pointer-events-none" : ""
+              }`}
           >
             <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-1 group-active:scale-95 transition-transform">
               <Check className="w-6 h-6 text-brand-primary" />

@@ -41,7 +41,7 @@ export function StepInput({
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             placeholder={placeholder}
-            className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-[var(--color-magenta)]/20 text-gray-900 placeholder:text-gray-300"
+            className="w-full p-4 rounded-2xl bg-gray-50 border-none focus:outline-none focus:ring-2 focus:ring-[var(--color-magenta)]/40 text-gray-900 placeholder:text-gray-300"
           />
         </div>
       </div>
@@ -55,9 +55,9 @@ export function StepInput({
                 type="date"
                 value={targetDate}
                 onChange={(e) => setTargetDate(e.target.value)}
-                className="flex-1 text-base border-none focus:ring-0 p-0 text-gray-700 bg-transparent cursor-pointer"
+                className="flex-1 text-base border-none focus:outline-none focus:ring-2 focus:ring-[var(--color-magenta)]/40 p-0 text-gray-700 bg-transparent cursor-pointer rounded"
               />
-              <button 
+              <button
                 onClick={() => { setShowDate(false); setTargetDate(""); }}
                 className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
               >

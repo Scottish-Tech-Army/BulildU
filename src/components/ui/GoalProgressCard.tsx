@@ -1,17 +1,17 @@
 "use client";
 
 import { Goal, GoalCategory } from "@/lib/storage";
-import { 
-  Check, 
+import {
+  Check,
   Calendar,
-  Activity, 
-  Heart, 
-  Briefcase, 
-  Coins, 
-  Sprout, 
+  Activity,
+  Heart,
+  Briefcase,
+  Coins,
+  Sprout,
   Home,
   Tag,
-  type LucideIcon 
+  type LucideIcon
 } from "lucide-react";
 
 interface GoalProgressCardProps {
@@ -38,9 +38,8 @@ export function GoalProgressCard({
     Wellbeing: Heart,
     Career: Briefcase,
     Finance: Coins,
-    Finances: Coins,
-    Growth: Sprout,
-    Family: Home,
+    "Personal Growth": Sprout,
+    Relationships: Home,
     other: Tag
   };
   const CategoryIcon = iconMap[goal.category] || Activity;
@@ -53,7 +52,7 @@ export function GoalProgressCard({
         <div className="w-14 h-14 rounded-xl bg-[var(--color-deep-violet)] flex items-center justify-center shrink-0">
           <CategoryIcon className="w-7 h-7 text-white" />
         </div>
-        
+
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-bold text-gray-900 truncate">
             {goal.title}
@@ -62,7 +61,7 @@ export function GoalProgressCard({
             {completedCount} of {totalSteps} steps completed ({progress}%)
           </p>
         </div>
-        
+
         <div className="flex items-center justify-center shrink-0">
           <div className="text-3xl font-light text-brand-primary">
             {progress}%
@@ -76,26 +75,23 @@ export function GoalProgressCard({
             <button
               key={step.id}
               onClick={() => onStepToggle(step.id)}
-              className={`w-full flex items-center gap-3 p-4 rounded-2xl transition-all border ${
-                step.completed
-                  ? "bg-warm-ivory border-brand-primary/20 text-brand-primary"
-                  : "bg-white border-gray-100 hover:border-brand-primary/20 text-gray-900"
-              }`}
+              className={`w-full flex items-center gap-3 p-4 rounded-2xl transition-all border ${step.completed
+                ? "bg-warm-ivory border-brand-primary/20 text-brand-primary"
+                : "bg-white border-gray-100 hover:border-brand-primary/20 text-gray-900"
+                }`}
             >
               <div
-                className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-colors ${
-                  step.completed
-                    ? "bg-brand-primary border-brand-primary text-white"
-                    : "bg-transparent border-gray-200"
-                }`}
+                className={`flex-shrink-0 w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-colors ${step.completed
+                  ? "bg-brand-primary border-brand-primary text-white"
+                  : "bg-transparent border-gray-200"
+                  }`}
               >
                 {step.completed && <Check className="w-4 h-4" />}
               </div>
-              
+
               <div className="flex-1 text-left min-w-0">
-                <p className={`text-sm font-semibold truncate ${
-                  step.completed ? "text-brand-primary" : "text-gray-900"
-                }`}>
+                <p className={`text-sm font-semibold truncate ${step.completed ? "text-brand-primary" : "text-gray-900"
+                  }`}>
                   {step.title}
                 </p>
                 {step.targetDate && (
@@ -113,7 +109,7 @@ export function GoalProgressCard({
               </div>
             </button>
           ))}
-          
+
           {goal.steps.length === 0 && (
             <div className="p-6 text-center">
               <p className="text-sm text-gray-400">No steps added yet</p>

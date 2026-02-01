@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { Goal, getGoalProgress, GoalCategory } from "@/lib/storage";
-import { 
-  Activity, 
-  Heart, 
-  Briefcase, 
-  Coins, 
-  Sprout, 
+import {
+  Activity,
+  Heart,
+  Briefcase,
+  Coins,
+  Sprout,
   Home,
   Tag,
-  type LucideIcon 
+  type LucideIcon
 } from "lucide-react";
 
 interface GoalCardProps {
@@ -19,9 +19,9 @@ interface GoalCardProps {
 
 export default function GoalCard({ goal }: GoalCardProps) {
   const progress = getGoalProgress(goal);
-  
+
   // Format date: e.g. "Oct 20"
-  const formattedDate = goal.targetDate 
+  const formattedDate = goal.targetDate
     ? new Date(goal.targetDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })
     : "No date";
 
@@ -30,9 +30,8 @@ export default function GoalCard({ goal }: GoalCardProps) {
     Wellbeing: Heart,
     Career: Briefcase,
     Finance: Coins,
-    Finances: Coins,
-    Growth: Sprout,
-    Family: Home,
+    "Personal Growth": Sprout,
+    Relationships: Home,
     other: Tag
   };
   const CategoryIcon = iconMap[goal.category] || Activity;
@@ -40,11 +39,10 @@ export default function GoalCard({ goal }: GoalCardProps) {
   return (
     <Link
       href={`/goals/${goal.id}`}
-      className={`block rounded-2xl p-4 group transition-all ${
-        goal.status === "active" 
-          ? "bg-white border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]" 
+      className={`block rounded-2xl p-4 group transition-all ${goal.status === "active"
+          ? "bg-white border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]"
           : "bg-warm-ivory"
-      } hover:bg-[var(--color-magenta)]/5`}
+        } hover:bg-[var(--color-magenta)]/5`}
     >
       <div className="flex items-center gap-4">
         {/* Left: Category Icon in colored square */}
@@ -66,21 +64,20 @@ export default function GoalCard({ goal }: GoalCardProps) {
               </span>
             )}
           </div>
-          <h3 className={`text-lg font-medium truncate group-hover:text-[var(--color-magenta)] transition-colors mb-0.5 ${
-            goal.status === "completed" ? "text-brand-primary" : "text-[var(--color-charcoal)]"
-          }`}>
+          <h3 className={`text-lg font-medium truncate group-hover:text-[var(--color-magenta)] transition-colors mb-0.5 ${goal.status === "completed" ? "text-brand-primary" : "text-[var(--color-charcoal)]"
+            }`}>
             {goal.title}
           </h3>
           <p className="text-xs text-text-muted">
-             Target: {formattedDate}
-           </p>
+            Target: {formattedDate}
+          </p>
         </div>
 
         {/* Right: Percentage - vertically centered and large */}
         <div className="flex items-center justify-center shrink-0">
-           <div className="text-4xl font-light text-brand-primary leading-none">
-             {progress}%
-           </div>
+          <div className="text-4xl font-light text-brand-primary leading-none">
+            {progress}%
+          </div>
         </div>
       </div>
     </Link>
