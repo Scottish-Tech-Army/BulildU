@@ -14,7 +14,7 @@ export default function SignupPage() {
 
   const handleCreateAccount = () => {
     // Handle sign-up logic here
-    router.push("/onboarding/baseline");
+    router.push("/onboarding/welcome");
 
   };
 
@@ -113,7 +113,7 @@ export default function SignupPage() {
       {/* Sign in link */}
       <p className="text-center text-sm text-text-muted mt-8">
         Already have an account?{" "}
-        <Link href="/login" className="text-[var(--color-charcoal)] font-semibold underline">
+        <Link href="/signIn" className="text-[var(--color-charcoal)] font-semibold underline">
           Sign in
         </Link>
       </p>

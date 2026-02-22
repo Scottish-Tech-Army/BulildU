@@ -3,10 +3,10 @@
 import { useRouter } from "next/navigation";
 
 
-export function LoginButton() {
+export function LoginButton({ type }: { type: "signup" | "signin" }) {
   const router = useRouter();
   const signIn = async () => {
-    router.push("/onboarding/baseline");
+    router.push("/onboarding/welcome");
   }
 
   return (<button
@@ -19,6 +19,6 @@ export function LoginButton() {
       className="w-5 h-5"
       loading="lazy"
     />
-    Sign up with Google
+    {type === "signup" ? "Sign up with Google" : "Sign in with Google"}
   </button>)
 }

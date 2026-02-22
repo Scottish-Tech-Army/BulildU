@@ -49,20 +49,25 @@ Complete reference of all routes in the EmpwrU PWA.
 
 The app implements automatic route guards:
 
-- **Dashboard** (`/`) — Redirects to `/onboarding/welcome` if onboarding is not completed
+- **Dashboard** (`/`) — Redirects to `/welcome` if onboarding is not completed
 - **All other routes** — No guards; accessible directly for development
 
 ---
 
 ## File Structure
 
-```
 src/app/
 ├── page.tsx                    # Dashboard (/)
 ├── layout.tsx                  # Root layout with fonts
 ├── globals.css                 # Global styles & CSS variables
-├── checkin/
+├── checkin/                    
 │   └── page.tsx                # Weekly check-in wizard
+├── welcome/
+│   │   └── page.tsx            # Welcome screen 
+├── signUp/
+│   │   └── page.tsx            # Sign Up screen 
+├── signIn/
+│   │   └── page.tsx            # Sign In screen               
 ├── goals/
 │   ├── page.tsx                # Goals list
 │   ├── new/
@@ -71,7 +76,7 @@ src/app/
 │       └── page.tsx            # Goal detail (dynamic)
 ├── onboarding/
 │   ├── welcome/
-│   │   └── page.tsx            # Welcome screen
+│   │   └── page.tsx            # Onboarding Welcome screen
 │   ├── baseline/
 │   │   └── page.tsx            # Baseline quiz
 │   └── reminder/

@@ -175,7 +175,7 @@ Personalize experience with single choice that affects all future content.
       />
       <FocusCard
         icon="📚"
-        title="Personal Growth"
+        title="Skills, Education & Learning"
         description="Education, training, learning"
         value="Growth"
         onSelect={handleFocusSelect}
@@ -432,17 +432,13 @@ After screen 4 completion:
 - > 90 seconds average on any screen → simplify content
 - <60% first task completion → adjust onboarding-to-task transition
 
-## Technical Implementation
-
-### Route Structure
-
-```
-/onboarding/welcome    → Screen 1
-/onboarding/baseline   → Screen 2
-/onboarding/focus      → Screen 3
-/onboarding/reminder   → Screen 4
-/checkin               → First weekly check-in
-```
+/welcome    → Screen 1
+/signUp     → Screen 2
+/signIn     → Screen 3
+/baseline   → Screen 4
+/focus      → Screen 5
+/reminder   → Screen 6
+/checkin    → First weekly check-in
 
 ### State Management
 

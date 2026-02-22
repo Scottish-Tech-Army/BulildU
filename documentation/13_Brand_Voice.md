@@ -260,10 +260,11 @@ Applied framework voices per brand guide:
 - `app/(marketing)/components/CTA.jsx`
 - `app/(marketing)/components/Footer.jsx`
 
-### Pages (2 files)
+### Pages (3 files)
 
 - `app/(marketing)/get-started/page.js`
-- `app/(marketing)/login/page.js`
+- `app/(marketing)/signUp/page.js`
+- `app/(marketing)/signIn/page.js`
 
 ---
 

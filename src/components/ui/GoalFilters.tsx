@@ -19,7 +19,7 @@ export interface GoalFilterState {
   atRiskOnly: boolean;
 }
 
-export const CATEGORIES: GoalCategory[] = ["Wellbeing", "Career", "Finance", "Personal Growth", "Relationships"];
+export const CATEGORIES: GoalCategory[] = ["Wellbeing", "Career", "Finance", "Skills, Education & Learning", "Relationships"];
 export const STATUS_OPTIONS: ("active" | "paused" | "completed")[] = ["active", "paused", "completed"];
 
 export const DEFAULT_FILTERS: GoalFilterState = {
@@ -77,13 +77,13 @@ export default function GoalFilters({
               key={cat}
               onClick={() => toggleCategory(cat)}
               className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${filters.categories.includes(cat)
-                  ? "border-[var(--color-deep-violet)] bg-[var(--color-deep-violet)]/5 text-[var(--color-charcoal)]"
-                  : "border-brand-surface bg-brand-surface text-text-muted"
+                ? "border-[var(--color-deep-violet)] bg-[var(--color-deep-violet)]/5 text-[var(--color-charcoal)]"
+                : "border-brand-surface bg-brand-surface text-text-muted"
                 }`}
             >
               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${filters.categories.includes(cat)
-                  ? "bg-[var(--color-deep-violet)] border-[var(--color-deep-violet)] text-white"
-                  : "bg-white border-brand-surface-dark"
+                ? "bg-[var(--color-deep-violet)] border-[var(--color-deep-violet)] text-white"
+                : "bg-white border-brand-surface-dark"
                 }`}>
                 {filters.categories.includes(cat) && <Check className="w-3.5 h-3.5" />}
               </div>
@@ -106,13 +106,13 @@ export default function GoalFilters({
               key={status}
               onClick={() => toggleStatus(status)}
               className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${filters.statuses.includes(status)
-                  ? "border-brand-primary bg-brand-primary/5 text-[var(--color-charcoal)]"
-                  : "border-brand-surface bg-brand-surface text-text-muted"
+                ? "border-brand-primary bg-brand-primary/5 text-[var(--color-charcoal)]"
+                : "border-brand-surface bg-brand-surface text-text-muted"
                 }`}
             >
               <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${filters.statuses.includes(status)
-                  ? "bg-brand-primary border-brand-primary text-white"
-                  : "bg-white border-brand-surface-dark"
+                ? "bg-brand-primary border-brand-primary text-white"
+                : "bg-white border-brand-surface-dark"
                 }`}>
                 {filters.statuses.includes(status) && <Check className="w-3.5 h-3.5" />}
               </div>
@@ -135,13 +135,13 @@ export default function GoalFilters({
               onFiltersChange({ ...filters, atRiskOnly: !filters.atRiskOnly })
             }
             className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${filters.atRiskOnly
-                ? "border-brand-primary bg-brand-primary/5 text-[var(--color-charcoal)]"
-                : "border-brand-surface bg-brand-surface text-text-muted"
+              ? "border-brand-primary bg-brand-primary/5 text-[var(--color-charcoal)]"
+              : "border-brand-surface bg-brand-surface text-text-muted"
               }`}
           >
             <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${filters.atRiskOnly
-                ? "bg-brand-primary border-brand-primary text-white"
-                : "bg-white border-brand-surface-dark"
+              ? "bg-brand-primary border-brand-primary text-white"
+              : "bg-white border-brand-surface-dark"
               }`}>
               {filters.atRiskOnly && <Check className="w-3.5 h-3.5" />}
             </div>

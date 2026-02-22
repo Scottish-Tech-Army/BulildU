@@ -50,7 +50,7 @@ export default function DashboardPage() {
   // Redirect to onboarding if not completed
   useEffect(() => {
     if (!onboardingComplete) {
-      router.replace("/onboarding/welcome");
+      router.replace("/welcome");
     }
   }, [onboardingComplete, router]);
 

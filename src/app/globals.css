@@ -255,3 +255,58 @@ h2 {
     transform: translateY(0);
   }
 }
+
+/* Welcome Name Entrance */
+/* .bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+} */
+
+/* Smooth animated brand gradient text */
+/* @keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease-in-out infinite;
+} */
+
+/* ================================================================
+   Animated Gradient Text (for dynamic name only)
+   ================================================================ */
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease-in-out infinite;
+}
+
+/* Safari support */
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+}

@@ -17,6 +17,7 @@ import {
   completeOnboarding,
   type WorkStatus,
   type BaselineResponse,
+  SkillsCurrentStatus,
 } from "@/lib/storage";
 import { Sunrise, Sunset, Sparkles } from "lucide-react";
 
@@ -32,12 +33,26 @@ const WORK_STATUS_OPTIONS = [
   { value: "other", label: "Other" },
 ];
 
+const SKILLS_CURRENT_STATUS_OPTIONS = [
+  { value: "activeLearning", label: "I’m actively learning or upskilling" },
+  { value: "pastLearning", label: "I’ve done learning in the past but not recently" },
+  { value: "wantToLearn", label: "I want to learn but don’t know where to start" },
+  { value: "notNow", label: "Learning or upskilling isn’t a focus for me right now" },
+];
+
+const SKILLS_CURRENT_STATUS_OPTIONS2 = [
+  { value: "activeLearning2", label: "actively upskilling" },
+  { value: "pastLearning2", label: "done learning in the past" },
+  { value: "wantToLearn2", label: "unsure where to start" },
+  { value: "notNow2", label: "not focused right now" },
+];
 // Section definitions
-const SECTIONS = [
+export const SECTIONS = [
   { id: "situation", title: "Current Situation" },
+  { id: "wellbeing", title: "Wellbeing & Balance" },
+  { id: "skills", title: "Skills, Education & Learning" },
   { id: "confidence", title: "Confidence" },
   { id: "aspirations", title: "Aspirations for the Future" },
-  { id: "wellbeing", title: "Wellbeing & Balance" },
   { id: "reminder", title: "Weekly Check-in" },
 ] as const;
 
@@ -130,6 +145,8 @@ export default function BaselinePage() {
     switch (section.id) {
       case "situation":
         return responses.workStatus != null && responses.situationSatisfaction != null;
+      case "skills":
+        return responses.skillsConfidence != null && responses.skillsCurrentStatus != null;
       case "confidence":
         return responses.confidence != null;
       case "aspirations":
@@ -216,6 +233,94 @@ export default function BaselinePage() {
               </>
             )}
 
+            {section.id === "wellbeing" && (
+              <>
+                <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 text-center">
+                  <p className="text-[var(--color-charcoal)] text-sm xs:text-base md:text-lg">
+                    How well do you manage stress?
+                  </p>
+                  <RatingScale
+                    value={responses.stressLevel ?? null}
+                    onChange={(v) => updateResponse("stressLevel", v)}
+                    lowLabel="Not well"
+                    highLabel="Very well"
+                  />
+                </div>
+
+                {responses.stressLevel != null && (
+                  <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 animate-fade-in text-center">
+                    <p className="text-[var(--color-charcoal)] text-sm xs:text-base md:text-lg">
+                      How would you rate your energy most days?
+                    </p>
+                    <RatingScale
+                      value={responses.energyLevel ?? null}
+                      onChange={(v) => updateResponse("energyLevel", v)}
+                      lowLabel="Very low"
+                      highLabel="Very high"
+                    />
+                  </div>
+                )}
+
+                {responses.energyLevel != null && (
+                  <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 animate-fade-in text-center">
+                    <p className="text-[var(--color-charcoal)] text-sm xs:text-base md:text-lg">
+                      How would you rate your life balance right now?
+                    </p>
+                    <RatingScale
+                      value={responses.lifeBalance ?? null}
+                      onChange={(v) => updateResponse("lifeBalance", v)}
+                      lowLabel="Out of balance"
+                      highLabel="Well balanced"
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            {section.id === "skills" && (
+              <>
+                <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 animate-fade-in text-center">
+                  <p className="text-[var(--color-charcoal)] text-sm xs:text-base md:text-lg text-center">
+                    How confident do you feel about developing your skills and learning right now?
+                  </p>
+                  <RatingScale
+                    value={responses.skillsConfidence ?? null}
+                    onChange={(v) => updateResponse("skillsConfidence", v)}
+                    lowLabel="Not confident"
+                    highLabel="Very confident"
+                  />
+                </div>
+
+                {responses.skillsConfidence != null && (
+                  <div className="text-center space-y-3">
+                    <p className="text-[var(--color-charcoal)] text-base">
+                      Which best describes where you&apos;re at right now?
+                    </p>
+                    <ChoiceChips
+                      className="justify-center"
+                      options={SKILLS_CURRENT_STATUS_OPTIONS}
+                      value={responses.skillsCurrentStatus ?? null}
+                      onChange={(v) => updateResponse("skillsCurrentStatus", v as SkillsCurrentStatus)}
+                    />
+                  </div>
+                )}
+
+                {/* {responses.skillsCurrentStatus != null && (
+                  <div className="text-center space-y-3">
+                    <p className="text-[var(--color-charcoal)] text-base">
+                      Which best describes where you&apos;re at right now?
+                    </p>
+                    <ChoiceChips
+                      className="justify-center"
+                      options={SKILLS_CURRENT_STATUS_OPTIONS2}
+                      value={responses.skillsCurrentStatus ?? null}
+                      onChange={(v) => updateResponse("skillsCurrentStatus", v as SkillsCurrentStatus)}
+                    />
+                  </div>
+                )} */}
+              </>
+            )}
+
             {section.id === "confidence" && (
               <>
                 <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 text-center">
@@ -262,49 +367,7 @@ export default function BaselinePage() {
               </>
             )}
 
-            {section.id === "wellbeing" && (
-              <>
-                <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 text-center">
-                  <p className="text-[var(--color-charcoal)] text-sm xs:text-base md:text-lg">
-                    How well do you manage stress?
-                  </p>
-                  <RatingScale
-                    value={responses.stressLevel ?? null}
-                    onChange={(v) => updateResponse("stressLevel", v)}
-                    lowLabel="Not well"
-                    highLabel="Very well"
-                  />
-                </div>
 
-                {responses.stressLevel != null && (
-                  <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-sm xs:text-base md:text-lg">
-                      How would you rate your energy most days?
-                    </p>
-                    <RatingScale
-                      value={responses.energyLevel ?? null}
-                      onChange={(v) => updateResponse("energyLevel", v)}
-                      lowLabel="Very low"
-                      highLabel="Very high"
-                    />
-                  </div>
-                )}
-
-                {responses.energyLevel != null && (
-                  <div className="p-3 xs:p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl border border-gray-100 space-y-2 xs:space-y-3 md:space-y-6 animate-fade-in text-center">
-                    <p className="text-[var(--color-charcoal)] text-sm xs:text-base md:text-lg">
-                      How would you rate your life balance right now?
-                    </p>
-                    <RatingScale
-                      value={responses.lifeBalance ?? null}
-                      onChange={(v) => updateResponse("lifeBalance", v)}
-                      lowLabel="Out of balance"
-                      highLabel="Well balanced"
-                    />
-                  </div>
-                )}
-              </>
-            )}
 
             {section.id === "reminder" && (
               <>
@@ -351,7 +414,7 @@ export default function BaselinePage() {
                     <p className="text-gray-900 font-medium text-sm md:text-base">Pick a time</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
                       <TimeOption
-                        time="8:00 AM"
+                        time="10:00 AM"
                         label="Morning"
                         description="Start your week with reflection"
                         icon={Sunrise}
@@ -383,8 +446,8 @@ export default function BaselinePage() {
             onClick={handleBack}
             disabled={currentSection === 0}
             className={`flex flex-col items-center justify-center w-full h-full transition-colors ${currentSection === 0
-                ? "text-gray-300 cursor-not-allowed"
-                : "text-gray-400 hover:text-brand-primary"
+              ? "text-gray-300 cursor-not-allowed"
+              : "text-gray-400 hover:text-brand-primary"
               }`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
@@ -409,8 +472,8 @@ export default function BaselinePage() {
             onClick={handleNext}
             disabled={!isSectionComplete()}
             className={`flex flex-col items-center justify-center w-full h-full transition-colors ${isSectionComplete()
-                ? "text-brand-primary"
-                : "text-gray-300 cursor-not-allowed"
+              ? "text-brand-primary"
+              : "text-gray-300 cursor-not-allowed"
               }`}
           >
             {isLastSection ? (

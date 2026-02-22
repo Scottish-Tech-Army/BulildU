@@ -12,7 +12,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleCreateAccount = () => {
+  const handleSignInAccount = () => {
     // Handle sign-up logic here
     router.push("/onboarding/baseline");
 
@@ -36,13 +36,13 @@ export default function SignupPage() {
 
       {/* Title */}
       <h1 className="text-center text-[var(--color-charcoal)] font-bold text-3xl md:text-4xl mb-4 leading-tight px-4 max-w-lg mx-auto">
-        Create your account
+        Sign in to your account
       </h1>
 
       {/* Add space between title and buttons */}
       <div className="w-full max-w-sm mt-6 space-y-4">
         {/* OAuth Buttons */}
-        <LoginButton type="signup" />
+        <LoginButton type="signin" />
 
         <button
           onClick={() => { }}
@@ -54,7 +54,7 @@ export default function SignupPage() {
             className="w-5 h-5"
             loading="lazy"
           />
-          Sign up with Facebook
+          Sign in with Facebook
         </button>
       </div>
 
@@ -69,7 +69,7 @@ export default function SignupPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleCreateAccount();
+          handleSignInAccount();
         }}
         className="w-full max-w-sm flex flex-col gap-6"
       >
@@ -105,16 +105,16 @@ export default function SignupPage() {
         >
           Create Aaccount
         </button> */}
-        <PrimaryButton onClick={handleCreateAccount}>
-          Sign up
+        <PrimaryButton onClick={handleSignInAccount}>
+          Sign in
         </PrimaryButton>
       </form>
 
-      {/* Sign in link */}
+      {/* Sign up link */}
       <p className="text-center text-sm text-text-muted mt-8">
-        Already have an account?{" "}
-        <Link href="/login" className="text-[var(--color-charcoal)] font-semibold underline">
-          Sign in
+        Don't have an account?{" "}
+        <Link href="/signUp" className="text-[var(--color-charcoal)] font-semibold underline">
+          Sign up
         </Link>
       </p>
 

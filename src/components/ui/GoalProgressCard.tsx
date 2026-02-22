@@ -38,7 +38,7 @@ export function GoalProgressCard({
     Wellbeing: Heart,
     Career: Briefcase,
     Finance: Coins,
-    "Personal Growth": Sprout,
+    "Skills, Education & Learning": Sprout,
     Relationships: Home,
     other: Tag
   };

@@ -77,7 +77,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
     measurablePlaceholder: "e.g. Complete 3 walks per week, feel more rested, notice improved energy levels...",
     stepPlaceholder: "e.g. Schedule 3 walks in my calendar"
   },
-  "Personal Growth": {
+  "Skills, Education & Learning": {
     tip: "Personal growth is your opportunity to expand your knowledge and skills through lifelong learning. You might set a goal to enrol in a short, accredited qualification, take an online course to build a new skill, or pursue learning that supports both personal and professional development.",
     titlePlaceholder: "e.g. Complete an online course in digital marketing",
     whyPlaceholder: "e.g. I want to build new skills that will help me feel more capable and confident in different areas of my life...",
@@ -86,10 +86,10 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   },
   "Relationships": {
     tip: "Relationships are key to a fulfilling life. You might set a goal to spend quality time with family or friends, strengthen important connections, or build professional relationships and networks that support your future opportunities.",
-    titlePlaceholder: "e.g. Have a weekly coffee date with a close friend",
+    titlePlaceholder: "e.g. Attend an industry event and introduce myself to two professionals.",
     whyPlaceholder: "e.g. I want to strengthen my connections with people who matter to me and feel less isolated...",
     measurablePlaceholder: "e.g. Have 1 meaningful conversation per week, arrange 2 social activities, reconnect with 3 friends...",
-    stepPlaceholder: "e.g. Text a friend to arrange coffee"
+    stepPlaceholder: "e.g. Text a friend to attend an event"
   },
   "Finance": {
     tip: "Financial goals help you create stability, security, and a more comfortable way of living. This might include easing financial pressure, enjoying more time and experiences with your family, or having more flexibility and control over your future.",
@@ -268,7 +268,7 @@ export default function NewGoalPage() {
                     {([
                       { name: "Career", icon: Briefcase },
                       { name: "Finance", icon: Coins },
-                      { name: "Personal Growth", icon: Sprout },
+                      { name: "Skills, Education & Learning", icon: Sprout },
                       { name: "Wellbeing", icon: Heart },
                       { name: "Relationships", icon: Home },
                     ] as { name: GoalCategory; icon: LucideIcon }[]).map(({ name, icon: Icon }) => (

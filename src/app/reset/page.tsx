@@ -15,10 +15,10 @@ export default function ResetPage() {
   useEffect(() => {
     // Clear all localStorage data
     resetAllData();
-    
+
     // Redirect to onboarding
     setTimeout(() => {
-      router.replace("/onboarding/welcome");
+      router.replace("/welcome");
     }, 500);
   }, [router]);
 

@@ -326,7 +326,7 @@ export default function GoalDetailPage() {
                           Wellbeing: Heart,
                           Career: Briefcase,
                           Finance: Coins,
-                          "Personal Growth": Sprout,
+                          "Skills, Education & Learning": Sprout,
                           Relationships: Home,
                           other: Tag
                         };
@@ -345,7 +345,7 @@ export default function GoalDetailPage() {
                   Wellbeing: Heart,
                   Career: Briefcase,
                   Finance: Coins,
-                  "Personal Growth": Sprout,
+                  "Skills, Education & Learning": Sprout,
                   Relationships: Home,
                   other: Tag
                 };
@@ -785,12 +785,12 @@ export default function GoalDetailPage() {
       >
         <div className="space-y-6 pt-4">
           <div className="grid grid-cols-1 gap-3">
-            {(["Wellbeing", "Career", "Finance", "Personal Growth", "Relationships"] as GoalCategory[]).map((cat) => {
+            {(["Wellbeing", "Career", "Finance", "Skills, Education & Learning", "Relationships"] as GoalCategory[]).map((cat) => {
               const iconMap: Record<GoalCategory, LucideIcon> = {
                 Wellbeing: Heart,
                 Career: Briefcase,
                 Finance: Coins,
-                "Personal Growth": Sprout,
+                "Skills, Education & Learning": Sprout,
                 Relationships: Home,
                 other: Tag
               };

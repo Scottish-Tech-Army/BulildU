@@ -101,27 +101,37 @@ export type WorkStatus =
   | "studying"
   | "other";
 
+export type SkillsCurrentStatus =
+  | "I’m actively learning or upskilling"
+  | "I’ve done learning in the past but not recently"
+  | "I want to learn but don’t know where to start"
+  | "Learning or upskilling isn’t a focus for me right now";
+
 export interface BaselineResponse {
   // Section 1: Current Situation
   workStatus?: WorkStatus;
   situationSatisfaction?: number; // 1-5
 
-  // Section 2: Confidence
-  confidence?: number; // 1-5
-
-  // Section 3: Aspirations
-  futureClarity?: number; // 1-5
-  futureHope?: number; // 1-5
-
-  // Section 4: Skills & Learning
-  buildingSkills?: "yes" | "no";
-  learningMotivation?: number; // 1-5
-
-  // Section 5: Wellbeing
+  // Section 2: Wellbeing
   energyLevel?: number; // 1-5
   stressLevel?: number; // 1-5 (inverted: 1=high stress, 5=low stress)
   lifeBalance?: number; // 1-5
   hasBalance?: "yes" | "no" | "unsure"; // Legacy field
+
+  // Section 3: Skills, Education & Learning
+  skillsConfidence?: number; // 1-5
+  skillsCurrentStatus?: SkillsCurrentStatus
+
+  // Section 4: Confidence
+  confidence?: number; // 1-5
+
+  // Section 5: Aspirations
+  futureClarity?: number; // 1-5
+  futureHope?: number; // 1-5
+
+  // Section 6: Skills & Learning
+  buildingSkills?: "yes" | "no";
+  learningMotivation?: number; // 1-5
 
   // Metadata
   completedAt?: string; // ISO date string
@@ -166,7 +176,7 @@ export function completeBaseline(): void {
 // Goals
 // =============================================================================
 
-export type GoalCategory = "Wellbeing" | "Career" | "Finance" | "Personal Growth" | "Relationships" | "other";
+export type GoalCategory = "Wellbeing" | "Career" | "Finance" | "Skills, Education & Learning" | "Relationships" | "other";
 
 export interface Action {
   id: string;

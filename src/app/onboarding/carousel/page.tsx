@@ -13,19 +13,19 @@ interface OnboardingScreen {
 
 const ONBOARDING_SCREENS: OnboardingScreen[] = [
   {
-    headline: "Build Self Awareness and Clarity",
-    description: "Discover who you are with our guided discovery tool",
+    headline: "Gain Clarity",
+    description: "Discover your strengths, values, and what meaningful career growth looks like for you",
     // illustration: "/illustrations/onboarding-1.svg",
   },
   {
-    headline: "Track Your Growth",
-    description: "Monitor your progress and celebrate your wins",
-    // illustration: "/illustrations/onboarding-2.svg",
+    headline: "Create Your Path",
+    description: "Set goals that help you progress, change direction, or step into new opportunities",
+    // illustration: "/illustrations/onboarding-3.svg",
   },
   {
-    headline: "Create Your Path",
-    description: "Set goals and take action toward your future",
-    // illustration: "/illustrations/onboarding-3.svg",
+    headline: "Track Your Growth",
+    description: "Turn consistent action into visible progress over time, and celebrate your wins along the way",
+    // illustration: "/illustrations/onboarding-2.svg",
   },
 ];
 
@@ -82,14 +82,14 @@ export default function OnboardingCarouselWithImages() {
 
   const handleNext = () => {
     if (isLastScreen) {
-      router.push("/login");
+      router.push("/signUp");
     } else {
       setCurrentScreen(currentScreen + 1);
     }
   };
 
   const handleSkip = () => {
-    router.push("/login");
+    router.push("/signUp");
   };
 
   const handleDotClick = (index: number) => {
@@ -218,7 +218,7 @@ export default function OnboardingCarouselWithImages() {
         <div className="space-y-3">
           {/* Next/Get Started Button */}
           <PrimaryButton onClick={handleNext}>
-            {isLastScreen ? "Sign up →" : "Next →"}
+            {isLastScreen ? "Let's Go →" : "Next →"}
           </PrimaryButton>
 
           {/* Skip Button */}
