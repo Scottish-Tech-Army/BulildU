@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 interface Quote {
   q: string; // quote text
-  a: string; // author name
+  a?: string; // author name (optional)
 }
 
 interface CachedQuote {
@@ -30,11 +30,12 @@ function getTodayDateString(): string {
  */
 interface DailyQuoteProps {
   className?: string;
+  title?: string;
   quote?: string;
   author?: string;
 }
 
-export default function DailyQuote({ className = "", quote: propQuote, author: propAuthor }: DailyQuoteProps) {
+export default function DailyQuote({ className = "", title = "Daily Inspiration", quote: propQuote, author: propAuthor }: DailyQuoteProps) {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -43,7 +44,7 @@ export default function DailyQuote({ className = "", quote: propQuote, author: p
     async function loadQuote() {
       // Check if we have props
       if (propQuote) {
-        setQuote({ q: propQuote, a: propAuthor || "Unknown" });
+        setQuote({ q: propQuote, a: propAuthor});
         setIsLoading(false);
         return;
       }
@@ -117,14 +118,16 @@ export default function DailyQuote({ className = "", quote: propQuote, author: p
     <section className={`flex flex-col h-full ${className}`}>
       <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] flex flex-col justify-between relative overflow-hidden h-full">
         <div className="relative z-10">
-           <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-6">{propQuote ? "Inspiration" : "Daily Inspiration"}</p>
+           <p className="text-xs font-bold text-brand-primary uppercase tracking-widest mb-6">{title}</p>
            <svg className="h-10 w-10 text-brand-primary/10 absolute -top-2 -left-4 -z-10" fill="currentColor" viewBox="0 0 24 24">
              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.570 9-10.609l.996 2.151c-2.433.917-4.001 3.638-4.001 5.849h4v10h-10z"/>
            </svg>
            <blockquote className="text-2xl md:text-3xl font-sans font-medium text-[var(--color-charcoal)] leading-tight mb-4">
             &ldquo;{quote.q.charAt(0).toUpperCase() + quote.q.slice(1)}&rdquo;
            </blockquote>
-           <cite className="text-text-muted not-italic font-medium">— {quote.a}</cite>
+           {quote.a && (
+             <cite className="text-text-muted not-italic font-medium">— {quote.a}</cite>
+           )}
         </div>
         {!propQuote && (
           <p className="text-[10px] text-text-subtle mt-8">

@@ -58,6 +58,7 @@ interface FullGoalDraft {
 
 const CATEGORY_CONTENT: Record<GoalCategory, {
   tip: string;
+  description: string;
   titlePlaceholder: string;
   whyPlaceholder: string;
   measurablePlaceholder: string;
@@ -65,6 +66,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
 }> = {
   "Career": {
     tip: "Career goals help you shape your professional future - whether that's aiming for a promotion, exploring a new role, or taking steps toward self-employment. This is your space to set goals that move you toward the career path you truly want, at a pace that works for you.",
+    description: "Shape your professional future",
     titlePlaceholder: "e.g. Apply for 3 new job opportunities in my field",
     whyPlaceholder: "e.g. I want to feel more confident in my professional skills and open up new opportunities for growth...",
     measurablePlaceholder: "e.g. Apply for 3 jobs, update my CV, complete 2 networking conversations, secure 1 interview...",
@@ -72,6 +74,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   },
   "Wellbeing": {
     tip: "Wellbeing goals help you care for yourself so you can thrive in all areas of life. You might set a goal to take part in activities that re-energise you, such as a weekly nature walk, or to prioritise rest and recovery through intentional downtime or a calming evening routine.",
+    description: "Support your physical and mental health",
     titlePlaceholder: "e.g. Go for a 30-minute walk 3 times a week",
     whyPlaceholder: "e.g. I want to feel more energised so I can spend better quality time with my family...",
     measurablePlaceholder: "e.g. Complete 3 walks per week, feel more rested, notice improved energy levels...",
@@ -79,6 +82,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   },
   "Skills, Education & Learning": {
     tip: "Personal growth is your opportunity to expand your knowledge and skills through lifelong learning. You might set a goal to enrol in a short, accredited qualification, take an online course to build a new skill, or pursue learning that supports both personal and professional development.",
+    description: "Build new skills and knowledge",
     titlePlaceholder: "e.g. Complete an online course in digital marketing",
     whyPlaceholder: "e.g. I want to build new skills that will help me feel more capable and confident in different areas of my life...",
     measurablePlaceholder: "e.g. Complete 1 online course, practice new skill 3 times per week, earn a certificate...",
@@ -86,6 +90,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   },
   "Relationships": {
     tip: "Relationships are key to a fulfilling life. You might set a goal to spend quality time with family or friends, strengthen important connections, or build professional relationships and networks that support your future opportunities.",
+    description: "Nurture the connections that matter",
     titlePlaceholder: "e.g. Attend an industry event and introduce myself to two professionals.",
     whyPlaceholder: "e.g. I want to strengthen my connections with people who matter to me and feel less isolated...",
     measurablePlaceholder: "e.g. Have 1 meaningful conversation per week, arrange 2 social activities, reconnect with 3 friends...",
@@ -93,6 +98,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   },
   "Finance": {
     tip: "Financial goals help you create stability, security, and a more comfortable way of living. This might include easing financial pressure, enjoying more time and experiences with your family, or having more flexibility and control over your future.",
+    description: "Create stability and security",
     titlePlaceholder: "e.g. Save £500 towards an emergency fund",
     whyPlaceholder: "e.g. I want to feel more secure and have less stress about unexpected expenses...",
     measurablePlaceholder: "e.g. Save £50 per week, reduce spending by £100 per month, build £500 emergency fund...",
@@ -100,6 +106,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   },
   "other": {
     tip: "",
+    description: "",
     titlePlaceholder: "",
     whyPlaceholder: "",
     measurablePlaceholder: "",
@@ -244,8 +251,8 @@ export default function NewGoalPage() {
             {step === "intro" && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <DailyQuote
-                  quote="When the why gets stronger, the how gets easier."
-                  author="Jim Rohn"
+                  quote="Set goals across the areas that shape your career and your life, so progress feels balanced, sustainable, and true to you."
+                  title="Reflection"
                 />
               </div>
             )}
@@ -271,25 +278,34 @@ export default function NewGoalPage() {
                       { name: "Skills, Education & Learning", icon: Sprout },
                       { name: "Wellbeing", icon: Heart },
                       { name: "Relationships", icon: Home },
-                    ] as { name: GoalCategory; icon: LucideIcon }[]).map(({ name, icon: Icon }) => (
-                      <button
-                        key={name}
-                        onClick={() => updateDraft("category", name)}
-                        className={`flex items-center gap-3 py-4 px-5 rounded-2xl text-base font-medium transition-all capitalize ${draft.category === name
-                          ? "bg-brand-primary text-white"
-                          : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                          }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        {name}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 mt-4">
-                    <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
-                    <p className="text-sm text-brand-primary/80 leading-relaxed italic">
-                      {CATEGORY_CONTENT[draft.category].tip}
-                    </p>
+                    ] as { name: GoalCategory; icon: LucideIcon }[]).map(({ name, icon: Icon }) => {
+                      const isActive = draft.category === name;
+                      return (
+                        <div key={name} className="flex flex-col gap-2">
+                          <button
+                            onClick={() => updateDraft("category", name)}
+                            className={`flex items-center gap-3 min-h-[70px] py-4 px-5 rounded-2xl text-base font-medium transition-all capitalize ${isActive
+                              ? "bg-brand-primary text-white"
+                              : "bg-gray-50 text-gray-900 hover:bg-gray-100"
+                              }`}
+                          >
+                            <Icon className={isActive ? "w-5 h-5 text-white" : "w-5 h-5 text-gray-700"} />
+                            <div className="flex-1 text-left">
+                              <div className={`text-lg font-semibold ${isActive ? "text-white" : "text-gray-900"}`}>{name}</div>
+                              <div className={`text-xs leading-snug ${isActive ? "text-white/80" : "text-gray-500"}`}>{CATEGORY_CONTENT[name].description}</div>
+                            </div>
+                          </button>
+                          {isActive && (
+                            <div className="flex items-start gap-3 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10">
+                              <Sparkles className="w-5 h-5 text-brand-primary shrink-0 mt-0.5" />
+                              <p className="text-sm text-brand-primary/80 leading-relaxed italic">
+                                {CATEGORY_CONTENT[name].tip}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
