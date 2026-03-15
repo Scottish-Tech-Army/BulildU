@@ -14,6 +14,7 @@ export const STORAGE_KEYS = {
   CATEGORY: `${STORAGE_PREFIX}category`,
   GOALS: `${STORAGE_PREFIX}goals`,
   CHECKINS: `${STORAGE_PREFIX}checkins`,
+  PROGRESS_LIKES: `${STORAGE_PREFIX}progress_likes`,
   PREFERENCES: `${STORAGE_PREFIX}preferences`,
   DAILY_QUOTE: "empwru_daily_quote", // Standardized name
   DISCOVERY: `${STORAGE_PREFIX}discovery`,
@@ -517,6 +518,52 @@ export interface CheckIn {
   stepsCompleted: string[]; // IDs of steps marked complete this session (legacy)
   milestonesCompleted?: string[]; // Legacy
   createdAt: string; // ISO datetime
+}
+
+export interface ProgressLikes {
+  achievements: string[]; // CheckIn IDs liked as proud-of
+  reflection: string[]; // CheckIn IDs liked as learning
+}
+
+const DEFAULT_PROGRESS_LIKES: ProgressLikes = {
+  achievements: [],
+  reflection: [],
+};
+
+/**
+ * Get saved progress likes (proud-of / learning) from localStorage.
+ */
+export function getProgressLikes(): ProgressLikes {
+  if (!isBrowser()) return DEFAULT_PROGRESS_LIKES;
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.PROGRESS_LIKES);
+    if (!stored) return DEFAULT_PROGRESS_LIKES;
+    return JSON.parse(stored) as ProgressLikes;
+  } catch {
+    return DEFAULT_PROGRESS_LIKES;
+  }
+}
+
+/**
+ * Toggle a liked progress card (proud-of or learning) for a specific check-in.
+ */
+export function toggleProgressLike(type: keyof ProgressLikes, checkInId: string): ProgressLikes {
+  const current = getProgressLikes();
+  const list = new Set(current[type]);
+
+  if (list.has(checkInId)) {
+    list.delete(checkInId);
+  } else {
+    list.add(checkInId);
+  }
+
+  const updated = { ...current, [type]: Array.from(list) };
+  if (isBrowser()) {
+    localStorage.setItem(STORAGE_KEYS.PROGRESS_LIKES, JSON.stringify(updated));
+  }
+
+  return updated;
 }
 
 /**

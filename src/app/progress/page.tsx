@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import BottomNav from "@/components/ui/BottomNav";
 import DailyQuote from "@/components/ui/DailyQuote";
@@ -9,10 +9,14 @@ import {
   getBaselineResponse,
   getCheckIns,
   getGoals,
+  getLastCheckIn,
   getMomentumDays,
+  getProgressLikes,
+  toggleProgressLike,
   hasCheckedInThisWeek,
   CheckIn,
   Goal,
+  GoalCategory,
   BaselineResponse,
 } from "@/lib/storage";
 import {
@@ -26,6 +30,9 @@ import {
   Sprout,
   Smile,
   Shield,
+  Heart,
+  ChevronRight,
+  Check,
 } from "lucide-react";
 
 /**
@@ -37,6 +44,51 @@ import {
  * - Goals/steps completion stats
  * - Celebrate wins
  */
+function GoalRing({
+  label,
+  value,
+  total,
+  icon: Icon,
+  accent,
+}: {
+  label: string;
+  value: number;
+  total: number;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: string;
+}) {
+  const [mounted, setMounted] = useState(false);
+  const percent = total > 0 ? Math.round((value / total) * 100) : 0;
+  const ringStyle = {
+    background: `conic-gradient(${accent} ${percent}%, rgba(0,0,0,0.08) ${percent}% 100%)`,
+  };
+
+  useEffect(() => {
+    requestAnimationFrame(() => setMounted(true));
+  }, []);
+
+  return (
+    <div
+      className={`flex flex-col items-center text-center transition-all duration-500 ${
+        mounted ? "opacity-100 scale-100" : "opacity-0 scale-95"
+      }`}
+    >
+      <div className="relative w-20 h-20" style={ringStyle}>
+        <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <span className="text-lg font-bold text-[var(--color-charcoal)]">{value}</span>
+            <span className="text-[10px] text-text-muted uppercase tracking-widest">{label}</span>
+          </div>
+        </div>
+        <div className="absolute top-1 left-1">
+          <Icon className="w-5 h-5 text-[var(--color-charcoal)]" />
+        </div>
+      </div>
+      <p className="mt-2 text-xs text-text-muted">{total > 0 ? `${percent}% of goals` : "No goals yet"}</p>
+    </div>
+  );
+}
+
 export default function ProgressPage() {
   const router = useRouter();
   
@@ -56,6 +108,10 @@ export default function ProgressPage() {
   const [checkInDue] = useState(() => 
     typeof window !== 'undefined' ? !hasCheckedInThisWeek() : false
   );
+  const [progressLikes, setProgressLikes] = useState(() =>
+    typeof window !== "undefined" ? getProgressLikes() : { achievements: [], reflection: [] }
+  );
+  const thisWeekCheckIn = !checkInDue ? getLastCheckIn() : null;
   const [celebrationDismissed, setCelebrationDismissed] = useState(false);
   const [period, setPeriod] = useState<"week" | "month" | "year">("week");
 
@@ -63,11 +119,24 @@ export default function ProgressPage() {
 
   // Calculate stats
   const completedGoals = goals.filter((g) => g.status === "completed");
+  const inProgressGoals = goals.filter((g) => g.status === "active");
   const totalSteps = goals.reduce((sum, g) => sum + g.steps.length, 0);
   const completedSteps = goals.reduce(
     (sum, g) => sum + g.steps.filter((s) => s.completed).length,
     0
   );
+
+  const goalCategoryCounts = completedGoals.reduce((acc, g) => {
+    acc[g.category] = (acc[g.category] || 0) + 1;
+    return acc;
+  }, {} as Record<GoalCategory, number>);
+  const topCategory = (Object.entries(goalCategoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] as GoalCategory) || null;
+
+  const likedProuds = checkIns.filter((c) => progressLikes.achievements.includes(c.id));
+  const likedLearnings = checkIns.filter((c) => progressLikes.reflection.includes(c.id));
+
+  const toggleLike = (type: "achievements" | "reflection", checkInId: string) =>
+    setProgressLikes(toggleProgressLike(type, checkInId));
 
   // Get recent energy levels from check-ins
   const recentCheckIns = [...checkIns]
@@ -113,9 +182,22 @@ export default function ProgressPage() {
             </div>
             <h2 className="text-xl text-[var(--color-charcoal)] mb-2">Your journey starts here</h2>
             <p className="text-text-muted max-w-xs">
-              Complete your first check-in and set a goal to start tracking your
-              progress.
+              Set a goal and do your first check-in to start tracking your progress.
             </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 w-full max-w-md">
+              <button
+                onClick={() => router.push("/goals/new")}
+                className="py-3 px-4 bg-brand-primary text-white rounded-2xl font-semibold hover:bg-brand-primary/90 transition"
+              >
+                Set your first goal
+              </button>
+              <button
+                onClick={() => router.push("/checkin")}
+                className="py-3 px-4 bg-white border border-gray-200 rounded-2xl font-semibold text-[var(--color-charcoal)] hover:bg-gray-50 transition"
+              >
+                Start weekly check-in
+              </button>
+            </div>
           </section>
         ) : (
           <>
@@ -149,324 +231,297 @@ export default function ProgressPage() {
               </section>
             )}
 
-            {/* Your Achievements Section - Bento Row */}
+            {/* Section 2: This week's win */}
             <section className="mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                {/* Left Column - 25% Weekly Energy */}
-                <div className="col-span-1 bg-brand-primary rounded-2xl p-5 flex flex-col">
-                  {/* Header */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-white" />
-                    </div>
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">This week&apos;s win</h2>
+                  <p className="text-sm text-text-muted">Celebrate what you&apos;ve moved forward this week.</p>
+                </div>
+                {checkInDue && (
+                  <button
+                    onClick={() => router.push("/checkin")}
+                    className="py-2 px-4 bg-brand-primary text-white rounded-xl text-xs font-semibold hover:bg-brand-primary/90 transition"
+                  >
+                    Do this week&apos;s check-in
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Goals summary */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold text-white">Energy Level</h3>
-                      <p className="text-xs text-white/70">from weekly check-ins</p>
+                      <h3 className="text-base font-semibold text-[var(--color-charcoal)]">Goals</h3>
+                      <p className="text-xs text-text-muted">Completed & in progress</p>
                     </div>
+                    <Trophy className="w-6 h-6 text-brand-primary" />
                   </div>
-                  {/* Content */}
-                  <div className="flex-1 flex flex-col items-center justify-center text-center">
-                    <p className="text-5xl font-bold text-white mb-1">
-                      {latestEnergy ?? baseline.energyLevel ?? 0}<span className="text-xl font-normal text-white/70">/5</span>
-                    </p>
-                    {previousEnergy !== null && latestEnergy !== null && latestEnergy !== previousEnergy ? (
-                      <p className="text-xs text-white/80 uppercase tracking-wide">
-                        {latestEnergy > previousEnergy ? "↑" : "↓"} {Math.abs(latestEnergy - previousEnergy)} vs last week
-                      </p>
-                    ) : (
-                      <p className="text-xs text-white/80 uppercase tracking-wide">No Change</p>
-                    )}
+                  <div className="grid grid-cols-2 gap-4">
+                    <GoalRing
+                      label="Completed"
+                      value={completedGoals.length}
+                      total={goals.length}
+                      icon={Check}
+                      accent="rgba(155, 81, 224, 0.85)"
+                    />
+                    <GoalRing
+                      label="In progress"
+                      value={inProgressGoals.length}
+                      total={goals.length}
+                      icon={Zap}
+                      accent="rgba(52, 211, 153, 0.85)"
+                    />
                   </div>
-                  {/* Motivational Quote */}
-                  <p className="text-sm text-white/70 italic text-center mt-4">
-                    Energy flows where attention goes.
-                  </p>
+
+                  {goals.length === 0 && (
+                    <div className="mt-4 p-4 bg-brand-primary/5 rounded-2xl border border-brand-primary/10 text-center">
+                      <p className="text-sm font-medium text-brand-primary">You haven&apos;t set a goal yet.</p>
+                      <button
+                        onClick={() => router.push("/goals/new")}
+                        className="mt-3 px-4 py-2 bg-brand-primary text-white rounded-xl text-sm font-semibold hover:bg-brand-primary/90 transition"
+                      >
+                        Set your first goal
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Right Column - 75% Achievements */}
-                <div className="col-span-1 md:col-span-3 mt-5 mx-4 mb0">
-                  {/* Header with period tabs */}
-                  <div className="flex items-start justify-between mb-4">
+                {/* Weekly check-in win */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
-                        Your Achievements
-                      </h2>
-                      <p className="text-sm text-text-muted">
-                        {period === "week" && "This week's progress"}
-                        {period === "month" && "This month's stats"}
-                        {period === "year" && "This year's stats"}
-                      </p>
+                      <h3 className="text-base font-semibold text-[var(--color-charcoal)]">This week&apos;s win</h3>
+                      <p className="text-xs text-text-muted">Capture what went well and what you learned.</p>
                     </div>
-                    <div className="flex gap-1 bg-gray-100 rounded-lg p-1 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                      {(["week", "month", "year"] as const).map((p) => (
+                    {thisWeekCheckIn && (
+                      <span className="text-xs text-text-muted uppercase tracking-wide">
+                        {new Date(thisWeekCheckIn.createdAt).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </span>
+                    )}
+                  </div>
+
+                  {checkInDue ? (
+                    <div className="flex flex-col gap-3">
+                      <div className="p-4 bg-gray-50 rounded-2xl text-center">
+                        <p className="text-sm text-text-muted">
+                          Complete a check-in to capture your proud moments and learnings.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => router.push("/checkin")}
+                        className="w-full py-3 bg-brand-primary text-white rounded-2xl font-semibold hover:bg-brand-primary/90 transition"
+                      >
+                        Do this week&apos;s check-in
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="relative p-4 bg-gray-50 rounded-2xl border border-gray-100">
                         <button
-                          key={p}
-                          onClick={() => setPeriod(p)}
-                          className={`px-3 py-1 text-xs rounded-md transition-colors ${
-                            period === p
-                              ? "bg-white text-[var(--color-charcoal)] shadow-sm"
-                              : "text-text-muted hover:text-[var(--color-charcoal)]"
+                          onClick={() => thisWeekCheckIn && toggleLike("achievements", thisWeekCheckIn.id)}
+                          className={`absolute top-3 right-3 p-1 rounded-full transition-colors ${
+                            thisWeekCheckIn && progressLikes.achievements.includes(thisWeekCheckIn.id)
+                              ? "bg-brand-primary/20 text-brand-primary"
+                              : "bg-white/80 text-gray-400 hover:bg-gray-100"
                           }`}
+                          aria-label="Save proud moment"
                         >
-                          {p.charAt(0).toUpperCase() + p.slice(1)}
+                          <Heart className="w-5 h-5" />
                         </button>
-                      ))}
-                    </div>
-                  </div>
 
-                  {/* Stats Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-0">
-                    {/* Streak - First */}
-                    <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                        Check-in Streak
-                      </p>
-                      <p className="text-3xl font-bold text-brand-primary flex items-center gap-1">
-                        {momentum > 0 && <Flame className="w-6 h-6" />}
-                        {momentum}
-                      </p>
-                      <p className="text-xs text-text-subtle mt-2 italic">
-                        {checkInDue ? "Check in to extend!" : "Keep it going!"}
-                      </p>
-                    </div>
+                        <p className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">Proud of</p>
+                        <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">
+                          {thisWeekCheckIn?.achievements?.trim() || "No proud moments recorded yet."}
+                        </p>
+                      </div>
 
-                    {/* Goals Completed */}
-                    <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                        Goals Achieved
-                      </p>
-                      <p className="text-3xl font-bold text-[var(--color-charcoal)]">
-                        {completedGoals.length}
-                      </p>
-                      <p className="text-xs text-text-subtle mt-2 italic">
-                        {completedGoals.length === 0 
-                          ? "Your journey begins now" 
-                          : completedGoals.length === 1 
-                          ? "Great start!" 
-                          : "You're making progress!"}
-                      </p>
-                    </div>
+                      <div className="relative p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <button
+                          onClick={() => thisWeekCheckIn && toggleLike("reflection", thisWeekCheckIn.id)}
+                          className={`absolute top-3 right-3 p-1 rounded-full transition-colors ${
+                            thisWeekCheckIn && progressLikes.reflection.includes(thisWeekCheckIn.id)
+                              ? "bg-brand-primary/20 text-brand-primary"
+                              : "bg-white/80 text-gray-400 hover:bg-gray-100"
+                          }`}
+                          aria-label="Save learning"
+                        >
+                          <Heart className="w-5 h-5" />
+                        </button>
 
-                    {/* Steps Done */}
-                    <div className="bg-white rounded-xl p-4 min-h-[120px] flex flex-col items-center justify-center text-center border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)]">
-                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">
-                        Steps Done
-                      </p>
-                      <p className="text-3xl font-bold text-[var(--color-charcoal)]">
-                        {completedSteps}/{totalSteps}
-                      </p>
-                      <p className="text-xs text-text-subtle mt-2 italic">
-                        {totalSteps === 0 
-                          ? "Plan your first steps" 
-                          : completedSteps === 0 
-                          ? "Take that first step!" 
-                          : completedSteps >= totalSteps 
-                          ? "Amazing work!" 
-                          : "Keep moving forward!"}
-                      </p>
+                        <p className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">Learning</p>
+                        <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">
+                          {thisWeekCheckIn?.reflection?.trim() || "No learning recorded yet."}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Check-in prompt */}
-                  {checkInDue && (
-                    <button
-                      onClick={() => router.push("/checkin")}
-                      className="w-full mt-4 py-3 text-brand-primary font-medium text-sm hover:bg-brand-primary/5 rounded-lg transition-colors"
-                    >
-                      Complete your weekly check-in →
-                    </button>
                   )}
                 </div>
               </div>
             </section>
 
-            {/* Divider */}
-            <hr className="border-gray-200 my-6" />
-
-            {/* Bento Grid Section */}
+            {/* Section 3: Overall achievements */}
             <section className="mb-6">
-              {/* Section Header */}
-              <div className="mb-4 mx-4">
-                <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">
-                  Where You Stand Now
-                </h2>
-                <p className="text-sm text-text-muted">vs where you started</p>
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">Overall achievements</h2>
+                  <p className="text-sm text-text-muted">A snapshot of what you&apos;ve built so far.</p>
+                </div>
               </div>
 
-              {/* Row 1: 2 columns + 1 column */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-                {/* Wellbeing Card */}
-                <div className="col-span-1 sm:col-span-2 bg-white rounded-2xl p-8 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[180px] relative overflow-hidden">
-                  {/* Decorative Icon */}
-                  <Sprout className="absolute right-8 bottom-4 w-48 h-48 text-brand-primary/5 transform rotate-12" />
-                  {/* Header */}
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-11 h-11 bg-brand-primary/10 rounded-xl flex items-center justify-center">
-                      <Sprout className="w-6 h-6 text-brand-primary" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-[var(--color-charcoal)]">Wellbeing</h3>
-                  </div>
-                  {/* Stats Row */}
-                  <div className="flex justify-between mb-5">
-                    <div>
-                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">State of Calm</p>
-                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                        {baseline.stressLevel === 5 ? "Very High" :
-                         baseline.stressLevel === 4 ? "High" :
-                         baseline.stressLevel === 3 ? "Moderate" :
-                         baseline.stressLevel === 2 ? "Low" : "Very Low"}
-                      </p>
-                      <p className="text-[10px] text-brand-primary uppercase tracking-wide mt-1">No Change</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Balance</p>
-                      <p className="text-2xl font-bold text-[var(--color-charcoal)]">
-                        {baseline.lifeBalance}<span className="text-base font-normal text-text-muted">/5</span>
-                      </p>
-                      <p className="text-[10px] text-brand-primary uppercase tracking-wide mt-1">No Change</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Energy</p>
-                      {(() => {
-                        const baselineEnergy = baseline.energyLevel ?? 0;
-                        const currentEnergy = latestEnergy ?? baselineEnergy;
-                        if (baselineEnergy === 0) return <p className="text-2xl font-bold text-brand-primary">+0%</p>;
-                        const percentChange = Math.round(((currentEnergy - baselineEnergy) / baselineEnergy) * 100);
-                        const arrow = percentChange > 0 ? "↑" : percentChange < 0 ? "↓" : "";
-                        const isNegative = percentChange < 0;
-                        return (
-                          <p className={`text-2xl font-bold flex items-center gap-1 ${isNegative ? "text-[var(--color-charcoal)]" : "text-brand-primary"}`}>
-                            {arrow}
-                            {percentChange >= 0 ? `+${percentChange}%` : `${percentChange}%`}
-                          </p>
-                        );
-                      })()}
-                    </div>
-                  </div>
-                  {/* State-based message */}
-                  <p className="text-base text-text-muted italic">
-                    {(baseline.stressLevel ?? 0) >= 4 
-                      ? "Your energy is currently grounded and stable."
-                      : (baseline.stressLevel ?? 0) === 3
-                      ? "You're finding your balance. Keep nurturing yourself."
-                      : "Small steps forward still count. You've got this."}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Goals completed</p>
+                  <p className="text-3xl font-bold text-brand-primary">{completedGoals.length}</p>
+                  <p className="text-xs text-text-muted mt-2">
+                    {completedGoals.length === 0 ? "Start by setting a goal" : "Keep going — you’re building momentum!"}
                   </p>
                 </div>
-                {/* Satisfaction Card - Gradient */}
-                <div className="col-span-1 bg-brand-gradient rounded-2xl p-8 min-h-[180px] flex flex-col">
-                  {/* Header */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                      <Smile className="w-5 h-5 text-white" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-white">Satisfaction</h3>
+
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <p className="text-xs text-text-muted uppercase tracking-wide mb-2">Top category</p>
+                  <p className="text-3xl font-bold text-[var(--color-charcoal)]">{topCategory || "—"}</p>
+                  <p className="text-xs text-text-muted mt-2">
+                    {topCategory
+                      ? `${goalCategoryCounts[topCategory]} completed goal${goalCategoryCounts[topCategory] !== 1 ? "s" : ""}`
+                      : "Add a completed goal to see trends"}
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-text-muted uppercase tracking-wide">Check-in streak</p>
+                    <Flame className="w-5 h-5 text-brand-primary" />
                   </div>
-                  {/* Content */}
-                  <div className="flex flex-col items-center justify-center text-center mb-4">
-                    <p className="text-7xl font-bold text-white mb-1">
-                      {baseline.situationSatisfaction ?? 0}<span className="text-2xl font-normal text-white/70">/5</span>
-                    </p>
-                    <p className="text-xs text-white/80 uppercase tracking-wide">No Change</p>
-                  </div>
-                  {/* Motivational tagline - pushed to bottom */}
-                  <p className="text-base text-white/80 italic text-center mt-auto">
-                    {(baseline.situationSatisfaction ?? 0) >= 4 
-                      ? "You're on a great path!"
-                      : (baseline.situationSatisfaction ?? 0) === 3
-                      ? "Room to grow, and that's exciting."
-                      : "Every step forward counts."}
+                  <p className="text-3xl font-bold text-brand-primary">{momentum}</p>
+                  <p className="text-xs text-text-muted mt-2">
+                    {checkInDue ? "Check in this week to keep it alive" : "Keep it going!"}
                   </p>
                 </div>
               </div>
 
-              {/* Row 2: 3 equal columns */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {/* Confidence Card */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[160px] flex flex-col items-center justify-center text-center relative overflow-hidden">
-                  {/* Decorative Icon */}
-                  <Shield className="absolute -left-6 -top-6 w-28 h-28 text-brand-primary/5 transform -rotate-12" />
-                  <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-3">
-                    <Shield className="w-5 h-5 text-brand-primary" />
-                  </div>
-                  <p className="text-sm font-medium text-[var(--color-charcoal)] mb-1">Confidence</p>
-                  <p className="text-xl font-bold text-brand-primary mb-1">
-                    {baseline.confidence === 5 ? "Very Strong" :
-                     baseline.confidence === 4 ? "Strong" :
-                     baseline.confidence === 3 ? "Moderate" :
-                     baseline.confidence === 2 ? "Low" : "Very Low"}
-                  </p>
-                  <p className="text-[10px] text-brand-primary uppercase tracking-wide mb-2">No Change</p>
-                  <p className="text-sm text-text-muted italic">
-                    {(baseline.confidence ?? 0) >= 4 
-                      ? "You believe in yourself!"
-                      : (baseline.confidence ?? 0) === 3
-                      ? "Building momentum."
-                      : "One step at a time."}
-                  </p>
-                </div>
+              {(likedProuds.length > 0 || likedLearnings.length > 0) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {likedProuds.length > 0 && (
+                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-sm font-semibold text-[var(--color-charcoal)]">Saved proud moments</p>
+                        <span className="text-xs text-text-muted">{likedProuds.length}</span>
+                      </div>
+                      <div className="space-y-3">
+                        {likedProuds.slice(0, 2).map((checkIn) => (
+                          <div key={checkIn.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                            <Sparkles className="w-5 h-5 text-brand-primary mt-1" />
+                            <div className="flex-1">
+                              <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">{checkIn.achievements}</p>
+                              <p className="text-[10px] text-text-muted mt-1">{new Date(checkIn.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <button
+                              onClick={() => toggleLike("achievements", checkIn.id)}
+                              className="p-1 rounded-full text-brand-primary hover:bg-brand-primary/10"
+                              aria-label="Remove saved proud moment"
+                            >
+                              <Heart className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      {likedProuds.length > 2 && (
+                        <button
+                          onClick={() => router.push("/progress/proud")}
+                          className="mt-4 w-full py-2 bg-brand-primary text-white rounded-xl text-sm font-semibold hover:bg-brand-primary/90 transition"
+                        >
+                          View all proud moments
+                        </button>
+                      )}
+                    </div>
+                  )}
 
-                {/* Future Clarity Card */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[160px] flex flex-col items-center justify-center text-center relative overflow-hidden">
-                  {/* Decorative Icon */}
-                  <Target className="absolute -right-4 -bottom-4 w-24 h-24 text-brand-primary/5 transform rotate-6" />
-                  <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-3">
-                    <Target className="w-5 h-5 text-brand-primary" />
-                  </div>
-                  <p className="text-sm font-medium text-[var(--color-charcoal)] mb-1">Future Clarity</p>
-                  <p className="text-xl font-bold text-brand-primary mb-1">
-                    {baseline.futureClarity === 5 ? "Very Clear" :
-                     baseline.futureClarity === 4 ? "Clear" :
-                     baseline.futureClarity === 3 ? "Moderate" :
-                     baseline.futureClarity === 2 ? "Unclear" : "Very Unclear"}
-                  </p>
-                  <p className="text-[10px] text-brand-primary uppercase tracking-wide mb-2">No Change</p>
-                  <p className="text-sm text-text-muted italic">
-                    {(baseline.futureClarity ?? 0) >= 4 
-                      ? "Your path is clear."
-                      : (baseline.futureClarity ?? 0) === 3
-                      ? "Clarity comes with action."
-                      : "Explore your possibilities."}
-                  </p>
+                  {likedLearnings.length > 0 && (
+                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-sm font-semibold text-[var(--color-charcoal)]">Saved learnings</p>
+                        <span className="text-xs text-text-muted">{likedLearnings.length}</span>
+                      </div>
+                      <div className="space-y-3">
+                        {likedLearnings.slice(0, 2).map((checkIn) => (
+                          <div key={checkIn.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                            <Sparkles className="w-5 h-5 text-brand-primary mt-1" />
+                            <div className="flex-1">
+                              <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">{checkIn.reflection}</p>
+                              <p className="text-[10px] text-text-muted mt-1">{new Date(checkIn.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <button
+                              onClick={() => toggleLike("reflection", checkIn.id)}
+                              className="p-1 rounded-full text-brand-primary hover:bg-brand-primary/10"
+                              aria-label="Remove saved learning"
+                            >
+                              <Heart className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      {likedLearnings.length > 2 && (
+                        <button
+                          onClick={() => router.push("/progress/learnings")}
+                          className="mt-4 w-full py-2 bg-brand-primary text-white rounded-xl text-sm font-semibold hover:bg-brand-primary/90 transition"
+                        >
+                          View all learnings
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
-
-                {/* Future Positivity Card */}
-                <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_0_15px_rgba(0,0,0,0.08)] min-h-[160px] flex flex-col items-center justify-center text-center relative overflow-hidden">
-                  {/* Decorative Icon */}
-                  <Sparkles className="absolute -right-4 top-1/2 -translate-y-1/2 w-24 h-24 text-brand-primary/5 transform rotate-6" />
-                  <div className="w-12 h-12 bg-brand-primary/10 rounded-full flex items-center justify-center mb-3">
-                    <Sparkles className="w-5 h-5 text-brand-primary" />
-                  </div>
-                  <p className="text-sm font-medium text-[var(--color-charcoal)] mb-1">Future Positivity</p>
-                  <p className="text-xl font-bold text-brand-primary mb-1">
-                    {baseline.futureHope === 5 ? "Very High" :
-                     baseline.futureHope === 4 ? "High" :
-                     baseline.futureHope === 3 ? "Moderate" :
-                     baseline.futureHope === 2 ? "Low" : "Very Low"}
-                  </p>
-                  <p className="text-[10px] text-brand-primary uppercase tracking-wide mb-2">No Change</p>
-                  <p className="text-sm text-text-muted italic">
-                    {(baseline.futureHope ?? 0) >= 4 
-                      ? "The future looks bright!"
-                      : (baseline.futureHope ?? 0) === 3
-                      ? "Hope is growing."
-                      : "Every day is a fresh start."}
-                  </p>
-                </div>
-              </div>
-
-              {/* Baseline date */}
-              {baseline.completedAt && (
-                <p className="text-xs text-brand-primary text-center mt-8">
-                  Baseline recorded{" "}
-                  {new Date(baseline.completedAt).toLocaleDateString("en-AU", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
               )}
             </section>
 
+            {/* Section 4: Review where you started */}
+            <section className="mb-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">Review where you started</h2>
+                  <p className="text-sm text-text-muted">Your baseline snapshot helps you see progress.</p>
+                </div>
+              </div>
+
+              <div
+                onClick={() => router.push("/onboarding/baseline")}
+                className="cursor-pointer bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4 hover:shadow-md transition"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-[var(--color-charcoal)]">Baseline details</p>
+                    <p className="text-xs text-text-muted">Tap to review and update your starting point.</p>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-text-muted" />
+                </div>
+
+                {hasBaseline ? (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-brand-primary/5 rounded-xl p-3 text-center">
+                      <p className="text-[10px] text-text-muted uppercase tracking-wide">Energy</p>
+                      <p className="text-xl font-bold text-brand-primary">{baseline.energyLevel ?? "—"}</p>
+                    </div>
+                    <div className="bg-brand-primary/5 rounded-xl p-3 text-center">
+                      <p className="text-[10px] text-text-muted uppercase tracking-wide">Stress</p>
+                      <p className="text-xl font-bold text-brand-primary">{baseline.stressLevel ?? "—"}</p>
+                    </div>
+                    <div className="bg-brand-primary/5 rounded-xl p-3 text-center">
+                      <p className="text-[10px] text-text-muted uppercase tracking-wide">Confidence</p>
+                      <p className="text-xl font-bold text-brand-primary">{baseline.confidence ?? "—"}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-gray-50 rounded-xl">
+                    <p className="text-sm text-text-muted">Complete the baseline quiz to compare where you started with where you are now.</p>
+                  </div>
+                )}
+              </div>
+            </section>
           </>
         )}
 
