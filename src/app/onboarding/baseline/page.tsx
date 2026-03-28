@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FullScreenLayout,
@@ -15,11 +15,12 @@ import {
   completeBaseline,
   saveOnboardingState,
   completeOnboarding,
+  getBaselineResponse,
   type WorkStatus,
   type BaselineResponse,
   SkillsCurrentStatus,
 } from "@/lib/storage";
-import { Sunrise, Sunset, Sparkles } from "lucide-react";
+import { Sunrise, Sunset, Sparkles, Lightbulb, ChevronLeft } from "lucide-react";
 
 // =============================================================================
 // Question Data
@@ -84,6 +85,8 @@ type ReminderDay = "sunday" | "monday" | "tuesday" | "wednesday" | "thursday" | 
 export default function BaselinePage() {
   const router = useRouter();
   const [currentSection, setCurrentSection] = useState(0);
+  const [showSummary, setShowSummary] = useState(false);
+  const [baseline, setBaseline] = useState<BaselineResponse | null>(null);
 
   // Form state - all questions
   const [responses, setResponses] = useState<Partial<BaselineResponse>>({});
@@ -92,6 +95,14 @@ export default function BaselinePage() {
   const [reminderDay, setReminderDay] = useState<ReminderDay | null>(null);
   const [reminderTime, setReminderTime] = useState<ReminderTime | null>(null);
   const [showCelebration, setShowCelebration] = useState(false);
+
+  useEffect(() => {
+    const savedBaseline = getBaselineResponse();
+    if (savedBaseline && Object.keys(savedBaseline).length > 0) {
+      setBaseline(savedBaseline);
+      setShowSummary(true);
+    }
+  }, []);
 
   const updateResponse = <K extends keyof BaselineResponse>(
     key: K,
@@ -170,6 +181,66 @@ export default function BaselinePage() {
         buttonText="GO TO DASHBOARD"
         onButtonClick={handleFinish}
       />
+    );
+  }
+
+  // Show summary view if baseline data exists
+  if (showSummary && baseline) {
+    return (
+      <FullScreenLayout bgClass="bg-white">
+        <div className="max-w-5xl mx-auto px-6 py-8 w-full">
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <Lightbulb className="w-6 h-6 text-brand-primary" />
+            <h1 className="text-2xl font-bold text-[var(--color-charcoal)]">About U Checkin</h1>
+          </div>
+
+          {/* Status Message */}
+          <div className="bg-brand-primary/10 rounded-2xl p-4 mb-6 border border-brand-primary/20">
+            <div className="flex gap-3">
+              <Sparkles className="w-5 h-5 text-brand-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-brand-primary font-medium">
+                  Your About U checkin was completed on {baseline.completedAt ? new Date(baseline.completedAt).toLocaleDateString() : "—"}.
+                </p>
+                <p className="text-xs text-brand-primary/70 mt-1">Your next checkin will be available after 90 days on {baseline.completedAt ? new Date(new Date(baseline.completedAt).getTime() + 90 * 24 * 60 * 60 * 1000).toLocaleDateString() : "—"}.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Metrics */}
+          <div className="space-y-4 mb-8">
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-wide mb-3">Wellbeing</p>
+              <p className="text-4xl font-bold text-[var(--color-charcoal)]">{baseline.energyLevel ?? "—"}<span className="text-xl text-text-muted">/5</span></p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-wide mb-3">Satisfaction</p>
+              <p className="text-4xl font-bold text-[var(--color-charcoal)]">{baseline.situationSatisfaction ?? "—"}<span className="text-xl text-text-muted">/5</span></p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-wide mb-3">Confidence</p>
+              <p className="text-4xl font-bold text-[var(--color-charcoal)]">{baseline.confidence ?? "—"}<span className="text-xl text-text-muted">/5</span></p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <p className="text-xs font-bold text-brand-primary uppercase tracking-wide mb-3">Future Clarity</p>
+              <p className="text-4xl font-bold text-[var(--color-charcoal)]">{baseline.futureClarity ?? "—"}<span className="text-xl text-text-muted">/5</span></p>
+            </div>
+          </div>
+
+          {/* Back Button */}
+          <button
+            onClick={() => router.push("/progress")}
+            className="flex items-center gap-2 text-brand-primary font-semibold hover:text-brand-primary/80 transition"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            Back to Progress
+          </button>
+        </div>
+      </FullScreenLayout>
     );
   }
 

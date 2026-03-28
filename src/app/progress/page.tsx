@@ -33,6 +33,7 @@ import {
   Heart,
   ChevronRight,
   Check,
+  Lightbulb,
 } from "lucide-react";
 
 /**
@@ -538,45 +539,25 @@ export default function ProgressPage() {
 
             {/* Section 4: Review where you started */}
             <section className="mb-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-[var(--color-charcoal)]">Review where you started</h2>
-                  <p className="text-sm text-text-muted">Your baseline snapshot helps you see progress.</p>
-                </div>
-              </div>
-
               <div
                 onClick={() => router.push("/onboarding/baseline")}
-                className="cursor-pointer bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4 hover:shadow-md transition"
+                className="cursor-pointer bg-brand-gradient rounded-3xl shadow-md p-6 flex items-center justify-between hover:shadow-lg transition"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-[var(--color-charcoal)]">Baseline details</p>
-                    <p className="text-xs text-text-muted">Tap to review and update your starting point.</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-text-muted" />
+                <div>
+                  {hasBaseline ? (
+                    <>
+                      <p className="text-white font-semibold text-lg">Review where you started</p>
+                      <p className="text-white/80 text-sm mt-1">Compare your progress over time</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-white font-semibold text-lg">Discover where you</p>
+                      <p className="text-white font-semibold text-lg">are now vs where</p>
+                      <p className="text-white font-semibold text-lg">you started →</p>
+                    </>
+                  )}
                 </div>
-
-                {hasBaseline ? (
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="bg-brand-primary/5 rounded-xl p-3 text-center">
-                      <p className="text-[10px] text-text-muted uppercase tracking-wide">Energy</p>
-                      <p className="text-xl font-bold text-brand-primary">{baseline.energyLevel ?? "—"}</p>
-                    </div>
-                    <div className="bg-brand-primary/5 rounded-xl p-3 text-center">
-                      <p className="text-[10px] text-text-muted uppercase tracking-wide">Stress</p>
-                      <p className="text-xl font-bold text-brand-primary">{baseline.stressLevel ?? "—"}</p>
-                    </div>
-                    <div className="bg-brand-primary/5 rounded-xl p-3 text-center">
-                      <p className="text-[10px] text-text-muted uppercase tracking-wide">Confidence</p>
-                      <p className="text-xl font-bold text-brand-primary">{baseline.confidence ?? "—"}</p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="p-4 bg-gray-50 rounded-xl">
-                    <p className="text-sm text-text-muted">Complete the baseline quiz to compare where you started with where you are now.</p>
-                  </div>
-                )}
+                <Lightbulb className="w-8 h-8 text-white flex-shrink-0" />
               </div>
             </section>
           </>
