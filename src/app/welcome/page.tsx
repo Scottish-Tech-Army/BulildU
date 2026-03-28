@@ -41,11 +41,11 @@ export default function WelcomePage() {
 
           {/* Value proposition */}
           <div>
-            <h1 className="text-[var(--color-charcoal)]">
+            <h2 className="text-[var(--color-charcoal)]">
               Step into your potential
               {/* <br /> */}
 
-            </h1>
+            </h2>
           </div>
         </div>
       </FullScreenLayout.Content>
@@ -59,7 +59,7 @@ export default function WelcomePage() {
             onClick={handleSignIn}
             className="text-[var(--color-charcoal)] hover:text-[var(--color-primary)] transition-colors"
           >
-            SignIn
+            Sign In
           </button>
         </div>
       </FullScreenLayout.Footer>

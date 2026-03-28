@@ -63,7 +63,7 @@ export default function DiscoveryPage() {
             <Lightbulb className="w-8 h-8 text-brand-primary" />
             <h1 className="text-2xl text-[var(--color-charcoal)]">Discovery</h1>
           </div>
-          <p className="text-text-muted mt-1">Move towards your potential</p>
+          <p className="text-text-muted mt-1">Step into your potential</p>
         </div>
       </header>
 

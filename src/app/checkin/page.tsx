@@ -148,7 +148,7 @@ export default function CheckInPage() {
                     autoFocus
                     value={draft.achievements}
                     onChange={(e) => setDraft({ ...draft, achievements: e.target.value })}
-                    placeholder="I completed my first workout... or, I had a difficult conversation I'd been putting off..."
+                    placeholder="e.g. I completed my first workout... or, I had a difficult conversation I'd been putting off..."
                     // className="w-full min-h-[180px] p-5 rounded-2xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-primary/20 text-gray-900 text-base resize-none"
                     className="w-full min-h-[180px] p-5 rounded-2xl bg-gray-50 border-none focus:outline-none focus:ring-2 focus:ring-brand-primary/40 text-gray-900 text-base resize-none"
 
@@ -175,7 +175,7 @@ export default function CheckInPage() {
                     autoFocus
                     value={draft.reflection}
                     onChange={(e) => setDraft({ ...draft, reflection: e.target.value })}
-                    placeholder="It felt good to start that habit... or, busy week, need to refocus..."
+                    placeholder="e.g. It felt good to start that habit... or, busy week, need to refocus..."
                     className="w-full min-h-[180px] p-5 rounded-2xl bg-gray-50 border-none focus:outline-none focus:ring-2 focus:ring-brand-primary/40 text-gray-900 text-base resize-none"
                   />
                 </div>

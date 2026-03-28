@@ -67,15 +67,15 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   "Career": {
     tip: "Career goals help you shape your professional future - whether that's aiming for a promotion, exploring a new role, or taking steps toward self-employment. This is your space to set goals that move you toward the career path you truly want, at a pace that works for you.",
     description: "Shape your professional future",
-    titlePlaceholder: "e.g. Apply for 3 new job opportunities in my field",
-    whyPlaceholder: "e.g. I want to feel more confident in my professional skills and open up new opportunities for growth...",
+    titlePlaceholder: "e.g. Apply for 3 new jobs",
+    whyPlaceholder: "e.g. I want to feel more confident in my professional skills and open up new opportunities for growth",
     measurablePlaceholder: "e.g. Apply for 3 jobs, update my CV, complete 2 networking conversations, secure 1 interview...",
     stepPlaceholder: "e.g. Update CV and LinkedIn profile"
   },
   "Wellbeing": {
     tip: "Wellbeing goals help you care for yourself so you can thrive in all areas of life. You might set a goal to take part in activities that re-energise you, such as a weekly nature walk, or to prioritise rest and recovery through intentional downtime or a calming evening routine.",
     description: "Support your physical and mental health",
-    titlePlaceholder: "e.g. Go for a 30-minute walk 3 times a week",
+    titlePlaceholder: "e.g. 30-min walk 3× weekly",
     whyPlaceholder: "e.g. I want to feel more energised so I can spend better quality time with my family...",
     measurablePlaceholder: "e.g. Complete 3 walks per week, feel more rested, notice improved energy levels...",
     stepPlaceholder: "e.g. Schedule 3 walks in my calendar"
@@ -83,7 +83,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   "Skills, Education & Learning": {
     tip: "Personal growth is your opportunity to expand your knowledge and skills through lifelong learning. You might set a goal to enrol in a short, accredited qualification, take an online course to build a new skill, or pursue learning that supports both personal and professional development.",
     description: "Build new skills and knowledge",
-    titlePlaceholder: "e.g. Complete an online course in digital marketing",
+    titlePlaceholder: "e.g. Learn basic coding skills",
     whyPlaceholder: "e.g. I want to build new skills that will help me feel more capable and confident in different areas of my life...",
     measurablePlaceholder: "e.g. Complete 1 online course, practice new skill 3 times per week, earn a certificate...",
     stepPlaceholder: "e.g. Research and enroll in a course"
@@ -91,7 +91,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   "Relationships": {
     tip: "Relationships are key to a fulfilling life. You might set a goal to spend quality time with family or friends, strengthen important connections, or build professional relationships and networks that support your future opportunities.",
     description: "Nurture the connections that matter",
-    titlePlaceholder: "e.g. Attend an industry event and introduce myself to two professionals.",
+    titlePlaceholder: "e.g. Practice active listening",
     whyPlaceholder: "e.g. I want to strengthen my connections with people who matter to me and feel less isolated...",
     measurablePlaceholder: "e.g. Have 1 meaningful conversation per week, arrange 2 social activities, reconnect with 3 friends...",
     stepPlaceholder: "e.g. Text a friend to attend an event"
@@ -99,7 +99,7 @@ const CATEGORY_CONTENT: Record<GoalCategory, {
   "Finance": {
     tip: "Financial goals help you create stability, security, and a more comfortable way of living. This might include easing financial pressure, enjoying more time and experiences with your family, or having more flexibility and control over your future.",
     description: "Create stability and security",
-    titlePlaceholder: "e.g. Save £500 towards an emergency fund",
+    titlePlaceholder: "e.g. Save £500 travel fund",
     whyPlaceholder: "e.g. I want to feel more secure and have less stress about unexpected expenses...",
     measurablePlaceholder: "e.g. Save £50 per week, reduce spending by £100 per month, build £500 emergency fund...",
     stepPlaceholder: "e.g. Set up automatic savings transfer"
@@ -252,7 +252,7 @@ export default function NewGoalPage() {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <DailyQuote
                   quote="Set goals across the areas that shape your career and your life, so progress feels balanced, sustainable, and true to you."
-                  title="Reflection"
+                  title="Guide"
                 />
               </div>
             )}

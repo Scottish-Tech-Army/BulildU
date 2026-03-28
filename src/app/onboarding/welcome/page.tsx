@@ -88,12 +88,13 @@ export default function WelcomePage() {
             </p>
 
             <p className="mt-4 text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed">
-              This short check-in helps you note how things feel now,
-              so you can see what’s changed later.
+              This quick check-in helps you capture where you are right now.
+              It creates a starting point so you can look back later and see just how far you’ve
+              come.
             </p>
 
             <p className="mt-4 text-base sm:text-lg md:text-xl text-gray-600">
-              It takes about 2 minutes.
+              It takes just a couple of minutes.
             </p>
           </div>
         </div>

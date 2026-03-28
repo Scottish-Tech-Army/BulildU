@@ -159,7 +159,7 @@ export default function GoalsPage() {
               <Target className="w-8 h-8 text-brand-primary" />
               <h1 className="text-2xl text-[var(--color-charcoal)]">Goals</h1>
             </div>
-            <p className="text-text-muted mt-1">Move towards your potential</p>
+            <p className="text-text-muted mt-1">Step into your potential</p>
           </div>
           <div className="flex items-center gap-3">
             <button

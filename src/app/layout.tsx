@@ -18,7 +18,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "empwrU",
-  description: "Move Towards Your Potential",
+  description: "Step into your potential",
   // Private preview - no indexing
   robots: "noindex, nofollow",
   icons: {
