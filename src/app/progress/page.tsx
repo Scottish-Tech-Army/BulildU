@@ -151,6 +151,17 @@ export default function ProgressPage() {
 
   return (
     <div className="min-h-dvh bg-bg-card pb-32 overflow-y-auto">
+      {/* SVG Gradient Definition */}
+      <svg width="0" height="0">
+        <defs>
+          <linearGradient id="heartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#4a0f7e" />
+            <stop offset="45%" stopColor="#bc03b9" />
+            <stop offset="100%" stopColor="#f27321" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       {/* Header */}
       <header className="pt-6 pb-4 bg-white sticky top-0 z-30">
         <div className="max-w-5xl mx-auto px-6">
@@ -368,45 +379,65 @@ export default function ProgressPage() {
                       </button>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="relative p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <button
-                          onClick={() => thisWeekCheckIn && toggleLike("achievements", thisWeekCheckIn.id)}
-                          className={`absolute top-3 right-3 p-1 rounded-full transition-colors ${
-                            thisWeekCheckIn && progressLikes.achievements.includes(thisWeekCheckIn.id)
-                              ? "bg-brand-primary/20 text-brand-primary"
-                              : "bg-white/80 text-gray-400 hover:bg-gray-100"
-                          }`}
-                          aria-label="Save proud moment"
-                        >
-                          <Heart className="w-5 h-5" />
-                        </button>
+                    <>
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="relative p-4 bg-white rounded-2xl border border-gray-100">
+                          <button
+                            onClick={() => thisWeekCheckIn && toggleLike("achievements", thisWeekCheckIn.id)}
+                            className={`absolute top-3 right-3 p-1 rounded-full transition-colors ${
+                              thisWeekCheckIn && progressLikes.achievements.includes(thisWeekCheckIn.id)
+                                ? "text-brand-primary"
+                                : "text-gray-300 hover:text-gray-400"
+                            }`}
+                            aria-label="Save proud moment"
+                          >
+                            <Heart 
+                              className="w-5 h-5" 
+                              fill={thisWeekCheckIn && progressLikes.achievements.includes(thisWeekCheckIn.id) ? "url(#heartGradient)" : "none"}
+                              stroke={thisWeekCheckIn && progressLikes.achievements.includes(thisWeekCheckIn.id) ? "url(#heartGradient)" : "currentColor"}
+                              strokeWidth={thisWeekCheckIn && progressLikes.achievements.includes(thisWeekCheckIn.id) ? 0 : 2}
+                            />
+                          </button>
 
-                        <p className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">Proud of</p>
-                        <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">
-                          {thisWeekCheckIn?.achievements?.trim() || "No proud moments recorded yet."}
-                        </p>
+                          <p className="text-xs font-bold text-brand-primary uppercase tracking-wide mb-2">Proud of</p>
+                          <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">
+                            {thisWeekCheckIn?.achievements?.trim() || "No proud moments recorded yet."}
+                          </p>
+                        </div>
+
+                        <div className="relative p-4 bg-white rounded-2xl border border-gray-100">
+                          <button
+                            onClick={() => thisWeekCheckIn && toggleLike("reflection", thisWeekCheckIn.id)}
+                            className={`absolute top-3 right-3 p-1 rounded-full transition-colors ${
+                              thisWeekCheckIn && progressLikes.reflection.includes(thisWeekCheckIn.id)
+                                ? "text-brand-primary"
+                                : "text-gray-300 hover:text-gray-400"
+                            }`}
+                            aria-label="Save learning"
+                          >
+                            <Heart 
+                              className="w-5 h-5" 
+                              fill={thisWeekCheckIn && progressLikes.reflection.includes(thisWeekCheckIn.id) ? "url(#heartGradient)" : "none"}
+                              stroke={thisWeekCheckIn && progressLikes.reflection.includes(thisWeekCheckIn.id) ? "url(#heartGradient)" : "currentColor"}
+                              strokeWidth={thisWeekCheckIn && progressLikes.reflection.includes(thisWeekCheckIn.id) ? 0 : 2}
+                            />
+                          </button>
+
+                          <p className="text-xs font-bold text-brand-primary uppercase tracking-wide mb-2">Learning</p>
+                          <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">
+                            {thisWeekCheckIn?.reflection?.trim() || "No learning recorded yet."}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="relative p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                        <button
-                          onClick={() => thisWeekCheckIn && toggleLike("reflection", thisWeekCheckIn.id)}
-                          className={`absolute top-3 right-3 p-1 rounded-full transition-colors ${
-                            thisWeekCheckIn && progressLikes.reflection.includes(thisWeekCheckIn.id)
-                              ? "bg-brand-primary/20 text-brand-primary"
-                              : "bg-white/80 text-gray-400 hover:bg-gray-100"
-                          }`}
-                          aria-label="Save learning"
-                        >
-                          <Heart className="w-5 h-5" />
-                        </button>
-
-                        <p className="text-xs font-bold text-text-muted uppercase tracking-wide mb-2">Learning</p>
-                        <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">
-                          {thisWeekCheckIn?.reflection?.trim() || "No learning recorded yet."}
+                      {/* Tip Card */}
+                      <div className="bg-brand-primary/10 rounded-2xl p-4 flex gap-3 mt-3">
+                        <Sparkles className="w-5 h-5 text-brand-primary flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-brand-primary font-medium">
+                          <span className="font-bold">Tip:</span> tap the heart icon to save a proud of or learning memory for later
                         </p>
                       </div>
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -456,25 +487,14 @@ export default function ProgressPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {likedProuds.length > 0 && (
                     <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-sm font-semibold text-[var(--color-charcoal)]">Saved proud moments</p>
-                        <span className="text-xs text-text-muted">{likedProuds.length}</span>
-                      </div>
+                      <p className="text-base font-bold text-[var(--color-charcoal)] mb-4">Proud of</p>
                       <div className="space-y-3">
                         {likedProuds.slice(0, 2).map((checkIn) => (
-                          <div key={checkIn.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                            <Sparkles className="w-5 h-5 text-brand-primary mt-1" />
-                            <div className="flex-1">
+                          <div key={checkIn.id} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
+                            <Heart className="w-5 h-5 flex-shrink-0 mt-0.5" fill="url(#heartGradient)" stroke="url(#heartGradient)" strokeWidth={2} />
+                            <div className="flex-1 min-w-0">
                               <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">{checkIn.achievements}</p>
-                              <p className="text-[10px] text-text-muted mt-1">{new Date(checkIn.createdAt).toLocaleDateString()}</p>
                             </div>
-                            <button
-                              onClick={() => toggleLike("achievements", checkIn.id)}
-                              className="p-1 rounded-full text-brand-primary hover:bg-brand-primary/10"
-                              aria-label="Remove saved proud moment"
-                            >
-                              <Heart className="w-4 h-4" />
-                            </button>
                           </div>
                         ))}
                       </div>
@@ -491,25 +511,14 @@ export default function ProgressPage() {
 
                   {likedLearnings.length > 0 && (
                     <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-sm font-semibold text-[var(--color-charcoal)]">Saved learnings</p>
-                        <span className="text-xs text-text-muted">{likedLearnings.length}</span>
-                      </div>
+                      <p className="text-base font-bold text-[var(--color-charcoal)] mb-4">Learning</p>
                       <div className="space-y-3">
                         {likedLearnings.slice(0, 2).map((checkIn) => (
-                          <div key={checkIn.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                            <Sparkles className="w-5 h-5 text-brand-primary mt-1" />
-                            <div className="flex-1">
+                          <div key={checkIn.id} className="flex gap-3 p-3 bg-gray-50 rounded-xl">
+                            <Heart className="w-5 h-5 flex-shrink-0 mt-0.5" fill="url(#heartGradient)" stroke="url(#heartGradient)" strokeWidth={2} />
+                            <div className="flex-1 min-w-0">
                               <p className="text-sm text-[var(--color-charcoal)] leading-relaxed">{checkIn.reflection}</p>
-                              <p className="text-[10px] text-text-muted mt-1">{new Date(checkIn.createdAt).toLocaleDateString()}</p>
                             </div>
-                            <button
-                              onClick={() => toggleLike("reflection", checkIn.id)}
-                              className="p-1 rounded-full text-brand-primary hover:bg-brand-primary/10"
-                              aria-label="Remove saved learning"
-                            >
-                              <Heart className="w-4 h-4" />
-                            </button>
                           </div>
                         ))}
                       </div>
