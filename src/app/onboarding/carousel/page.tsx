@@ -27,6 +27,13 @@ const ONBOARDING_SCREENS: OnboardingScreen[] = [
     description: "Turn consistent action into visible progress over time, and celebrate your wins along the way",
     // illustration: "/illustrations/onboarding-2.svg",
   },
+  {
+    headline: "Find Encouragement",
+    description:
+      "Chat to Em, empwrU's friendly AI career and life coach, whenever you need guidance on your journey",
+     //illustration: "/illustrations/Em-aicoach-2.png",
+     illustration: "/illustrations/em-aicoachv1-full.png",
+  },
 ];
 
 /**
