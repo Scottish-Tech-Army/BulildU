@@ -67,7 +67,7 @@ export default function AiCoachPage() {
           <div className="flex flex-col items-center gap-5 text-center">
             <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-[var(--color-magenta)] via-[var(--color-deep-violet)] to-[var(--color-pumpkin)] text-white shadow-lg shadow-[rgba(188,3,185,0.25)]">
               <Image
-                src="/illustrations/em-aicoach.png"
+                src="/illustrations/em-aicoachv2-half.png"
                 alt="Em AI Coach"
                 fill
                 className="object-cover"
@@ -116,7 +116,7 @@ export default function AiCoachPage() {
                       <div className="flex items-start gap-3">
                         <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-magenta)]/10">
                           <Image
-                            src="/illustrations/Em-aicoach.png"
+                            src="/illustrations/em-aicoachv2-half.png"
                             alt="Em AI Coach"
                             fill
                             className="object-cover"
